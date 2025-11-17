@@ -19,6 +19,8 @@ export interface Front {
   };
   image: {
     imageUrl: string;
+    overlayColor: string;
+    overlayOpacity: number;
   };
   gradient: {
     from: string;
@@ -27,13 +29,55 @@ export interface Front {
   };
   text: {
     font: "Default" | string;
-    title: string;
-    subtitle: string;
+    title: {
+      content: string;
+      size: number;
+      color: string;
+      font: string;
+      bold: boolean;
+      italic: boolean;
+      underline: boolean;
+      align: "left" | "center" | "right" | "justify";
+      lineHeight: number;
+    };
+    subTitle: {
+      content: string;
+      size: number;
+      color: string;
+      font: string;
+      bold: boolean;
+      italic: boolean;
+      underline: boolean;
+      align: "left" | "center" | "right" | "justify";
+      lineHeight: number;
+    };
     position: {
       x: number;
       y: number;
     };
   };
 }
-export interface Back {}
-export interface Spine {}
+export interface Back {
+  color: {
+    colorCode: string;
+  };
+  description: {
+    content: string;
+    size: number;
+    color: string;
+    font: string;
+  };
+  author: {
+    title: string;
+    content: string;
+    imageUrl: string;
+    size: number;
+    color: string;
+    font: string;
+  };
+}
+export interface Spine {
+  color: {
+    colorCode: string;
+  };
+}

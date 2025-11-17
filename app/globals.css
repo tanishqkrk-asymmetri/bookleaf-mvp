@@ -29,3 +29,53 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/*
+Source - https://stackoverflow.com/a/38163892
+Posted by deathangel908, modified by community. See post 'Timeline' for change history
+Retrieved 2025-11-17, License - CC BY-SA 3.0
+*/
+
+/*Chrome*/
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  input[type="range"] {
+    overflow: hidden;
+    width: 100%;
+    -webkit-appearance: none;
+    background-color: #f3edeb;
+    border-radius: 10px;
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 20px;
+    -webkit-appearance: none;
+    color: #13bba4;
+    margin-top: -1px;
+    border-radius: 10px;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    width: 20px;
+    -webkit-appearance: none;
+    height: 20px;
+    border-radius: 100%;
+    margin-right: 100px;
+    cursor: ew-resize;
+    background: #434343;
+    box-shadow: -200px 0 0 190px #ff5972;
+  }
+}
+/** FF*/
+input[type="range"]::-moz-range-progress {
+  background-color: #ff5972;
+}
+input[type="range"]::-moz-range-track {
+  background-color: #f3edeb;
+}
+/* IE*/
+input[type="range"]::-ms-fill-lower {
+  background-color: #ff5972;
+}
+input[type="range"]::-ms-fill-upper {
+  background-color: #f3edeb;
+}
