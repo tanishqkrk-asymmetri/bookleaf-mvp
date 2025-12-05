@@ -2,7 +2,7 @@
 
 import useDesign from "@/context/DesignContext";
 import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 export default function Canvas({
   selectedView,
@@ -19,6 +19,36 @@ export default function Canvas({
   const titleRef = useRef<HTMLDivElement>(null);
   const subtitleRef = useRef<HTMLDivElement>(null);
   const authorNameRef = useRef<HTMLDivElement>(null);
+
+  // State for dragging and snapping
+  const [isDragging, setIsDragging] = useState(false);
+  const [snapGuides, setSnapGuides] = useState({ showX: false, showY: false });
+
+  // Constants for snapping
+  const SNAP_THRESHOLD = 10; // pixels from center to trigger snap
+  const FRONT_COVER_WIDTH = 487;
+  const FRONT_COVER_HEIGHT = 782;
+  const PADDING = 27; // padding of the front cover
+  const CENTER_X = (FRONT_COVER_WIDTH - PADDING * 2) / 2;
+  const CENTER_Y = (FRONT_COVER_HEIGHT - PADDING - 40) / 2; // 40 is bottom padding
+  // Helper function to apply snapping
+  const applySnapping = (x: number, y: number) => {
+    let snappedX = x;
+    let snappedY = y;
+    const showXGuide = Math.abs(x - CENTER_X) < SNAP_THRESHOLD;
+    const showYGuide = Math.abs(y - CENTER_Y) < SNAP_THRESHOLD;
+
+    if (showXGuide) {
+      snappedX = CENTER_X;
+    }
+    if (showYGuide) {
+      snappedY = CENTER_Y;
+    }
+
+    setSnapGuides({ showX: showXGuide, showY: showYGuide });
+    return { x: snappedX, y: snappedY };
+  };
+
   // Function to determine if a color is dark or light
   const isColorDark = (hexColor: string): boolean => {
     const hex = hexColor.replace("#", "");
@@ -79,7 +109,22 @@ export default function Canvas({
   };
 
   // Handlers for draggable elements
+  const handleDragStart = () => {
+    setIsDragging(true);
+  };
+
+  const handleDragStop = () => {
+    setIsDragging(false);
+    setSnapGuides({ showX: false, showY: false });
+  };
+
   const handleTitleDrag = (e: DraggableEvent, data: DraggableData) => {
+    applySnapping(data.x, data.y);
+  };
+
+  const handleTitleStop = (e: DraggableEvent, data: DraggableData) => {
+    handleDragStop();
+    const snapped = applySnapping(data.x, data.y);
     setDesignData((org) => ({
       ...org,
       coverData: {
@@ -91,8 +136,8 @@ export default function Canvas({
             title: {
               ...org.coverData.front.text.title,
               position: {
-                x: data.x,
-                y: data.y,
+                x: snapped.x,
+                y: snapped.y,
               },
             },
           },
@@ -102,6 +147,12 @@ export default function Canvas({
   };
 
   const handleSubtitleDrag = (e: DraggableEvent, data: DraggableData) => {
+    applySnapping(data.x, data.y);
+  };
+
+  const handleSubtitleStop = (e: DraggableEvent, data: DraggableData) => {
+    handleDragStop();
+    const snapped = applySnapping(data.x, data.y);
     setDesignData((org) => ({
       ...org,
       coverData: {
@@ -113,8 +164,8 @@ export default function Canvas({
             subTitle: {
               ...org.coverData.front.text.subTitle,
               position: {
-                x: data.x,
-                y: data.y,
+                x: snapped.x,
+                y: snapped.y,
               },
             },
           },
@@ -124,6 +175,12 @@ export default function Canvas({
   };
 
   const handleAuthorNameDrag = (e: DraggableEvent, data: DraggableData) => {
+    applySnapping(data.x, data.y);
+  };
+
+  const handleAuthorNameStop = (e: DraggableEvent, data: DraggableData) => {
+    handleDragStop();
+    const snapped = applySnapping(data.x, data.y);
     setDesignData((org) => ({
       ...org,
       coverData: {
@@ -135,8 +192,8 @@ export default function Canvas({
             authorName: {
               ...org.coverData.front.text.authorName,
               position: {
-                x: data.x,
-                y: data.y,
+                x: snapped.x,
+                y: snapped.y,
               },
             },
           },
@@ -286,15 +343,101 @@ export default function Canvas({
           }}
         >
           <div style={{ position: "relative", width: "100%", height: "100%" }}>
+            {/* Margin Guidelines - shown only when dragging */}
+            {isDragging && (
+              <>
+                {/* Top margin line */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: "1px",
+                    backgroundColor: "rgba(59, 130, 246, 0.5)",
+                    zIndex: 5,
+                  }}
+                />
+                {/* Bottom margin line */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: "1px",
+                    backgroundColor: "rgba(59, 130, 246, 0.5)",
+                    zIndex: 5,
+                  }}
+                />
+                {/* Left margin line */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    width: "1px",
+                    backgroundColor: "rgba(59, 130, 246, 0.5)",
+                    zIndex: 5,
+                  }}
+                />
+                {/* Right margin line */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    bottom: 0,
+                    right: 0,
+                    width: "1px",
+                    backgroundColor: "rgba(59, 130, 246, 0.5)",
+                    zIndex: 5,
+                  }}
+                />
+              </>
+            )}
+
+            {/* Center Snap Guides */}
+            {snapGuides.showX && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  bottom: 0,
+                  left: CENTER_X,
+                  width: "2px",
+                  backgroundColor: "rgba(236, 72, 153, 0.8)",
+                  zIndex: 5,
+                }}
+              />
+            )}
+            {snapGuides.showY && (
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  right: 0,
+                  top: CENTER_Y,
+                  height: "2px",
+                  backgroundColor: "rgba(236, 72, 153, 0.8)",
+                  zIndex: 5,
+                }}
+              />
+            )}
+
             {/* Title - Draggable */}
             <Draggable
+              key={`title-${designData.coverData.front.text.title.position.x}-${designData.coverData.front.text.title.position.y}`}
               nodeRef={titleRef}
-              position={{
+              defaultPosition={{
                 x: designData.coverData.front.text.title.position.x,
                 y: designData.coverData.front.text.title.position.y,
               }}
+              onStart={handleDragStart}
               onDrag={handleTitleDrag}
+              onStop={handleTitleStop}
               bounds="parent"
+              positionOffset={{ x: "-50%", y: "-50%" }}
             >
               <div
                 ref={titleRef}
@@ -307,7 +450,7 @@ export default function Canvas({
                   wordWrap: "break-word",
                   overflowWrap: "break-word",
                 }}
-                className="h-fit cursor-grab select-none"
+                className="h-fit cursor-grab select-none active:cursor-grabbing"
               >
                 <div
                   style={{
@@ -339,13 +482,17 @@ export default function Canvas({
 
             {/* Subtitle - Draggable */}
             <Draggable
+              key={`subtitle-${designData.coverData.front.text.subTitle.position.x}-${designData.coverData.front.text.subTitle.position.y}`}
               nodeRef={subtitleRef}
-              position={{
+              defaultPosition={{
                 x: designData.coverData.front.text.subTitle.position.x,
                 y: designData.coverData.front.text.subTitle.position.y,
               }}
+              onStart={handleDragStart}
               onDrag={handleSubtitleDrag}
+              onStop={handleSubtitleStop}
               bounds="parent"
+              positionOffset={{ x: "-50%", y: "-50%" }}
             >
               <div
                 ref={subtitleRef}
@@ -358,7 +505,7 @@ export default function Canvas({
                   wordWrap: "break-word",
                   overflowWrap: "break-word",
                 }}
-                className="h-fit cursor-grab select-none"
+                className="h-fit cursor-grab select-none active:cursor-grabbing"
               >
                 <div
                   style={{
@@ -392,13 +539,17 @@ export default function Canvas({
 
             {/* Author Name - Draggable */}
             <Draggable
+              key={`authorName-${designData.coverData.front.text.authorName.position.x}-${designData.coverData.front.text.authorName.position.y}`}
               nodeRef={authorNameRef}
-              position={{
+              defaultPosition={{
                 x: designData.coverData.front.text.authorName.position.x,
                 y: designData.coverData.front.text.authorName.position.y,
               }}
+              onStart={handleDragStart}
               onDrag={handleAuthorNameDrag}
+              onStop={handleAuthorNameStop}
               bounds="parent"
+              positionOffset={{ x: "-50%", y: "-50%" }}
             >
               <div
                 ref={authorNameRef}
@@ -411,7 +562,7 @@ export default function Canvas({
                   wordWrap: "break-word",
                   overflowWrap: "break-word",
                 }}
-                className="h-fit cursor-grab select-none"
+                className="h-fit cursor-grab select-none active:cursor-grabbing"
               >
                 <div
                   style={{
