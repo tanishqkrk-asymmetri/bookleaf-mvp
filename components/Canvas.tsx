@@ -28,21 +28,38 @@ export default function Canvas({
   const SNAP_THRESHOLD = 10; // pixels from center to trigger snap
   const FRONT_COVER_WIDTH = 487;
   const FRONT_COVER_HEIGHT = 782;
-  const PADDING = 27; // padding of the front cover
-  const CENTER_X = (FRONT_COVER_WIDTH - PADDING * 2) / 2;
-  const CENTER_Y = (FRONT_COVER_HEIGHT - PADDING - 40) / 2; // 40 is bottom padding
-  // Helper function to apply snapping
-  const applySnapping = (x: number, y: number) => {
+  const PADDING = 35; // padding of the front cover
+  const BOTTOM_PADDING = 40;
+  const AVAILABLE_WIDTH = FRONT_COVER_WIDTH - PADDING * 2;
+  const AVAILABLE_HEIGHT = FRONT_COVER_HEIGHT - PADDING - BOTTOM_PADDING;
+  const CENTER_X = AVAILABLE_WIDTH / 2;
+  const CENTER_Y = AVAILABLE_HEIGHT / 2;
+
+  // Helper function to apply snapping (now works with top-left positioning)
+  const applySnapping = (
+    x: number,
+    y: number,
+    elementRef?: React.RefObject<HTMLDivElement | null>
+  ) => {
     let snappedX = x;
     let snappedY = y;
-    const showXGuide = Math.abs(x - CENTER_X) < SNAP_THRESHOLD;
-    const showYGuide = Math.abs(y - CENTER_Y) < SNAP_THRESHOLD;
+
+    // If we have the element ref, we can center it properly
+    const elementWidth = elementRef?.current?.offsetWidth || 0;
+    const elementHeight = elementRef?.current?.offsetHeight || 0;
+
+    // Calculate the center point of the element
+    const elementCenterX = x + elementWidth / 2;
+    const elementCenterY = y + elementHeight / 2;
+
+    const showXGuide = Math.abs(elementCenterX - CENTER_X) < SNAP_THRESHOLD;
+    const showYGuide = Math.abs(elementCenterY - CENTER_Y) < SNAP_THRESHOLD;
 
     if (showXGuide) {
-      snappedX = CENTER_X;
+      snappedX = CENTER_X - elementWidth / 2;
     }
     if (showYGuide) {
-      snappedY = CENTER_Y;
+      snappedY = CENTER_Y - elementHeight / 2;
     }
 
     setSnapGuides({ showX: showXGuide, showY: showYGuide });
@@ -78,7 +95,7 @@ export default function Canvas({
     return spineWidthPx;
   };
 
-  const handleAuthorImageUpload = (
+  const handleAuthorImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
@@ -87,24 +104,67 @@ export default function Canvas({
         alert("Please upload an image file");
         return;
       }
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        setDesignData((org) => ({
-          ...org,
-          coverData: {
-            ...org.coverData,
-            back: {
-              ...org.coverData.back,
-              author: {
-                ...org.coverData.back.author,
-                imageUrl: imageUrl,
+
+      try {
+        // Read file as base64
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const base64Data = e.target?.result as string;
+
+          // First, set a temporary preview
+          setDesignData((org) => ({
+            ...org,
+            coverData: {
+              ...org.coverData,
+              back: {
+                ...org.coverData.back,
+                author: {
+                  ...org.coverData.back.author,
+                  imageUrl: base64Data,
+                },
               },
             },
-          },
-        }));
-      };
-      reader.readAsDataURL(file);
+          }));
+
+          // Upload to server
+          const response = await fetch("/api/uploadImage", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              filename: file.name,
+              upload_file: {
+                filename: `author-${Date.now()}.png`,
+                contents: base64Data,
+              },
+            }),
+          });
+
+          const result = await response.json();
+
+          // Update with hosted URL
+          if (result.hosted_link) {
+            setDesignData((org) => ({
+              ...org,
+              coverData: {
+                ...org.coverData,
+                back: {
+                  ...org.coverData.back,
+                  author: {
+                    ...org.coverData.back.author,
+                    imageUrl: result.hosted_link,
+                  },
+                },
+              },
+            }));
+          }
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error("Error uploading author image:", error);
+        alert("Failed to upload image. Please try again.");
+      }
     }
   };
 
@@ -119,12 +179,11 @@ export default function Canvas({
   };
 
   const handleTitleDrag = (e: DraggableEvent, data: DraggableData) => {
-    applySnapping(data.x, data.y);
+    applySnapping(data.x, data.y, titleRef);
   };
 
   const handleTitleStop = (e: DraggableEvent, data: DraggableData) => {
-    handleDragStop();
-    const snapped = applySnapping(data.x, data.y);
+    const snapped = applySnapping(data.x, data.y, titleRef);
     setDesignData((org) => ({
       ...org,
       coverData: {
@@ -144,15 +203,15 @@ export default function Canvas({
         },
       },
     }));
+    handleDragStop();
   };
 
   const handleSubtitleDrag = (e: DraggableEvent, data: DraggableData) => {
-    applySnapping(data.x, data.y);
+    applySnapping(data.x, data.y, subtitleRef);
   };
 
   const handleSubtitleStop = (e: DraggableEvent, data: DraggableData) => {
-    handleDragStop();
-    const snapped = applySnapping(data.x, data.y);
+    const snapped = applySnapping(data.x, data.y, subtitleRef);
     setDesignData((org) => ({
       ...org,
       coverData: {
@@ -172,15 +231,15 @@ export default function Canvas({
         },
       },
     }));
+    handleDragStop();
   };
 
   const handleAuthorNameDrag = (e: DraggableEvent, data: DraggableData) => {
-    applySnapping(data.x, data.y);
+    applySnapping(data.x, data.y, authorNameRef);
   };
 
   const handleAuthorNameStop = (e: DraggableEvent, data: DraggableData) => {
-    handleDragStop();
-    const snapped = applySnapping(data.x, data.y);
+    const snapped = applySnapping(data.x, data.y, authorNameRef);
     setDesignData((org) => ({
       ...org,
       coverData: {
@@ -200,6 +259,7 @@ export default function Canvas({
         },
       },
     }));
+    handleDragStop();
   };
 
   return (
@@ -213,7 +273,7 @@ export default function Canvas({
           style={{
             height: "782px",
             width: "487px",
-            padding: "27px",
+            padding: "35px",
             background: designData.coverData.back.color?.colorCode || "#FFFFFF",
           }}
         >
@@ -332,9 +392,9 @@ export default function Canvas({
           style={{
             height: "782px",
             width: "487px",
-            paddingTop: "27px",
-            paddingLeft: "27px",
-            paddingRight: "27px",
+            paddingTop: "35px",
+            paddingLeft: "35px",
+            paddingRight: "35px",
             paddingBottom: "40px",
             background:
               designData.coverData.front.backgroundType === "Gradient"
@@ -429,7 +489,7 @@ export default function Canvas({
             <Draggable
               key={`title-${designData.coverData.front.text.title.position.x}-${designData.coverData.front.text.title.position.y}`}
               nodeRef={titleRef}
-              defaultPosition={{
+              position={{
                 x: designData.coverData.front.text.title.position.x,
                 y: designData.coverData.front.text.title.position.y,
               }}
@@ -437,7 +497,6 @@ export default function Canvas({
               onDrag={handleTitleDrag}
               onStop={handleTitleStop}
               bounds="parent"
-              positionOffset={{ x: "-50%", y: "-50%" }}
             >
               <div
                 ref={titleRef}
@@ -446,7 +505,7 @@ export default function Canvas({
                   cursor: "move",
                   zIndex: 10,
                   touchAction: "none",
-                  maxWidth: "100%",
+                  maxWidth: "90%",
                   wordWrap: "break-word",
                   overflowWrap: "break-word",
                 }}
@@ -484,7 +543,7 @@ export default function Canvas({
             <Draggable
               key={`subtitle-${designData.coverData.front.text.subTitle.position.x}-${designData.coverData.front.text.subTitle.position.y}`}
               nodeRef={subtitleRef}
-              defaultPosition={{
+              position={{
                 x: designData.coverData.front.text.subTitle.position.x,
                 y: designData.coverData.front.text.subTitle.position.y,
               }}
@@ -492,7 +551,6 @@ export default function Canvas({
               onDrag={handleSubtitleDrag}
               onStop={handleSubtitleStop}
               bounds="parent"
-              positionOffset={{ x: "-50%", y: "-50%" }}
             >
               <div
                 ref={subtitleRef}
@@ -501,7 +559,7 @@ export default function Canvas({
                   cursor: "move",
                   zIndex: 10,
                   touchAction: "none",
-                  maxWidth: "100%",
+                  maxWidth: "90%",
                   wordWrap: "break-word",
                   overflowWrap: "break-word",
                 }}
@@ -541,7 +599,7 @@ export default function Canvas({
             <Draggable
               key={`authorName-${designData.coverData.front.text.authorName.position.x}-${designData.coverData.front.text.authorName.position.y}`}
               nodeRef={authorNameRef}
-              defaultPosition={{
+              position={{
                 x: designData.coverData.front.text.authorName.position.x,
                 y: designData.coverData.front.text.authorName.position.y,
               }}
@@ -549,7 +607,6 @@ export default function Canvas({
               onDrag={handleAuthorNameDrag}
               onStop={handleAuthorNameStop}
               bounds="parent"
-              positionOffset={{ x: "-50%", y: "-50%" }}
             >
               <div
                 ref={authorNameRef}
@@ -558,7 +615,7 @@ export default function Canvas({
                   cursor: "move",
                   zIndex: 10,
                   touchAction: "none",
-                  maxWidth: "100%",
+                  maxWidth: "90%",
                   wordWrap: "break-word",
                   overflowWrap: "break-word",
                 }}
