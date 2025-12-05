@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Mulish } from "next/font/google";
 import "./globals.css";
 import { DesignProvider } from "@/context/DesignContext";
+import { Suspense } from "react";
 
 const geistSans = Mulish({
   variable: "--font-geist-sans",
@@ -25,9 +26,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.className}  antialiased`}>
-        <DesignProvider>{children}</DesignProvider>
-      </body>
+      <Suspense fallback={<></>}>
+        <body className={`${geistSans.className}  antialiased`}>
+          <DesignProvider>{children}</DesignProvider>
+        </body>
+      </Suspense>
     </html>
   );
 }
