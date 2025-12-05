@@ -133,9 +133,9 @@ export default function Canvas({
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              filename: file.name,
+              filename: `author${Date.now()}.jpg`,
               upload_file: {
-                filename: `author-${Date.now()}.png`,
+                filename: `author${Date.now()}.jpg`,
                 contents: base64Data,
               },
             }),

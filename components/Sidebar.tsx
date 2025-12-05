@@ -962,9 +962,9 @@ export default function Sidebar({
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              filename: file.name,
+              filename: `frontcover${Date.now()}.jpg`,
               upload_file: {
-                filename: `front-cover-${Date.now()}.png`,
+                filename: `frontcover${Date.now()}.jpg`,
                 contents: base64Data,
               },
             }),

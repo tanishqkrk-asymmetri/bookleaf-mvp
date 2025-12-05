@@ -42,6 +42,7 @@ export default function Header() {
 
     try {
       const dataUrl = await htmlToImage.toPng(element, { quality: 1 });
+      // console.log(dataUrl);
       return dataUrl;
     } catch (error) {
       console.error(`Error converting ${className} to base64:`, error);
@@ -64,15 +65,18 @@ export default function Header() {
         convertElementToBase64("back"),
       ]);
 
+      console.log([frontBase64, spineBase64, backBase64]);
+
       const uploadResults = await Promise.all(
         [frontBase64, spineBase64, backBase64].map(async (x, i) => {
+          console.log(x);
           const response = await fetch("/api/uploadImage", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              filename: designData.bookName + Date.now() + ".png",
+              filename: designData.bookName + Date.now() + ".jpg",
               upload_file: {
                 filename:
                   designData.ISBN +
@@ -83,7 +87,7 @@ export default function Header() {
                     : i === 2
                     ? "back"
                     : "") +
-                  ".png",
+                  ".jpg",
                 contents: x,
               },
             }),
@@ -99,6 +103,8 @@ export default function Header() {
         splineImageUrl: uploadResults[1]?.hostedLink || "",
         backImageUrl: uploadResults[2]?.hostedLink || "",
       };
+
+      console.log(newLinks);
 
       setLinks(newLinks);
 
