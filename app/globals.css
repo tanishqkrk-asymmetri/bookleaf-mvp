@@ -9,6 +9,10 @@
   display: none;
 }
 
+* {
+  /* outline: 1px solid red; */
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

@@ -1,6 +1,27 @@
 export interface Book {
   id: string;
   bookName: string;
+  ISBN: string;
+  pageCount: number;
+  splineWidth: number;
+  coverData: CoverData;
+  frontImageUrl?: string;
+  backImageUrl?: string;
+  splineImageUrl?: string;
+}
+
+// {
+//     id,
+//     bookName,
+//     ISBN,
+//     splineWidth,
+//     coverData,
+//     frontImageUrl,
+//     backImageUrl,
+//     splineImageUrl,
+//   }
+
+export interface CoverData {
   editTrace: Edit[];
   lastEdited: number;
   front: Front;
@@ -39,6 +60,10 @@ export interface Front {
       underline: boolean;
       align: "left" | "center" | "right" | "justify";
       lineHeight: number;
+      position: {
+        x: number;
+        y: number;
+      };
     };
     subTitle: {
       content: string;
@@ -50,10 +75,25 @@ export interface Front {
       underline: boolean;
       align: "left" | "center" | "right" | "justify";
       lineHeight: number;
+      position: {
+        x: number;
+        y: number;
+      };
     };
-    position: {
-      x: number;
-      y: number;
+    authorName: {
+      content: string;
+      size: number;
+      color: string;
+      font: string;
+      bold: boolean;
+      italic: boolean;
+      underline: boolean;
+      align: "left" | "center" | "right" | "justify";
+      lineHeight: number;
+      position: {
+        x: number;
+        y: number;
+      };
     };
   };
 }

@@ -1,16 +1,273 @@
 "use client";
+import useDesign from "@/context/DesignContext";
+import * as htmlToImage from "html-to-image";
+import {
+  ChevronRight,
+  Download,
+  Loader2,
+  Check,
+  Save,
+  Edit2,
+} from "lucide-react";
+import { useState } from "react";
+
 export default function Header() {
+  const { designData, setDesignData, isSaving } = useDesign()!;
+  const [isEditingBookName, setIsEditingBookName] = useState(false);
+  const [tempBookName, setTempBookName] = useState(designData.bookName);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleSaveBookName = () => {
+    setDesignData((prev) => ({
+      ...prev,
+      bookName: tempBookName,
+    }));
+    setIsEditingBookName(false);
+  };
+
+  const handleEditBookName = () => {
+    setTempBookName(designData.bookName);
+    setIsEditingBookName(true);
+  };
+
+  const convertElementToBase64 = async (
+    className: string
+  ): Promise<string | null> => {
+    const element = document.querySelector(`.${className}`) as HTMLElement;
+
+    if (!element) {
+      console.error(`Element with class ${className} not found`);
+      return null;
+    }
+
+    try {
+      const dataUrl = await htmlToImage.toPng(element, { quality: 1 });
+      return dataUrl;
+    } catch (error) {
+      console.error(`Error converting ${className} to base64:`, error);
+      return null;
+    }
+  };
+
+  const [links, setLinks] = useState({
+    frontImageUrl: "",
+    backImageUrl: "",
+    splineImageUrl: "",
+  });
+
+  const handleContinue = async () => {
+    setIsUploading(true);
+    try {
+      const [frontBase64, spineBase64, backBase64] = await Promise.all([
+        convertElementToBase64("front"),
+        convertElementToBase64("spine"),
+        convertElementToBase64("back"),
+      ]);
+
+      const uploadResults = await Promise.all(
+        [frontBase64, spineBase64, backBase64].map(async (x, i) => {
+          const response = await fetch("/api/uploadImage", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              filename: designData.bookName + Date.now() + ".png",
+              upload_file: {
+                filename:
+                  designData.ISBN +
+                  (i === 0
+                    ? "front"
+                    : i === 1
+                    ? "spine"
+                    : i === 2
+                    ? "back"
+                    : "") +
+                  ".png",
+                contents: x,
+              },
+            }),
+          });
+          const result = await response.json();
+          return { index: i, hostedLink: result.hosted_link };
+        })
+      );
+
+      // Update links state with all uploaded URLs
+      const newLinks = {
+        frontImageUrl: uploadResults[0]?.hostedLink || "",
+        splineImageUrl: uploadResults[1]?.hostedLink || "",
+        backImageUrl: uploadResults[2]?.hostedLink || "",
+      };
+
+      setLinks(newLinks);
+
+      // console.log("Uploaded links:", newLinks);
+
+      const post = await fetch("/api/saveBook", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...designData,
+          coverData: JSON.stringify({ ...designData.coverData, ...newLinks }),
+        }),
+      });
+
+      console.log(post);
+    } catch (error) {
+      console.error("Error uploading:", error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const downloadDesign = (className: string, designName: string) => {
+    const element = document.querySelector(`.${className}`) as HTMLElement;
+
+    if (!element) {
+      console.error(`Element with class ${className} not found`);
+      return;
+    }
+
+    htmlToImage
+      .toPng(element, { quality: 1 })
+      .then(function (dataUrl) {
+        let link = document.createElement("a");
+        link.download =
+          (designData.bookName || "design") +
+          "_" +
+          designName +
+          "_" +
+          Date.now().toString() +
+          ".png";
+        link.href = dataUrl;
+        link.click();
+      })
+      .catch(function (error) {
+        console.error("Error generating image:", error);
+      });
+  };
+
   return (
-    <div className="w-full  bg-foreground  p-4 text-background fixed top-0 h-16">
-      <div className="flex gap-1 font-thin items-center">
-        <div className="aspect-square bg-background text-foreground w-8 h-8 text-center flex justify-center items-center font-bold text-2xl">
-          /
+    <div className="w-full bg-background p-4 text-foreground fixed top-0 h-16 z-50">
+      <div className="flex justify-between items-center h-full">
+        <div className="flex gap-1 font-thin items-center">
+          <div className="aspect-square bg-[#e45a6a] text-background w-8 h-8 text-center flex justify-center items-center font-bold text-2xl">
+            /
+          </div>
+          <p className="leading-4">
+            Bookleaf <br /> Publishing
+          </p>
         </div>
-        <p className="leading-4">
-          Bookleaf <br /> Publishing
-        </p>
+        <div className="flex items-center gap-4">
+          {/* Book Name Editor */}
+          <div className="flex items-center gap-2">
+            <div>{tempBookName}</div>
+            {isEditingBookName ? (
+              <>
+                <input
+                  type="text"
+                  value={tempBookName}
+                  onChange={(e) => setTempBookName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSaveBookName();
+                    } else if (e.key === "Escape") {
+                      setIsEditingBookName(false);
+                    }
+                  }}
+                  disabled
+                  className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e45a6a] focus:border-transparent"
+                  placeholder="Enter book name"
+                  autoFocus
+                />
+                <button
+                  // onClick={handleSaveBookName}
+                  className="p-2 bg-[#e45a6a] text-white rounded-md hover:bg-[#d14959] transition-colors hidden"
+                  title="Save book name"
+                >
+                  <Save size={16} />
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleEditBookName}
+                className="flex items-center gap-2 px-3 py-1 rounded-md hover:bg-gray-100 transition-colors group hidden"
+                title="Click to edit book name"
+              >
+                <span className="font-medium text-gray-800">
+                  {designData.bookName || "Untitled Book"}
+                </span>
+                <Edit2
+                  size={14}
+                  className="text-gray-400 group-hover:text-gray-600"
+                />
+              </button>
+            )}
+          </div>
+          {/* Saving Indicator */}
+          <div className="flex items-center gap-2 text-sm">
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-[#e45a6a]" />
+                <span className="text-gray-600">Saving...</span>
+              </>
+            ) : (
+              <>
+                <Check className="w-4 h-4 text-green-600" />
+                <span className="text-gray-600">Saved</span>
+              </>
+            )}
+          </div>
+          <button
+            onClick={async () => {
+              await handleContinue();
+              // console.log(links);
+            }}
+            disabled={isUploading}
+            className="bg-[#e45a6a] rounded-md p-2 text-white flex hover:scale-105 duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          >
+            {isUploading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin mr-1" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                Continue <ChevronRight />
+              </>
+            )}
+          </button>
+        </div>
+        <div className="flex gap-2 hidden">
+          <button
+            onClick={() => downloadDesign("front", "front")}
+            className="flex items-center gap-2 bg-background text-foreground px-4 py-2 rounded hover:opacity-80 transition-opacity"
+            title="Download Front Cover"
+          >
+            <Download size={16} />
+            Front
+          </button>
+          <button
+            onClick={() => downloadDesign("spine", "spine")}
+            className="flex items-center gap-2 bg-background text-foreground px-4 py-2 rounded hover:opacity-80 transition-opacity"
+            title="Download Spine"
+          >
+            <Download size={16} />
+            Spine
+          </button>
+          <button
+            onClick={() => downloadDesign("back", "back")}
+            className="flex items-center gap-2 bg-background text-foreground px-4 py-2 rounded hover:opacity-80 transition-opacity"
+            title="Download Back Cover"
+          >
+            <Download size={16} />
+            Back
+          </button>
+        </div>
       </div>
-      <div></div>
     </div>
   );
 }

@@ -9,7 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@react-spring/web": "^10.0.3",
     "@reactuses/core": "^6.1.5",
+    "@use-gesture/react": "^10.3.1",
+    "html-to-image": "^1.11.13",
     "lucide-react": "^0.553.0",
     "motion": "^12.23.24",
     "next": "16.0.2",
