@@ -922,12 +922,10 @@ export default function Sidebar({
     }));
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
-
-    // if (file) {
-    //   console.log(new File([file], file.name, { type: file.type }));
-    // }
 
     if (file) {
       if (!file.type.startsWith("image/")) {
@@ -935,25 +933,68 @@ export default function Sidebar({
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        setDesignData((org) => ({
-          ...org,
-          coverData: {
-            ...org.coverData,
-            front: {
-              ...org.coverData.front,
-              backgroundType: "Image",
-              image: {
-                ...org.coverData.front.image,
-                imageUrl: imageUrl,
+      try {
+        // Read file as base64
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const base64Data = e.target?.result as string;
+
+          // First, set a temporary preview
+          setDesignData((org) => ({
+            ...org,
+            coverData: {
+              ...org.coverData,
+              front: {
+                ...org.coverData.front,
+                backgroundType: "Image",
+                image: {
+                  ...org.coverData.front.image,
+                  imageUrl: base64Data,
+                },
               },
             },
-          },
-        }));
-      };
-      reader.readAsDataURL(file);
+          }));
+
+          // Upload to server
+          const response = await fetch("/api/uploadImage", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              filename: file.name,
+              upload_file: {
+                filename: `front-cover-${Date.now()}.png`,
+                contents: base64Data,
+              },
+            }),
+          });
+
+          const result = await response.json();
+
+          // Update with hosted URL
+          if (result.hosted_link) {
+            setDesignData((org) => ({
+              ...org,
+              coverData: {
+                ...org.coverData,
+                front: {
+                  ...org.coverData.front,
+                  backgroundType: "Image",
+                  image: {
+                    ...org.coverData.front.image,
+                    imageUrl: result.hosted_link,
+                  },
+                },
+              },
+            }));
+          }
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        alert("Failed to upload image. Please try again.");
+      }
     }
   };
 
