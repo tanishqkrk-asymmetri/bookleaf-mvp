@@ -406,23 +406,19 @@ export default function Canvas({
           </div>
 
           {/* BookLeaf Logo at Bottom */}
-          <div className="flex justify-between items-center">
-            <div
-              className="flex gap-1 font-thin items-center"
-              style={{ color: getLogoColors().textColor }}
-            >
-              <div
-                className="aspect-square w-8 h-8 text-center flex justify-center items-center font-bold text-2xl"
-                style={{
-                  backgroundColor: getLogoColors().logoBackground,
-                  color: getLogoColors().logoText,
-                }}
-              >
-                /
-              </div>
-              <p className="leading-4 font-semibold">
-                Bookleaf <br /> Publishing
-              </p>
+          <div className="flex justify-between items-start">
+            <div>
+              <img
+                src={
+                  isColorDark(
+                    designData.coverData.back.color?.colorCode || "#FFFFFF"
+                  )
+                    ? "/white.png"
+                    : "/black.png"
+                }
+                alt="Bookleaf Publishing"
+                className="h-16 w-auto"
+              />
             </div>
             <div className="flex flex-col items-center">
               <svg id="barcode"></svg>

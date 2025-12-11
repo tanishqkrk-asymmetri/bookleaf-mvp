@@ -13,9 +13,8 @@ export async function POST(request: Request) {
     }
   );
 
+  console.log(response);
   const data = await response.json();
-
-  console.log(data);
 
   // return Response.json({ hi: "hi" });
   return Response.json(data.response);
