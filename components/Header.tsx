@@ -158,16 +158,13 @@ export default function Header({ url }: { url?: string }) {
   };
 
   return (
-    <div className="w-full bg-background p-4 text-foreground fixed top-0 h-16 z-50">
+    <div className="w-full bg-background px-4 text-foreground fixed top-0 h-16 z-50">
       <div className="flex justify-between items-center h-full">
-        <div className="flex gap-1 font-thin items-center">
-          <div className="aspect-square bg-[#e45a6a] text-background w-8 h-8 text-center flex justify-center items-center font-bold text-2xl">
-            /
-          </div>
-          <p className="leading-4">
-            Bookleaf <br /> Publishing
-          </p>
-        </div>
+        <img
+          src={"/white.png"}
+          alt="Bookleaf Publishing"
+          className="h-16 w-auto"
+        />
 
         <div className="flex items-center gap-4">
           {/* Book Name Editor */}
