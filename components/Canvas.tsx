@@ -424,8 +424,14 @@ export default function Canvas({
                 Bookleaf <br /> Publishing
               </p>
             </div>
-            <div>
+            <div className="flex flex-col items-center">
               <svg id="barcode"></svg>
+              <div
+                className="text-xs mt-1"
+                style={{ color: getLogoColors().textColor }}
+              >
+                {designData.ISBN}
+              </div>
             </div>
           </div>
         </div>
