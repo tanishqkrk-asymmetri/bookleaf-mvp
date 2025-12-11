@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-export default function Header() {
+export default function Header({ url }: { url?: string }) {
   const { designData, setDesignData, isSaving } = useDesign()!;
   const [isEditingBookName, setIsEditingBookName] = useState(false);
   const [tempBookName, setTempBookName] = useState(designData.bookName);
@@ -88,7 +88,7 @@ export default function Header() {
                     ? "back"
                     : "") +
                   ".jpg",
-                contents: x,
+                contents: x?.split(",")[1] || x,
               },
             }),
           });
@@ -121,7 +121,8 @@ export default function Header() {
         }),
       });
 
-      console.log(post);
+      console.log(url);
+      window.location.href = url || "/";
     } catch (error) {
       console.error("Error uploading:", error);
     } finally {
@@ -167,6 +168,7 @@ export default function Header() {
             Bookleaf <br /> Publishing
           </p>
         </div>
+
         <div className="flex items-center gap-4">
           {/* Book Name Editor */}
           <div className="flex items-center gap-2">
@@ -190,7 +192,7 @@ export default function Header() {
                   autoFocus
                 />
                 <button
-                  // onClick={handleSaveBookName}
+                  onClick={handleSaveBookName}
                   className="p-2 bg-[#e45a6a] text-white rounded-md hover:bg-[#d14959] transition-colors hidden"
                   title="Save book name"
                 >

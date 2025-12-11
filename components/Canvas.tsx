@@ -2,7 +2,47 @@
 
 import useDesign from "@/context/DesignContext";
 import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import * as htmlToImage from "html-to-image";
+import JsBarcode from "jsbarcode";
+
+// Helper function to convert uploaded file to base64 using htmlToImage
+const fileToBase64WithHtmlToImage = async (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = document.createElement("img");
+    const url = URL.createObjectURL(file);
+
+    img.onload = async () => {
+      try {
+        // Create a container for the image
+        const container = document.createElement("div");
+        container.style.position = "absolute";
+        container.style.left = "-9999px";
+        container.appendChild(img);
+        document.body.appendChild(container);
+
+        // Convert to base64 using htmlToImage
+        const dataUrl = await htmlToImage.toPng(img, { quality: 1 });
+
+        // Cleanup
+        document.body.removeChild(container);
+        URL.revokeObjectURL(url);
+
+        resolve(dataUrl);
+      } catch (error) {
+        URL.revokeObjectURL(url);
+        reject(error);
+      }
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Failed to load image"));
+    };
+
+    img.src = url;
+  });
+};
 
 export default function Canvas({
   selectedView,
@@ -106,12 +146,43 @@ export default function Canvas({
       }
 
       try {
-        // Read file as base64
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          const base64Data = e.target?.result as string;
+        // Convert file to base64 using htmlToImage
+        const base64Data = await fileToBase64WithHtmlToImage(file);
 
-          // First, set a temporary preview
+        // First, set a temporary preview
+        setDesignData((org) => ({
+          ...org,
+          coverData: {
+            ...org.coverData,
+            back: {
+              ...org.coverData.back,
+              author: {
+                ...org.coverData.back.author,
+                imageUrl: base64Data,
+              },
+            },
+          },
+        }));
+
+        // Upload to server
+        const response = await fetch("/api/uploadImage", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            filename: `author${Date.now()}.jpg`,
+            upload_file: {
+              filename: `author${Date.now()}.jpg`,
+              contents: base64Data.split(",")[1],
+            },
+          }),
+        });
+
+        const result = await response.json();
+
+        // Update with hosted URL
+        if (result.hosted_link) {
           setDesignData((org) => ({
             ...org,
             coverData: {
@@ -120,47 +191,12 @@ export default function Canvas({
                 ...org.coverData.back,
                 author: {
                   ...org.coverData.back.author,
-                  imageUrl: base64Data,
+                  imageUrl: result.hosted_link,
                 },
               },
             },
           }));
-
-          // Upload to server
-          const response = await fetch("/api/uploadImage", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              filename: `author${Date.now()}.jpg`,
-              upload_file: {
-                filename: `author${Date.now()}.jpg`,
-                contents: base64Data,
-              },
-            }),
-          });
-
-          const result = await response.json();
-
-          // Update with hosted URL
-          if (result.hosted_link) {
-            setDesignData((org) => ({
-              ...org,
-              coverData: {
-                ...org.coverData,
-                back: {
-                  ...org.coverData.back,
-                  author: {
-                    ...org.coverData.back.author,
-                    imageUrl: result.hosted_link,
-                  },
-                },
-              },
-            }));
-          }
-        };
-        reader.readAsDataURL(file);
+        }
       } catch (error) {
         console.error("Error uploading author image:", error);
         alert("Failed to upload image. Please try again.");
@@ -262,6 +298,24 @@ export default function Canvas({
     handleDragStop();
   };
 
+  // Initialize barcode
+  useEffect(() => {
+    const barcodeElement = document.querySelector("#barcode");
+    if (barcodeElement && designData.ISBN) {
+      try {
+        JsBarcode("#barcode", designData.ISBN, {
+          format: "CODE128",
+          lineColor: "#000",
+          width: 2,
+          height: 40,
+          displayValue: false,
+        });
+      } catch (error) {
+        console.error("Error generating barcode:", error);
+      }
+    }
+  }, [designData.ISBN]);
+
   return (
     <div className="w-full bg-[#f3edeb] ">
       <div className="flex justify-center items-center h-full gap-0">
@@ -352,22 +406,27 @@ export default function Canvas({
           </div>
 
           {/* BookLeaf Logo at Bottom */}
-          <div
-            className="flex gap-1 font-thin items-center"
-            style={{ color: getLogoColors().textColor }}
-          >
+          <div className="flex justify-between items-center">
             <div
-              className="aspect-square w-8 h-8 text-center flex justify-center items-center font-bold text-2xl"
-              style={{
-                backgroundColor: getLogoColors().logoBackground,
-                color: getLogoColors().logoText,
-              }}
+              className="flex gap-1 font-thin items-center"
+              style={{ color: getLogoColors().textColor }}
             >
-              /
+              <div
+                className="aspect-square w-8 h-8 text-center flex justify-center items-center font-bold text-2xl"
+                style={{
+                  backgroundColor: getLogoColors().logoBackground,
+                  color: getLogoColors().logoText,
+                }}
+              >
+                /
+              </div>
+              <p className="leading-4 font-semibold">
+                Bookleaf <br /> Publishing
+              </p>
             </div>
-            <p className="leading-4 font-semibold">
-              Bookleaf <br /> Publishing
-            </p>
+            <div>
+              <svg id="barcode"></svg>
+            </div>
           </div>
         </div>
 

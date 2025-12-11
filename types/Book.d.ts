@@ -8,6 +8,7 @@ export interface Book {
   frontImageUrl?: string;
   backImageUrl?: string;
   splineImageUrl?: string;
+  redirect_url: string;
 }
 
 // {

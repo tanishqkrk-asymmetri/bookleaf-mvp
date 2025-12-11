@@ -44,17 +44,24 @@ export default function Home() {
         }
 
         const data = await response.json();
+
         setBookData(data);
-        // console.log(JSON.parse(data));
-        setDesignData((org) => ({
-          ...org,
-          id,
-          bookName: data.bookName || "",
-          ISBN: data.ISBN?.toString() || "",
-          splineWidth: data?.splineWidth.toString() || "",
-          coverData: JSON.parse(data.coverData || "") || {},
-        }));
-        setError(null);
+        // console.log(Object.keys(data).length > 1);
+        if (Object.keys(data).length > 1) {
+          // console.log(JSON.parse(data));
+          setDesignData((org) => ({
+            ...org,
+            id,
+            bookName: data.bookName || "",
+            ISBN: data.ISBN?.toString() || "",
+            splineWidth: data?.splineWidth.toString() || "",
+            coverData: JSON.parse(data.coverData || "") || {},
+            redirect_url: data?.redirect_url,
+          }));
+          setError(null);
+        } else {
+          setError("No data found for this book.");
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
@@ -65,14 +72,10 @@ export default function Home() {
     fetchBookData();
   }, [id]);
 
-  console.log(designData);
-
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl font-semibold text-red-600">
-          No book found: {error}
-        </div>
+        <div className="text-xl font-semibold text-red-600">{error}</div>
       </div>
     );
   }
@@ -85,6 +88,7 @@ export default function Home() {
     );
   }
 
+  console.log(designData);
   return (
     <div className="">
       <button
@@ -201,7 +205,7 @@ export default function Home() {
       >
         UNGABUGNA
       </button>
-      <Header></Header>
+      <Header url={designData.redirect_url}></Header>
       <div className="flex  pt-16 overflow-hidden min-h-screen max-h-screen">
         <Sidebar
           selectedView={selectedView}

@@ -15,5 +15,8 @@ export async function POST(request: Request) {
 
   const data = await response.json();
 
+  console.log(data);
+
+  // return Response.json({ hi: "hi" });
   return Response.json(data.response);
 }

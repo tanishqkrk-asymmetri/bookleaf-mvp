@@ -23,6 +23,45 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CoverData } from "../types/Book";
+import * as htmlToImage from "html-to-image";
+
+// Helper function to convert uploaded file to base64 using htmlToImage
+const fileToBase64WithHtmlToImage = async (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = document.createElement("img");
+    const url = URL.createObjectURL(file);
+
+    img.onload = async () => {
+      try {
+        // Create a container for the image
+        const container = document.createElement("div");
+        container.style.position = "absolute";
+        container.style.left = "-9999px";
+        container.appendChild(img);
+        document.body.appendChild(container);
+
+        // Convert to base64 using htmlToImage
+        const dataUrl = await htmlToImage.toPng(img, { quality: 1 });
+        
+        // Cleanup
+        document.body.removeChild(container);
+        URL.revokeObjectURL(url);
+        
+        resolve(dataUrl);
+      } catch (error) {
+        URL.revokeObjectURL(url);
+        reject(error);
+      }
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Failed to load image"));
+    };
+
+    img.src = url;
+  });
+};
 
 export default function Sidebar({
   selectedView,
@@ -934,12 +973,44 @@ export default function Sidebar({
       }
 
       try {
-        // Read file as base64
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          const base64Data = e.target?.result as string;
+        // Convert file to base64 using htmlToImage
+        const base64Data = await fileToBase64WithHtmlToImage(file);
 
-          // First, set a temporary preview
+        // First, set a temporary preview
+        setDesignData((org) => ({
+          ...org,
+          coverData: {
+            ...org.coverData,
+            front: {
+              ...org.coverData.front,
+              backgroundType: "Image",
+              image: {
+                ...org.coverData.front.image,
+                imageUrl: base64Data,
+              },
+            },
+          },
+        }));
+
+        // Upload to server
+        const response = await fetch("/api/uploadImage", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            filename: `frontcover${Date.now()}.jpg`,
+            upload_file: {
+              filename: `frontcover${Date.now()}.jpg`,
+              contents: base64Data.split(',')[1],
+            },
+          }),
+        });
+
+        const result = await response.json();
+
+        // Update with hosted URL
+        if (result.hosted_link) {
           setDesignData((org) => ({
             ...org,
             coverData: {
@@ -949,48 +1020,12 @@ export default function Sidebar({
                 backgroundType: "Image",
                 image: {
                   ...org.coverData.front.image,
-                  imageUrl: base64Data,
+                  imageUrl: result.hosted_link,
                 },
               },
             },
           }));
-
-          // Upload to server
-          const response = await fetch("/api/uploadImage", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              filename: `frontcover${Date.now()}.jpg`,
-              upload_file: {
-                filename: `frontcover${Date.now()}.jpg`,
-                contents: base64Data,
-              },
-            }),
-          });
-
-          const result = await response.json();
-
-          // Update with hosted URL
-          if (result.hosted_link) {
-            setDesignData((org) => ({
-              ...org,
-              coverData: {
-                ...org.coverData,
-                front: {
-                  ...org.coverData.front,
-                  backgroundType: "Image",
-                  image: {
-                    ...org.coverData.front.image,
-                    imageUrl: result.hosted_link,
-                  },
-                },
-              },
-            }));
-          }
-        };
-        reader.readAsDataURL(file);
+        }
       } catch (error) {
         console.error("Error uploading image:", error);
         alert("Failed to upload image. Please try again.");
@@ -1674,7 +1709,7 @@ export default function Sidebar({
     }));
   };
 
-  const handleAuthorImageUpload = (
+  const handleAuthorImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
@@ -1683,9 +1718,12 @@ export default function Sidebar({
         alert("Please upload an image file");
         return;
       }
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
+      
+      try {
+        // Convert file to base64 using htmlToImage
+        const base64Data = await fileToBase64WithHtmlToImage(file);
+        
+        // First, set a temporary preview
         setDesignData((org) => ({
           ...org,
           coverData: {
@@ -1694,13 +1732,49 @@ export default function Sidebar({
               ...org.coverData.back,
               author: {
                 ...org.coverData.back.author,
-                imageUrl: imageUrl,
+                imageUrl: base64Data,
               },
             },
           },
         }));
-      };
-      reader.readAsDataURL(file);
+
+        // Upload to server
+        const response = await fetch("/api/uploadImage", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            filename: `author${Date.now()}.jpg`,
+            upload_file: {
+              filename: `author${Date.now()}.jpg`,
+              contents: base64Data.split(',')[1],
+            },
+          }),
+        });
+
+        const result = await response.json();
+
+        // Update with hosted URL
+        if (result.hosted_link) {
+          setDesignData((org) => ({
+            ...org,
+            coverData: {
+              ...org.coverData,
+              back: {
+                ...org.coverData.back,
+                author: {
+                  ...org.coverData.back.author,
+                  imageUrl: result.hosted_link,
+                },
+              },
+            },
+          }));
+        }
+      } catch (error) {
+        console.error("Error uploading author image:", error);
+        alert("Failed to upload image. Please try again.");
+      }
     }
   };
 
