@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Mulish } from "next/font/google";
 import "./globals.css";
 import { DesignProvider } from "@/context/DesignContext";
 import { Suspense } from "react";
+import { AuthProvider } from "@/context/AuthContext";
 
 const geistSans = Mulish({
   variable: "--font-geist-sans",
@@ -28,7 +29,9 @@ export default function RootLayout({
     <html lang="en">
       <Suspense fallback={<></>}>
         <body className={`${geistSans.className}  antialiased`}>
-          <DesignProvider>{children}</DesignProvider>
+          <AuthProvider>
+            <DesignProvider>{children}</DesignProvider>
+          </AuthProvider>
         </body>
       </Suspense>
     </html>

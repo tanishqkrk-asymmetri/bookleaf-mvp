@@ -42,11 +42,11 @@ const fileToBase64WithHtmlToImage = async (file: File): Promise<string> => {
 
         // Convert to base64 using htmlToImage
         const dataUrl = await htmlToImage.toPng(img, { quality: 1 });
-        
+
         // Cleanup
         document.body.removeChild(container);
         URL.revokeObjectURL(url);
-        
+
         resolve(dataUrl);
       } catch (error) {
         URL.revokeObjectURL(url);
@@ -97,722 +97,31 @@ export default function Sidebar({
   const { designData, setDesignData } = useDesign()!;
 
   // console.log(designData.coverData.front.text.title.content);
-  const [templates, setTemplates] = useState<CoverData[]>([
-    {
-      editTrace: [],
-      lastEdited: 0,
-      front: {
-        backgroundType: "Image",
-        text: {
-          font: "Serif",
-          title: {
-            color: "#FFFFFF",
-            content: "The Great Novel",
-            font: "Serif",
-            size: 42,
-            bold: true,
-            italic: false,
-            underline: false,
-            align: "center",
-            lineHeight: 1.2,
-            position: { x: 50, y: 35 },
-          },
-          subTitle: {
-            color: "#FFFFFF",
-            content: "A Timeless Classic",
-            font: "Serif",
-            size: 18,
-            bold: false,
-            italic: true,
-            underline: false,
-            align: "center",
-            lineHeight: 1.5,
-            position: { x: 50, y: 50 },
-          },
-          authorName: {
-            color: "#FFFFFF",
-            content: "John Smith",
-            font: "Serif",
-            size: 20,
-            bold: false,
-            italic: false,
-            underline: false,
-            align: "center",
-            lineHeight: 1.5,
-            position: { x: 50, y: 85 },
-          },
-        },
-        color: {
-          colorCode: "",
-        },
-        gradient: {
-          direction: 0,
-          from: "",
-          to: "",
-        },
-        image: {
-          imageUrl:
-            "https://images.unsplash.com/photo-1481627834876-b7833e8f5570",
-          overlayColor: "#000000",
-          overlayOpacity: 0.4,
-        },
-        template: {
-          templateId: "template_1",
-        },
-      },
-      back: {
-        color: {
-          colorCode: "#2C3E50",
-        },
-        description: {
-          content:
-            "A masterpiece of literature that explores the depths of human nature and society. This compelling narrative takes readers on an unforgettable journey through time and emotion.",
-          size: 14,
-          color: "#FFFFFF",
-          font: "Serif",
-        },
-        author: {
-          title: "ABOUT THE AUTHOR",
-          content:
-            "An acclaimed writer whose works have captivated readers worldwide for decades. Winner of numerous literary awards and beloved by critics and readers alike.",
-          imageUrl: "",
-          size: 12,
-          color: "#FFFFFF",
-          font: "Serif",
-        },
-      },
-      spine: {
-        color: {
-          colorCode: "#2C3E50",
-        },
-      },
-    },
+  const [templates, setTemplates] = useState<CoverData[]>([]);
+  const [isLoadingTemplates, setIsLoadingTemplates] = useState(true);
 
-    {
-      editTrace: [],
-      lastEdited: 0,
-      front: {
-        backgroundType: "Image",
-        text: {
-          font: "Fantasy",
-          title: {
-            color: "#FFD700",
-            content: "REALM OF DRAGONS",
-            font: "Fantasy",
-            size: 44,
-            bold: true,
-            italic: false,
-            underline: false,
-            align: "center",
-            lineHeight: 1.2,
-            position: { x: 50, y: 35 },
-          },
-          subTitle: {
-            color: "#E0E0E0",
-            content: "Book One of the Chronicles",
-            font: "Serif",
-            size: 14,
-            bold: false,
-            italic: true,
-            underline: false,
-            align: "center",
-            lineHeight: 1.5,
-            position: { x: 50, y: 50 },
-          },
-          authorName: {
-            color: "#E0E0E0",
-            content: "Marcus Dragonheart",
-            font: "Serif",
-            size: 18,
-            bold: false,
-            italic: true,
-            underline: false,
-            align: "center",
-            lineHeight: 1.5,
-            position: { x: 50, y: 85 },
-          },
-        },
-        color: {
-          colorCode: "",
-        },
-        gradient: {
-          direction: 0,
-          from: "",
-          to: "",
-        },
-        image: {
-          imageUrl:
-            "https://images.unsplash.com/photo-1518709268805-4e9042af9f23",
-          overlayColor: "#1A0033",
-          overlayOpacity: 0.6,
-        },
-        template: {
-          templateId: "template_3",
-        },
-      },
-      back: {
-        color: {
-          colorCode: "#2C1B47",
-        },
-        description: {
-          content:
-            "In a world where magic has been forgotten and dragons are myths, one young hero discovers an ancient power that could change everything. An epic adventure of courage, friendship, and destiny.",
-          size: 14,
-          color: "#FFFFFF",
-          font: "Serif",
-        },
-        author: {
-          title: "ABOUT THE AUTHOR",
-          content:
-            "Master of epic fantasy and world-building. This internationally acclaimed series has enchanted millions of readers across the globe.",
-          imageUrl: "",
-          size: 12,
-          color: "#E0E0E0",
-          font: "Serif",
-        },
-      },
-      spine: {
-        color: {
-          colorCode: "#FFD700",
-        },
-      },
-    },
+  // Fetch templates from Firestore on component mount
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        setIsLoadingTemplates(true);
+        const response = await fetch("/api/templates");
+        const data = await response.json();
 
-    {
-      editTrace: [],
-      lastEdited: 0,
-      front: {
-        backgroundType: "Image",
-        text: {
-          font: "Monospace",
-          title: {
-            color: "#FFFFFF",
-            content: "NEXUS PRIME",
-            font: "Sans-serif",
-            size: 50,
-            bold: true,
-            italic: false,
-            underline: false,
-            align: "center",
-            lineHeight: 1.1,
-            position: { x: 50, y: 35 },
-          },
-          subTitle: {
-            color: "#00FFFF",
-            content: "THE FUTURE IS NOW",
-            font: "Sans-serif",
-            size: 14,
-            bold: true,
-            italic: false,
-            underline: false,
-            align: "center",
-            lineHeight: 1.5,
-            position: { x: 50, y: 50 },
-          },
-          authorName: {
-            color: "#00FFFF",
-            content: "Dr. Alex Nova",
-            font: "Sans-serif",
-            size: 18,
-            bold: true,
-            italic: false,
-            underline: false,
-            align: "center",
-            lineHeight: 1.5,
-            position: { x: 50, y: 85 },
-          },
-        },
-        color: {
-          colorCode: "",
-        },
-        gradient: {
-          direction: 0,
-          from: "",
-          to: "",
-        },
-        image: {
-          imageUrl:
-            "https://images.unsplash.com/photo-1451187580459-43490279c0fa",
-          overlayColor: "#000033",
-          overlayOpacity: 0.5,
-        },
-        template: {
-          templateId: "template_5",
-        },
-      },
-      back: {
-        color: {
-          colorCode: "#0A0A1A",
-        },
-        description: {
-          content:
-            "In the year 2347, humanity has colonized the stars. But when an ancient alien intelligence awakens, one crew must race against time to prevent galactic annihilation.",
-          size: 14,
-          color: "#FFFFFF",
-          font: "Sans-serif",
-        },
-        author: {
-          title: "ABOUT THE AUTHOR",
-          content:
-            "Award-winning science fiction author with a background in astrophysics. Known for hard sci-fi with compelling characters and mind-bending concepts.",
-          imageUrl: "",
-          size: 12,
-          color: "#00FFFF",
-          font: "Sans-serif",
-        },
-      },
-      spine: {
-        color: {
-          colorCode: "#00FFFF",
-        },
-      },
-    },
-    {
-      editTrace: [],
-      lastEdited: 0,
-      front: {
-        backgroundType: "Image",
-        text: {
-          font: "Gothic",
-          title: {
-            color: "#FFFFFF",
-            content: "SHADOWS FALL",
-            font: "Gothic",
-            size: 46,
-            bold: true,
-            italic: false,
-            underline: false,
-            align: "center",
-            lineHeight: 1.2,
-            position: { x: 50, y: 35 },
-          },
-          subTitle: {
-            color: "#8B0000",
-            content: "A Tale of Terror",
-            font: "Serif",
-            size: 16,
-            bold: false,
-            italic: true,
-            underline: false,
-            align: "center",
-            lineHeight: 1.5,
-            position: { x: 50, y: 50 },
-          },
-          authorName: {
-            color: "#8B0000",
-            content: "Vincent Dark",
-            font: "Serif",
-            size: 20,
-            bold: false,
-            italic: true,
-            underline: false,
-            align: "center",
-            lineHeight: 1.5,
-            position: { x: 50, y: 85 },
-          },
-        },
-        color: {
-          colorCode: "",
-        },
-        gradient: {
-          direction: 0,
-          from: "",
-          to: "",
-        },
-        image: {
-          imageUrl:
-            "https://images.unsplash.com/photo-1509248961158-e54f6934749c",
-          overlayColor: "#000000",
-          overlayOpacity: 0.7,
-        },
-        template: {
-          templateId: "template_6",
-        },
-      },
-      back: {
-        color: {
-          colorCode: "#1A0000",
-        },
-        description: {
-          content:
-            "In the abandoned mansion on Hollow Hill, something sinister awaits. A chilling tale of supernatural horror that will haunt your dreams long after the final page.",
-          size: 14,
-          color: "#FFFFFF",
-          font: "Serif",
-        },
-        author: {
-          title: "ABOUT THE AUTHOR",
-          content:
-            "Master of modern horror with a talent for creating atmospheric dread. Praised for psychological depth and unforgettable scares.",
-          imageUrl: "",
-          size: 12,
-          color: "#CCCCCC",
-          font: "Serif",
-        },
-      },
-      spine: {
-        color: {
-          colorCode: "#8B0000",
-        },
-      },
-    },
-    {
-      editTrace: [],
-      lastEdited: 0,
-      front: {
-        backgroundType: "Image",
-        text: {
-          font: "Sans-serif",
-          title: {
-            color: "#FFFFFF",
-            content: "WINNING MINDSET",
-            font: "Sans-serif",
-            size: 42,
-            bold: true,
-            italic: false,
-            underline: false,
-            align: "left",
-            lineHeight: 1.2,
-            position: { x: 10, y: 35 },
-          },
-          subTitle: {
-            color: "#FFA500",
-            content: "Strategies for Modern Leaders",
-            font: "Sans-serif",
-            size: 16,
-            bold: true,
-            italic: false,
-            underline: false,
-            align: "left",
-            lineHeight: 1.5,
-            position: { x: 10, y: 50 },
-          },
-          authorName: {
-            color: "#FFA500",
-            content: "Michael Success",
-            font: "Sans-serif",
-            size: 18,
-            bold: true,
-            italic: false,
-            underline: false,
-            align: "left",
-            lineHeight: 1.5,
-            position: { x: 10, y: 85 },
-          },
-        },
-        color: {
-          colorCode: "",
-        },
-        gradient: {
-          direction: 0,
-          from: "",
-          to: "",
-        },
-        image: {
-          imageUrl:
-            "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab",
-          overlayColor: "#003366",
-          overlayOpacity: 0.6,
-        },
-        template: {
-          templateId: "template_7",
-        },
-      },
-      back: {
-        color: {
-          colorCode: "#003366",
-        },
-        description: {
-          content:
-            "Transform your approach to business and life with proven strategies from top industry leaders. Learn the habits and mindsets that separate good from great.",
-          size: 14,
-          color: "#FFFFFF",
-          font: "Sans-serif",
-        },
-        author: {
-          title: "ABOUT THE AUTHOR",
-          content:
-            "Former Fortune 500 CEO and sought-after business consultant. Has advised countless companies on strategy, leadership, and organizational transformation.",
-          imageUrl: "",
-          size: 12,
-          color: "#FFA500",
-          font: "Sans-serif",
-        },
-      },
-      spine: {
-        color: {
-          colorCode: "#FFA500",
-        },
-      },
-    },
-    {
-      editTrace: [],
-      lastEdited: 0,
-      front: {
-        backgroundType: "Image",
-        text: {
-          font: "Handwriting",
-          title: {
-            color: "#FFFFFF",
-            content: "Wanderlust",
-            font: "Handwriting",
-            size: 52,
-            bold: true,
-            italic: false,
-            underline: false,
-            align: "center",
-            lineHeight: 1.3,
-            position: { x: 50, y: 30 },
-          },
-          subTitle: {
-            color: "#FFFFFF",
-            content: "A Journey of Discovery",
-            font: "Handwriting",
-            size: 18,
-            bold: false,
-            italic: true,
-            underline: false,
-            align: "center",
-            lineHeight: 1.5,
-            position: { x: 50, y: 45 },
-          },
-          authorName: {
-            color: "#FFFFFF",
-            content: "Sofia Journey",
-            font: "Handwriting",
-            size: 22,
-            bold: false,
-            italic: true,
-            underline: false,
-            align: "center",
-            lineHeight: 1.5,
-            position: { x: 50, y: 85 },
-          },
-        },
-        color: {
-          colorCode: "",
-        },
-        gradient: {
-          direction: 0,
-          from: "",
-          to: "",
-        },
-        image: {
-          imageUrl:
-            "https://images.unsplash.com/photo-1488646953014-85cb44e25828",
-          overlayColor: "#006666",
-          overlayOpacity: 0.3,
-        },
-        template: {
-          templateId: "template_8",
-        },
-      },
-      back: {
-        color: {
-          colorCode: "#E8F4F8",
-        },
-        description: {
-          content:
-            "From bustling cities to remote villages, one traveler's quest to find meaning in the journey itself. An inspiring memoir about adventure, culture, and self-discovery.",
-          size: 14,
-          color: "#333333",
-          font: "Serif",
-        },
-        author: {
-          title: "ABOUT THE AUTHOR",
-          content:
-            "World traveler and storyteller who has visited over 100 countries. Writer for major travel publications and passionate advocate for cultural exchange.",
-          imageUrl: "",
-          size: 12,
-          color: "#555555",
-          font: "Serif",
-        },
-      },
-      spine: {
-        color: {
-          colorCode: "#006666",
-        },
-      },
-    },
-    {
-      editTrace: [],
-      lastEdited: 0,
-      front: {
-        backgroundType: "Image",
-        text: {
-          font: "Serif",
-          title: {
-            color: "#FFFFFF",
-            content: "ECHOES OF REVOLUTION",
-            font: "Serif",
-            size: 38,
-            bold: true,
-            italic: false,
-            underline: false,
-            align: "center",
-            lineHeight: 1.3,
-            position: { x: 50, y: 35 },
-          },
-          subTitle: {
-            color: "#D4AF37",
-            content: "Paris, 1789",
-            font: "Serif",
-            size: 18,
-            bold: false,
-            italic: true,
-            underline: false,
-            align: "center",
-            lineHeight: 1.5,
-            position: { x: 50, y: 50 },
-          },
-          authorName: {
-            color: "#D4AF37",
-            content: "Pierre Laurent",
-            font: "Serif",
-            size: 20,
-            bold: false,
-            italic: true,
-            underline: false,
-            align: "center",
-            lineHeight: 1.5,
-            position: { x: 50, y: 85 },
-          },
-        },
-        color: {
-          colorCode: "",
-        },
-        gradient: {
-          direction: 0,
-          from: "",
-          to: "",
-        },
-        image: {
-          imageUrl:
-            "https://images.unsplash.com/photo-1499856871958-5b9627545d1a",
-          overlayColor: "#3D2817",
-          overlayOpacity: 0.5,
-        },
-        template: {
-          templateId: "template_9",
-        },
-      },
-      back: {
-        color: {
-          colorCode: "#8B7355",
-        },
-        description: {
-          content:
-            "In the tumultuous days of the French Revolution, two families find their fates intertwined. A sweeping historical epic of love, betrayal, and survival against impossible odds.",
-          size: 14,
-          color: "#FFFFFF",
-          font: "Serif",
-        },
-        author: {
-          title: "ABOUT THE AUTHOR",
-          content:
-            "Historian and novelist specializing in European history. Known for meticulous research and bringing the past to vivid life on the page.",
-          imageUrl: "",
-          size: 12,
-          color: "#F5E6D3",
-          font: "Serif",
-        },
-      },
-      spine: {
-        color: {
-          colorCode: "#D4AF37",
-        },
-      },
-    },
-    {
-      editTrace: [],
-      lastEdited: 0,
-      front: {
-        backgroundType: "Image",
-        text: {
-          font: "Sans-serif",
-          title: {
-            color: "#FFFFFF",
-            content: "MINDFUL LIVING",
-            font: "Sans-serif",
-            size: 44,
-            bold: true,
-            italic: false,
-            underline: false,
-            align: "center",
-            lineHeight: 1.2,
-            position: { x: 50, y: 35 },
-          },
-          subTitle: {
-            color: "#FFFFFF",
-            content: "Transform Your Life Daily",
-            font: "Sans-serif",
-            size: 16,
-            bold: true,
-            italic: false,
-            underline: false,
-            align: "center",
-            lineHeight: 1.5,
-            position: { x: 50, y: 50 },
-          },
-          authorName: {
-            color: "#FFFFFF",
-            content: "Dr. Zen Mindful",
-            font: "Sans-serif",
-            size: 18,
-            bold: false,
-            italic: false,
-            underline: false,
-            align: "center",
-            lineHeight: 1.5,
-            position: { x: 50, y: 85 },
-          },
-        },
-        color: {
-          colorCode: "",
-        },
-        gradient: {
-          direction: 0,
-          from: "",
-          to: "",
-        },
-        image: {
-          imageUrl:
-            "https://images.unsplash.com/photo-1506126613408-eca07ce68773",
-          overlayColor: "#4A90E2",
-          overlayOpacity: 0.4,
-        },
-        template: {
-          templateId: "template_10",
-        },
-      },
-      back: {
-        color: {
-          colorCode: "#E8F5F7",
-        },
-        description: {
-          content:
-            "Discover practical techniques for reducing stress, increasing happiness, and living with intention. A comprehensive guide to mindfulness and personal growth for modern life.",
-          size: 14,
-          color: "#333333",
-          font: "Sans-serif",
-        },
-        author: {
-          title: "ABOUT THE AUTHOR",
-          content:
-            "Licensed therapist and mindfulness coach with over 15 years of experience. Featured speaker at wellness conferences worldwide.",
-          imageUrl: "",
-          size: 12,
-          color: "#555555",
-          font: "Sans-serif",
-        },
-      },
-      spine: {
-        color: {
-          colorCode: "#4A90E2",
-        },
-      },
-    },
-  ]);
+        if (data.success && data.templates) {
+          setTemplates(data.templates);
+        } else {
+          console.error("Failed to fetch templates:", data.error);
+        }
+      } catch (error) {
+        console.error("Error fetching templates:", error);
+      } finally {
+        setIsLoadingTemplates(false);
+      }
+    };
+
+    fetchTemplates();
+  }, []);
 
   const handleViewClick = (view: "Front" | "Back" | "Spine") => {
     setSelectedView(view);
@@ -1002,7 +311,7 @@ export default function Sidebar({
             filename: `frontcover${Date.now()}.jpg`,
             upload_file: {
               filename: `frontcover${Date.now()}.jpg`,
-              contents: base64Data.split(',')[1],
+              contents: base64Data.split(",")[1],
             },
           }),
         });
@@ -1718,11 +1027,11 @@ export default function Sidebar({
         alert("Please upload an image file");
         return;
       }
-      
+
       try {
         // Convert file to base64 using htmlToImage
         const base64Data = await fileToBase64WithHtmlToImage(file);
-        
+
         // First, set a temporary preview
         setDesignData((org) => ({
           ...org,
@@ -1748,7 +1057,7 @@ export default function Sidebar({
             filename: `author${Date.now()}.jpg`,
             upload_file: {
               filename: `author${Date.now()}.jpg`,
-              contents: base64Data.split(',')[1],
+              contents: base64Data.split(",")[1],
             },
           }),
         });
@@ -2855,146 +2164,52 @@ export default function Sidebar({
             ) : selectedFrontView === "Template" ? (
               <div className="space-y-6">
                 <div className=""></div>
-                <div className="grid grid-cols-2 gap-6">
-                  {templates.map((temp, i) => {
-                    // Scale factor for thumbnail: thumbnails are ~30% of canvas size
-                    const thumbnailScale = 0.3;
-                    return (
-                      <div
-                        onClick={() => {
-                          setDesignData((org) => {
-                            return {
-                              ...org,
-                              coverData: {
-                                editTrace: org.coverData.editTrace,
-                                lastEdited: org.coverData.lastEdited,
-                                back: temp.back,
-                                front: temp.front,
-                                spine: temp.spine,
-                              },
-                            };
-                          });
-                        }}
-                        key={i}
-                        className="cursor-pointer hover:ring-2 hover:ring-theme transition-all rounded-lg overflow-hidden"
-                      >
+                {isLoadingTemplates ? (
+                  <div className="flex justify-center items-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme"></div>
+                  </div>
+                ) : templates.length === 0 ? (
+                  <div className="text-center py-12 text-foreground/50">
+                    No templates available
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-6">
+                    {templates.map((temp, i) => {
+                      // Canvas dimensions (matching Canvas.tsx)
+                      const CANVAS_WIDTH = 487;
+                      const CANVAS_HEIGHT = 782;
+                      const CANVAS_PADDING_X = 35;
+                      const CANVAS_PADDING_Y_TOP = 35;
+                      const CANVAS_PADDING_Y_BOTTOM = 40;
+                      const AVAILABLE_WIDTH =
+                        CANVAS_WIDTH - CANVAS_PADDING_X * 2;
+                      const AVAILABLE_HEIGHT =
+                        CANVAS_HEIGHT -
+                        CANVAS_PADDING_Y_TOP -
+                        CANVAS_PADDING_Y_BOTTOM;
+
+                      // Scale factor for thumbnail (25% of canvas size)
+                      const thumbnailScale = 0.25;
+
+                      return (
                         <div
                           onClick={() => {
-                            // setSelectedView("Front");
+                            setDesignData((org) => {
+                              return {
+                                ...org,
+                                coverData: {
+                                  editTrace: org.coverData.editTrace,
+                                  lastEdited: org.coverData.lastEdited,
+                                  back: temp.back,
+                                  front: temp.front,
+                                  spine: temp.spine,
+                                },
+                              };
+                            });
                           }}
-                          className="front bg-foreground/20 overflow-hidden flex justify-center items-center p-2 relative"
-                          style={{
-                            height: "auto",
-                            aspectRatio: "1/1.33",
-                            background:
-                              temp.front.backgroundType === "Gradient"
-                                ? `linear-gradient(${temp.front.gradient?.direction}deg, ${temp.front.gradient?.from}, ${temp.front.gradient?.to})`
-                                : temp.front.color?.colorCode,
-                          }}
+                          key={i}
+                          className="cursor-pointer hover:ring-2 hover:ring-theme transition-all rounded-lg overflow-hidden relative"
                         >
-                          <div
-                            className={`h-full w-full relative transition-all`}
-                          >
-                            {/* Title */}
-                            <div
-                              style={{
-                                position: "absolute",
-                                zIndex: 10,
-                                left: `${temp.front.text.title.position.x}%`,
-                                top: `${temp.front.text.title.position.y}%`,
-                                transform: "translateX(-50%)",
-                                color: temp.front.text.title.color,
-                                fontSize: temp.front.text.title.size / 4 + "px",
-                                fontFamily:
-                                  temp.front.text.title.font === "Default"
-                                    ? "inherit"
-                                    : temp.front.text.title.font,
-                                fontWeight: temp.front.text.title.bold
-                                  ? "bold"
-                                  : "normal",
-                                fontStyle: temp.front.text.title.italic
-                                  ? "italic"
-                                  : "normal",
-                                textDecoration: temp.front.text.title.underline
-                                  ? "underline"
-                                  : "none",
-                                textAlign: temp.front.text.title.align,
-                                lineHeight: temp.front.text.title.lineHeight,
-                                whiteSpace: "nowrap",
-                              }}
-                              className="select-none"
-                            >
-                              {temp.front.text.title.content}
-                            </div>
-                            {/* Subtitle */}
-                            <div
-                              style={{
-                                position: "absolute",
-                                zIndex: 10,
-                                left: `${temp.front.text.subTitle.position.x}%`,
-                                top: `${temp.front.text.subTitle.position.y}%`,
-                                transform: "translateX(-50%)",
-                                color: temp.front.text.subTitle.color,
-                                fontSize:
-                                  temp.front.text.subTitle.size / 4 + "px",
-                                fontFamily:
-                                  temp.front.text.subTitle.font === "Default"
-                                    ? "inherit"
-                                    : temp.front.text.subTitle.font,
-                                fontWeight: temp.front.text.subTitle.bold
-                                  ? "bold"
-                                  : "normal",
-                                fontStyle: temp.front.text.subTitle.italic
-                                  ? "italic"
-                                  : "normal",
-                                textDecoration: temp.front.text.subTitle
-                                  .underline
-                                  ? "underline"
-                                  : "none",
-                                textAlign: temp.front.text.subTitle.align,
-                                lineHeight: temp.front.text.subTitle.lineHeight,
-                                whiteSpace: "nowrap",
-                              }}
-                              className="select-none"
-                            >
-                              {temp.front.text.subTitle.content}
-                            </div>
-                            {/* Author Name */}
-                            <div
-                              style={{
-                                position: "absolute",
-                                zIndex: 10,
-                                left: `${temp.front.text.authorName.position.x}%`,
-                                top: `${temp.front.text.authorName.position.y}%`,
-                                transform: "translateX(-50%)",
-                                color: temp.front.text.authorName.color,
-                                fontSize:
-                                  temp.front.text.authorName.size / 4 + "px",
-                                fontFamily:
-                                  temp.front.text.authorName.font === "Default"
-                                    ? "inherit"
-                                    : temp.front.text.authorName.font,
-                                fontWeight: temp.front.text.authorName.bold
-                                  ? "bold"
-                                  : "normal",
-                                fontStyle: temp.front.text.authorName.italic
-                                  ? "italic"
-                                  : "normal",
-                                textDecoration: temp.front.text.authorName
-                                  .underline
-                                  ? "underline"
-                                  : "none",
-                                textAlign: temp.front.text.authorName.align,
-                                lineHeight:
-                                  temp.front.text.authorName.lineHeight,
-                                whiteSpace: "nowrap",
-                              }}
-                              className="select-none"
-                            >
-                              {temp.front.text.authorName.content}
-                            </div>
-                          </div>
-
                           {temp.front.backgroundType === "Image" && (
                             <>
                               <img
@@ -3004,6 +2219,7 @@ export default function Sidebar({
                                 }
                                 className="w-full h-full absolute top-0 left-0 object-cover"
                                 alt=""
+                                style={{ zIndex: 0 }}
                               />
                               <div
                                 className="w-full h-full absolute top-0 left-0"
@@ -3012,15 +2228,169 @@ export default function Sidebar({
                                     temp.front.image.overlayColor,
                                   opacity: temp.front.image.overlayOpacity,
                                   pointerEvents: "none",
+                                  zIndex: 1,
                                 }}
                               ></div>
                             </>
                           )}
+
+                          <div
+                            onClick={() => {
+                              // setSelectedView("Front");
+                            }}
+                            className="front bg-foreground/20 overflow-hidden flex justify-center items-center relative"
+                            style={{
+                              height: `${CANVAS_HEIGHT * thumbnailScale}px`,
+                              width: `${CANVAS_WIDTH * thumbnailScale}px`,
+                              padding: `${
+                                CANVAS_PADDING_Y_TOP * thumbnailScale
+                              }px ${CANVAS_PADDING_X * thumbnailScale}px ${
+                                CANVAS_PADDING_Y_BOTTOM * thumbnailScale
+                              }px`,
+                              background:
+                                temp.front.backgroundType === "Gradient"
+                                  ? `linear-gradient(${temp.front.gradient?.direction}deg, ${temp.front.gradient?.from}, ${temp.front.gradient?.to})`
+                                  : temp.front.color?.colorCode,
+                            }}
+                          >
+                            <div
+                              className={`h-full w-full relative transition-all`}
+                            >
+                              {/* Title */}
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  zIndex: 10,
+                                  left: `${
+                                    temp.front.text.title.position.x *
+                                    thumbnailScale
+                                  }px`,
+                                  top: `${
+                                    temp.front.text.title.position.y *
+                                    thumbnailScale
+                                  }px`,
+                                  color: temp.front.text.title.color,
+                                  fontSize: `${
+                                    temp.front.text.title.size * thumbnailScale
+                                  }px`,
+                                  fontFamily:
+                                    temp.front.text.title.font === "Default"
+                                      ? "inherit"
+                                      : temp.front.text.title.font,
+                                  fontWeight: temp.front.text.title.bold
+                                    ? "bold"
+                                    : "normal",
+                                  fontStyle: temp.front.text.title.italic
+                                    ? "italic"
+                                    : "normal",
+                                  textDecoration: temp.front.text.title
+                                    .underline
+                                    ? "underline"
+                                    : "none",
+                                  textAlign: temp.front.text.title.align,
+                                  lineHeight: temp.front.text.title.lineHeight,
+                                  maxWidth: "90%",
+                                  wordWrap: "break-word",
+                                  overflowWrap: "break-word",
+                                }}
+                                className="select-none"
+                              >
+                                {temp.front.text.title.content}
+                              </div>
+                              {/* Subtitle */}
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  zIndex: 10,
+                                  left: `${
+                                    temp.front.text.subTitle.position.x *
+                                    thumbnailScale
+                                  }px`,
+                                  top: `${
+                                    temp.front.text.subTitle.position.y *
+                                    thumbnailScale
+                                  }px`,
+                                  color: temp.front.text.subTitle.color,
+                                  fontSize: `${
+                                    temp.front.text.subTitle.size *
+                                    thumbnailScale
+                                  }px`,
+                                  fontFamily:
+                                    temp.front.text.subTitle.font === "Default"
+                                      ? "inherit"
+                                      : temp.front.text.subTitle.font,
+                                  fontWeight: temp.front.text.subTitle.bold
+                                    ? "bold"
+                                    : "normal",
+                                  fontStyle: temp.front.text.subTitle.italic
+                                    ? "italic"
+                                    : "normal",
+                                  textDecoration: temp.front.text.subTitle
+                                    .underline
+                                    ? "underline"
+                                    : "none",
+                                  textAlign: temp.front.text.subTitle.align,
+                                  lineHeight:
+                                    temp.front.text.subTitle.lineHeight,
+                                  maxWidth: "90%",
+                                  wordWrap: "break-word",
+                                  overflowWrap: "break-word",
+                                }}
+                                className="select-none"
+                              >
+                                {temp.front.text.subTitle.content}
+                              </div>
+                              {/* Author Name */}
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  zIndex: 10,
+                                  left: `${
+                                    temp.front.text.authorName.position.x *
+                                    thumbnailScale
+                                  }px`,
+                                  top: `${
+                                    temp.front.text.authorName.position.y *
+                                    thumbnailScale
+                                  }px`,
+                                  color: temp.front.text.authorName.color,
+                                  fontSize: `${
+                                    temp.front.text.authorName.size *
+                                    thumbnailScale
+                                  }px`,
+                                  fontFamily:
+                                    temp.front.text.authorName.font ===
+                                    "Default"
+                                      ? "inherit"
+                                      : temp.front.text.authorName.font,
+                                  fontWeight: temp.front.text.authorName.bold
+                                    ? "bold"
+                                    : "normal",
+                                  fontStyle: temp.front.text.authorName.italic
+                                    ? "italic"
+                                    : "normal",
+                                  textDecoration: temp.front.text.authorName
+                                    .underline
+                                    ? "underline"
+                                    : "none",
+                                  textAlign: temp.front.text.authorName.align,
+                                  lineHeight:
+                                    temp.front.text.authorName.lineHeight,
+                                  maxWidth: "90%",
+                                  wordWrap: "break-word",
+                                  overflowWrap: "break-word",
+                                }}
+                                className="select-none"
+                              >
+                                {temp.front.text.authorName.content}
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             ) : (
               <></>

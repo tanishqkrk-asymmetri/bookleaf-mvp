@@ -719,6 +719,7 @@ export default function Canvas({
                 src={designData.coverData.front.image.imageUrl}
                 className="w-full h-full absolute top-0 left-0 object-cover"
                 alt=""
+                style={{ zIndex: 0 }}
               />
               <div
                 className="w-full h-full absolute top-0 left-0"
@@ -727,6 +728,7 @@ export default function Canvas({
                     designData.coverData.front.image.overlayColor,
                   opacity: designData.coverData.front.image.overlayOpacity,
                   pointerEvents: "none",
+                  zIndex: 1,
                 }}
               ></div>
             </>
