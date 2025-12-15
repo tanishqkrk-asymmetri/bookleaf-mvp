@@ -9,6 +9,45 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "@/firebase";
+import * as htmlToImage from "html-to-image";
+
+// Helper function to convert uploaded file to base64 using htmlToImage
+const fileToBase64WithHtmlToImage = async (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = document.createElement("img");
+    const url = URL.createObjectURL(file);
+
+    img.onload = async () => {
+      try {
+        // Create a container for the image
+        const container = document.createElement("div");
+        container.style.position = "absolute";
+        container.style.left = "-9999px";
+        container.appendChild(img);
+        document.body.appendChild(container);
+
+        // Convert to base64 using htmlToImage
+        const dataUrl = await htmlToImage.toPng(img, { quality: 1 });
+
+        // Cleanup
+        document.body.removeChild(container);
+        URL.revokeObjectURL(url);
+
+        resolve(dataUrl);
+      } catch (error) {
+        URL.revokeObjectURL(url);
+        reject(error);
+      }
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Failed to load image"));
+    };
+
+    img.src = url;
+  });
+};
 
 interface Template {
   id: string;
@@ -89,7 +128,7 @@ function LoginScreen() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* Header */}
@@ -265,6 +304,9 @@ export default function Admin() {
   // Saving state
   const [isSaving, setIsSaving] = useState(false);
 
+  // Image upload state
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
   // Delete confirmation state
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     show: boolean;
@@ -276,6 +318,24 @@ export default function Admin() {
     templateName: "",
   });
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Available fonts
+  const availableFonts = [
+    "Default",
+    "Arial",
+    "Helvetica",
+    "Times New Roman",
+    "Georgia",
+    "Verdana",
+    "Courier New",
+    "Trebuchet MS",
+    "Comic Sans MS",
+    "Impact",
+    "Palatino",
+    "Garamond",
+    "Bookman",
+    "Avant Garde",
+  ];
 
   // Constants for snapping
   const SNAP_THRESHOLD = 10;
@@ -635,8 +695,14 @@ export default function Admin() {
 
     // Can't delete if it's the only template
     if (templates.length === 1) {
-      alert("⚠️ Cannot delete the last template. You must have at least one template.");
-      setDeleteConfirmation({ show: false, templateId: null, templateName: "" });
+      alert(
+        "⚠️ Cannot delete the last template. You must have at least one template."
+      );
+      setDeleteConfirmation({
+        show: false,
+        templateId: null,
+        templateName: "",
+      });
       return;
     }
 
@@ -645,7 +711,9 @@ export default function Admin() {
 
     try {
       // Remove template from array
-      const updatedTemplates = templates.filter((t) => t.id !== templateIdToDelete);
+      const updatedTemplates = templates.filter(
+        (t) => t.id !== templateIdToDelete
+      );
 
       // Prepare templates for saving to Firestore
       const templatesToSave = updatedTemplates.map((template) => ({
@@ -673,7 +741,11 @@ export default function Admin() {
           setCurrentTemplate(updatedTemplates[0]);
         }
 
-        setDeleteConfirmation({ show: false, templateId: null, templateName: "" });
+        setDeleteConfirmation({
+          show: false,
+          templateId: null,
+          templateName: "",
+        });
         alert("✅ Template deleted successfully!");
       } else {
         throw new Error(result.error || "Failed to delete template");
@@ -681,7 +753,11 @@ export default function Admin() {
     } catch (error) {
       console.error("Error deleting template:", error);
       alert("❌ Failed to delete template. Please try again.");
-      setDeleteConfirmation({ show: false, templateId: null, templateName: "" });
+      setDeleteConfirmation({
+        show: false,
+        templateId: null,
+        templateName: "",
+      });
     } finally {
       setIsDeleting(false);
     }
@@ -780,10 +856,83 @@ export default function Admin() {
     setShowImageSearch(false);
   };
 
+  // Upload custom image
+  const handleCustomImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file || !currentTemplate) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please upload an image file");
+      return;
+    }
+
+    setIsUploadingImage(true);
+    try {
+      // Convert file to base64 using htmlToImage
+      const base64Data = await fileToBase64WithHtmlToImage(file);
+
+      // First, set a temporary preview
+      const newCoverData = { ...currentTemplate.coverData };
+      newCoverData.front.backgroundType = "Image";
+      newCoverData.front.image.imageUrl = base64Data;
+      newCoverData.front.image.overlayColor = "#000000";
+      newCoverData.front.image.overlayOpacity = 0.3;
+      setCurrentTemplate({ ...currentTemplate, coverData: newCoverData });
+      setTemplates((prev) =>
+        prev.map((t) =>
+          t.id === currentTemplate.id ? { ...t, coverData: newCoverData } : t
+        )
+      );
+
+      // Upload to server
+      const response = await fetch("/api/uploadImage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          filename: `frontcover${Date.now()}.jpg`,
+          upload_file: {
+            filename: `frontcover${Date.now()}.jpg`,
+            contents: base64Data.split(",")[1],
+          },
+        }),
+      });
+
+      const result = await response.json();
+
+      // Update with hosted URL
+      if (result.hosted_link) {
+        const updatedCoverData = { ...currentTemplate.coverData };
+        updatedCoverData.front.backgroundType = "Image";
+        updatedCoverData.front.image.imageUrl = result.hosted_link;
+        updatedCoverData.front.image.overlayColor = "#000000";
+        updatedCoverData.front.image.overlayOpacity = 0.3;
+        setCurrentTemplate({ ...currentTemplate, coverData: updatedCoverData });
+        setTemplates((prev) =>
+          prev.map((t) =>
+            t.id === currentTemplate.id
+              ? { ...t, coverData: updatedCoverData }
+              : t
+          )
+        );
+        alert("✅ Image uploaded successfully!");
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploadingImage(false);
+      event.target.value = ""; // Reset file input
+    }
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="text-lg text-gray-600">Loading...</div>
+      <div className="flex items-center justify-center h-screen bg-gray-900">
+        <div className="text-lg text-gray-300">Loading...</div>
       </div>
     );
   }
@@ -794,18 +943,18 @@ export default function Admin() {
 
   if (!currentTemplate) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="text-lg text-gray-600">No template selected</div>
+      <div className="flex items-center justify-center h-screen bg-gray-900">
+        <div className="text-lg text-gray-300">No template selected</div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-[#fafafa]">
+    <div className="flex h-screen bg-gray-900">
       {/* Left Sidebar */}
-      <div className="w-72 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
+      <div className="w-72 bg-gray-800 border-r border-gray-700 flex flex-col">
+        <div className="p-6 border-b border-gray-700">
+          <h2 className="text-sm font-semibold text-gray-100 uppercase tracking-wide">
             Templates
           </h2>
         </div>
@@ -816,28 +965,26 @@ export default function Admin() {
               key={template.id}
               className={`relative group w-full text-left px-4 py-2.5 rounded-md transition-all text-sm font-medium cursor-pointer flex items-center justify-between ${
                 selectedTemplateId === template.id
-                  ? "bg-gray-900 text-white shadow-sm"
-                  : "text-gray-700 hover:bg-gray-100"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "text-gray-300 hover:bg-gray-700"
               }`}
               onClick={() => setSelectedTemplateId(template.id)}
             >
               <span className="flex-1">{template.name}</span>
               <button
-                onClick={(e) => handleDeleteClick(e, template.id, template.name)}
-                className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-red-100 ${
+                onClick={(e) =>
+                  handleDeleteClick(e, template.id, template.name)
+                }
+                className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-red-600 ${
                   selectedTemplateId === template.id
-                    ? "hover:bg-red-600"
-                    : "hover:bg-red-100"
+                    ? "hover:bg-red-700"
+                    : "hover:bg-red-600"
                 }`}
                 title="Delete template"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`h-4 w-4 ${
-                    selectedTemplateId === template.id
-                      ? "text-white hover:text-red-100"
-                      : "text-red-600"
-                  }`}
+                  className="h-4 w-4 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -854,10 +1001,10 @@ export default function Admin() {
           ))}
         </div>
 
-        <div className="p-4 border-t border-gray-200 space-y-2">
+        <div className="p-4 border-t border-gray-700 space-y-2">
           <button
             onClick={addNewTemplate}
-            className="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium"
+            className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 text-gray-200 rounded-md hover:bg-gray-600 transition-colors text-sm font-medium"
           >
             + New Template
           </button>
@@ -865,7 +1012,7 @@ export default function Admin() {
           <button
             onClick={saveAllTemplates}
             disabled={isSaving}
-            className="w-full px-4 py-2.5 bg-black text-white rounded-md hover:bg-gray-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-2.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSaving ? (
               <span className="flex items-center justify-center">
@@ -900,22 +1047,22 @@ export default function Admin() {
 
       {/* Main Editor Area */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto p-8 space-y-6">
+        <div className="max-w-7xl mx-auto p-6 space-y-4">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">
+              <h1 className="text-2xl font-semibold text-gray-100">
                 {currentTemplate.name}
               </h1>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-400 mt-1">
                 Customize your book cover template
               </p>
             </div>
           </div>
 
           {/* Template Name Editor */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
               Template Name
             </label>
             <input
@@ -934,21 +1081,21 @@ export default function Admin() {
                   )
                 );
               }}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black text-sm"
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
           </div>
 
           {/* Front Cover Editor */}
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
+            <div className="p-4 border-b border-gray-700">
+              <h3 className="text-xs font-semibold text-gray-300 uppercase tracking-wide">
                 Front Cover
               </h3>
             </div>
 
             {/* Front Cover Canvas */}
-            <div className="p-8 bg-gradient-to-br from-gray-50 to-gray-100 flex justify-center">
-              <div className="bg-white p-8 rounded-xl shadow-lg">
+            <div className="p-6 bg-gray-850 flex justify-center">
+              <div className="bg-gray-900 p-6 rounded-xl shadow-lg">
                 <div
                   className="relative"
                   style={{
@@ -1212,12 +1359,12 @@ export default function Admin() {
             </div>
 
             {/* Front Cover Controls */}
-            <div className="p-6 space-y-6">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">
+            <div className="p-4 grid grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
                   Background Type
                 </label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-2">
                   <button
                     onClick={() => {
                       const newCoverData = { ...currentTemplate.coverData };
@@ -1234,10 +1381,10 @@ export default function Admin() {
                         )
                       );
                     }}
-                    className={`px-4 py-2.5 rounded-md text-sm font-medium transition-all ${
+                    className={`px-3 py-2 rounded-md text-xs font-medium transition-all ${
                       currentTemplate.coverData.front.backgroundType === "Color"
-                        ? "bg-gray-900 text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                     }`}
                   >
                     Solid Color
@@ -1258,21 +1405,21 @@ export default function Admin() {
                         )
                       );
                     }}
-                    className={`px-4 py-2.5 rounded-md text-sm font-medium transition-all ${
+                    className={`px-3 py-2 rounded-md text-xs font-medium transition-all ${
                       currentTemplate.coverData.front.backgroundType ===
                       "Gradient"
-                        ? "bg-gray-900 text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                     }`}
                   >
                     Gradient
                   </button>
                   <button
                     onClick={() => setShowImageSearch(true)}
-                    className={`px-4 py-2.5 rounded-md text-sm font-medium transition-all ${
+                    className={`px-3 py-2 rounded-md text-xs font-medium transition-all ${
                       currentTemplate.coverData.front.backgroundType === "Image"
-                        ? "bg-gray-900 text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                     }`}
                   >
                     Image
@@ -1281,11 +1428,11 @@ export default function Admin() {
               </div>
 
               {currentTemplate.coverData.front.backgroundType === "Color" && (
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">
+                <div className="col-span-2">
+                  <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
                     Background Color
                   </label>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <input
                       type="color"
                       value={currentTemplate.coverData.front.color.colorCode}
@@ -1304,7 +1451,7 @@ export default function Admin() {
                           )
                         );
                       }}
-                      className="w-20 h-10 rounded-md cursor-pointer border border-gray-300"
+                      className="w-16 h-9 rounded-md cursor-pointer border border-gray-600"
                     />
                     <input
                       type="text"
@@ -1324,7 +1471,7 @@ export default function Admin() {
                           )
                         );
                       }}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm font-mono"
+                      className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md text-sm font-mono"
                       placeholder="#FFFFFF"
                     />
                   </div>
@@ -1333,115 +1480,113 @@ export default function Admin() {
 
               {currentTemplate.coverData.front.backgroundType ===
                 "Gradient" && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">
-                        From Color
-                      </label>
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="color"
-                          value={currentTemplate.coverData.front.gradient.from}
-                          onChange={(e) => {
-                            const newCoverData = {
-                              ...currentTemplate.coverData,
-                            };
-                            newCoverData.front.gradient.from = e.target.value;
-                            setCurrentTemplate({
-                              ...currentTemplate,
-                              coverData: newCoverData,
-                            });
-                            setTemplates((prev) =>
-                              prev.map((t) =>
-                                t.id === currentTemplate.id
-                                  ? { ...t, coverData: newCoverData }
-                                  : t
-                              )
-                            );
-                          }}
-                          className="w-20 h-10 rounded-md cursor-pointer border border-gray-300"
-                        />
-                        <input
-                          type="text"
-                          value={currentTemplate.coverData.front.gradient.from}
-                          onChange={(e) => {
-                            const newCoverData = {
-                              ...currentTemplate.coverData,
-                            };
-                            newCoverData.front.gradient.from = e.target.value;
-                            setCurrentTemplate({
-                              ...currentTemplate,
-                              coverData: newCoverData,
-                            });
-                            setTemplates((prev) =>
-                              prev.map((t) =>
-                                t.id === currentTemplate.id
-                                  ? { ...t, coverData: newCoverData }
-                                  : t
-                              )
-                            );
-                          }}
-                          className="flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm font-mono"
-                          placeholder="#FFFFFF"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">
-                        To Color
-                      </label>
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="color"
-                          value={currentTemplate.coverData.front.gradient.to}
-                          onChange={(e) => {
-                            const newCoverData = {
-                              ...currentTemplate.coverData,
-                            };
-                            newCoverData.front.gradient.to = e.target.value;
-                            setCurrentTemplate({
-                              ...currentTemplate,
-                              coverData: newCoverData,
-                            });
-                            setTemplates((prev) =>
-                              prev.map((t) =>
-                                t.id === currentTemplate.id
-                                  ? { ...t, coverData: newCoverData }
-                                  : t
-                              )
-                            );
-                          }}
-                          className="w-20 h-10 rounded-md cursor-pointer border border-gray-300"
-                        />
-                        <input
-                          type="text"
-                          value={currentTemplate.coverData.front.gradient.to}
-                          onChange={(e) => {
-                            const newCoverData = {
-                              ...currentTemplate.coverData,
-                            };
-                            newCoverData.front.gradient.to = e.target.value;
-                            setCurrentTemplate({
-                              ...currentTemplate,
-                              coverData: newCoverData,
-                            });
-                            setTemplates((prev) =>
-                              prev.map((t) =>
-                                t.id === currentTemplate.id
-                                  ? { ...t, coverData: newCoverData }
-                                  : t
-                              )
-                            );
-                          }}
-                          className="flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm font-mono"
-                          placeholder="#000000"
-                        />
-                      </div>
+                <>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
+                      From Color
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={currentTemplate.coverData.front.gradient.from}
+                        onChange={(e) => {
+                          const newCoverData = {
+                            ...currentTemplate.coverData,
+                          };
+                          newCoverData.front.gradient.from = e.target.value;
+                          setCurrentTemplate({
+                            ...currentTemplate,
+                            coverData: newCoverData,
+                          });
+                          setTemplates((prev) =>
+                            prev.map((t) =>
+                              t.id === currentTemplate.id
+                                ? { ...t, coverData: newCoverData }
+                                : t
+                            )
+                          );
+                        }}
+                        className="w-16 h-9 rounded-md cursor-pointer border border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={currentTemplate.coverData.front.gradient.from}
+                        onChange={(e) => {
+                          const newCoverData = {
+                            ...currentTemplate.coverData,
+                          };
+                          newCoverData.front.gradient.from = e.target.value;
+                          setCurrentTemplate({
+                            ...currentTemplate,
+                            coverData: newCoverData,
+                          });
+                          setTemplates((prev) =>
+                            prev.map((t) =>
+                              t.id === currentTemplate.id
+                                ? { ...t, coverData: newCoverData }
+                                : t
+                            )
+                          );
+                        }}
+                        className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md text-sm font-mono"
+                        placeholder="#FFFFFF"
+                      />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">
+                    <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
+                      To Color
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={currentTemplate.coverData.front.gradient.to}
+                        onChange={(e) => {
+                          const newCoverData = {
+                            ...currentTemplate.coverData,
+                          };
+                          newCoverData.front.gradient.to = e.target.value;
+                          setCurrentTemplate({
+                            ...currentTemplate,
+                            coverData: newCoverData,
+                          });
+                          setTemplates((prev) =>
+                            prev.map((t) =>
+                              t.id === currentTemplate.id
+                                ? { ...t, coverData: newCoverData }
+                                : t
+                            )
+                          );
+                        }}
+                        className="w-16 h-9 rounded-md cursor-pointer border border-gray-600"
+                      />
+                      <input
+                        type="text"
+                        value={currentTemplate.coverData.front.gradient.to}
+                        onChange={(e) => {
+                          const newCoverData = {
+                            ...currentTemplate.coverData,
+                          };
+                          newCoverData.front.gradient.to = e.target.value;
+                          setCurrentTemplate({
+                            ...currentTemplate,
+                            coverData: newCoverData,
+                          });
+                          setTemplates((prev) =>
+                            prev.map((t) =>
+                              t.id === currentTemplate.id
+                                ? { ...t, coverData: newCoverData }
+                                : t
+                            )
+                          );
+                        }}
+                        className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md text-sm font-mono"
+                        placeholder="#000000"
+                      />
+                    </div>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
                       Direction
                     </label>
                     <input
@@ -1468,51 +1613,101 @@ export default function Admin() {
                       }}
                       className="w-full"
                     />
-                    <div className="flex justify-between text-xs text-gray-500 mt-2">
+                    <div className="flex justify-between text-xs text-gray-400 mt-1">
                       <span>0°</span>
-                      <span className="font-mono font-semibold text-gray-900">
+                      <span className="font-mono font-semibold text-gray-200">
                         {currentTemplate.coverData.front.gradient.direction}°
                       </span>
                       <span>360°</span>
                     </div>
                   </div>
-                </div>
+                </>
               )}
 
               {currentTemplate.coverData.front.backgroundType === "Image" && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">
+                <>
+                  <div className="col-span-2">
+                    <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
                       Background Image
                     </label>
                     {currentTemplate.coverData.front.image.imageUrl ? (
-                      <div className="relative">
+                      <div className="relative mb-3">
                         <img
                           src={currentTemplate.coverData.front.image.imageUrl}
                           alt="Background"
-                          className="w-full h-32 object-cover rounded-md"
+                          className="w-full h-24 object-cover rounded-md"
                         />
-                        <button
-                          onClick={() => setShowImageSearch(true)}
-                          className="absolute top-2 right-2 px-3 py-1.5 bg-white text-gray-700 rounded-md text-xs font-medium shadow-md hover:bg-gray-100"
-                        >
-                          Change
-                        </button>
+                        <div className="absolute top-2 right-2 flex gap-2">
+                          <button
+                            onClick={() => setShowImageSearch(true)}
+                            className="px-2 py-1 bg-gray-800/90 text-gray-200 rounded-md text-xs font-medium shadow-md hover:bg-gray-700 backdrop-blur-sm"
+                          >
+                            Search
+                          </button>
+                          <label className="px-2 py-1 bg-gray-800/90 text-gray-200 rounded-md text-xs font-medium shadow-md hover:bg-gray-700 backdrop-blur-sm cursor-pointer">
+                            {isUploadingImage ? "Uploading..." : "Upload"}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleCustomImageUpload}
+                              disabled={isUploadingImage}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
                       </div>
                     ) : (
-                      <button
-                        onClick={() => setShowImageSearch(true)}
-                        className="w-full px-4 py-8 border-2 border-dashed border-gray-300 rounded-md text-sm text-gray-500 hover:border-gray-400 hover:text-gray-600"
-                      >
-                        Click to select image
-                      </button>
+                      <div className="space-y-2">
+                        <button
+                          onClick={() => setShowImageSearch(true)}
+                          className="w-full px-3 py-4 border-2 border-dashed border-gray-600 rounded-md text-sm text-gray-400 hover:border-gray-500 hover:text-gray-300 transition-colors"
+                        >
+                          Search from Unsplash
+                        </button>
+                        <label className="w-full px-3 py-4 border-2 border-dashed border-gray-600 rounded-md text-sm text-gray-400 hover:border-gray-500 hover:text-gray-300 transition-colors flex items-center justify-center cursor-pointer">
+                          {isUploadingImage ? (
+                            <span className="flex items-center gap-2">
+                              <svg
+                                className="animate-spin h-4 w-4 text-gray-400"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                ></circle>
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                              </svg>
+                              Uploading...
+                            </span>
+                          ) : (
+                            "Upload Custom Image"
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleCustomImageUpload}
+                            disabled={isUploadingImage}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
                     )}
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">
+                    <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
                       Overlay Color
                     </label>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <input
                         type="color"
                         value={
@@ -1534,7 +1729,7 @@ export default function Admin() {
                             )
                           );
                         }}
-                        className="w-20 h-10 rounded-md cursor-pointer border border-gray-300"
+                        className="w-16 h-9 rounded-md cursor-pointer border border-gray-600"
                       />
                       <input
                         type="text"
@@ -1557,13 +1752,13 @@ export default function Admin() {
                             )
                           );
                         }}
-                        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm font-mono"
+                        className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md text-sm font-mono"
                         placeholder="#000000"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">
+                    <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
                       Overlay Opacity
                     </label>
                     <input
@@ -1593,9 +1788,9 @@ export default function Admin() {
                       }}
                       className="w-full"
                     />
-                    <div className="flex justify-between text-xs text-gray-500 mt-2">
+                    <div className="flex justify-between text-xs text-gray-400 mt-1">
                       <span>0%</span>
-                      <span className="font-mono font-semibold text-gray-900">
+                      <span className="font-mono font-semibold text-gray-200">
                         {Math.round(
                           currentTemplate.coverData.front.image.overlayOpacity *
                             100
@@ -1605,266 +1800,72 @@ export default function Admin() {
                       <span>100%</span>
                     </div>
                   </div>
-                </div>
+                </>
               )}
 
               {/* Text Content Editors */}
-              <div className="pt-6 border-t border-gray-200">
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-4">
+              <div className="col-span-2 pt-4 border-t border-gray-700">
+                <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-3">
                   Text Elements
                 </label>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Title
-                    </label>
-                    <input
-                      type="text"
-                      value={currentTemplate.coverData.front.text.title.content}
-                      onChange={(e) => {
-                        const newCoverData = { ...currentTemplate.coverData };
-                        newCoverData.front.text.title.content = e.target.value;
-                        setCurrentTemplate({
-                          ...currentTemplate,
-                          coverData: newCoverData,
-                        });
-                        setTemplates((prev) =>
-                          prev.map((t) =>
-                            t.id === currentTemplate.id
-                              ? { ...t, coverData: newCoverData }
-                              : t
-                          )
-                        );
-                      }}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-md mb-2 text-sm"
-                      placeholder="Enter title"
-                    />
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="color"
-                        value={currentTemplate.coverData.front.text.title.color}
-                        onChange={(e) => {
-                          const newCoverData = { ...currentTemplate.coverData };
-                          newCoverData.front.text.title.color = e.target.value;
-                          setCurrentTemplate({
-                            ...currentTemplate,
-                            coverData: newCoverData,
-                          });
-                          setTemplates((prev) =>
-                            prev.map((t) =>
-                              t.id === currentTemplate.id
-                                ? { ...t, coverData: newCoverData }
-                                : t
-                            )
-                          );
-                        }}
-                        className="w-20 h-10 rounded-md cursor-pointer border border-gray-300"
-                      />
-                      <input
-                        type="text"
-                        value={currentTemplate.coverData.front.text.title.color}
-                        onChange={(e) => {
-                          const newCoverData = { ...currentTemplate.coverData };
-                          newCoverData.front.text.title.color = e.target.value;
-                          setCurrentTemplate({
-                            ...currentTemplate,
-                            coverData: newCoverData,
-                          });
-                          setTemplates((prev) =>
-                            prev.map((t) =>
-                              t.id === currentTemplate.id
-                                ? { ...t, coverData: newCoverData }
-                                : t
-                            )
-                          );
-                        }}
-                        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm font-mono"
-                        placeholder="#000000"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Subtitle
-                    </label>
-                    <input
-                      type="text"
-                      value={
-                        currentTemplate.coverData.front.text.subTitle.content
-                      }
-                      onChange={(e) => {
-                        const newCoverData = { ...currentTemplate.coverData };
-                        newCoverData.front.text.subTitle.content =
-                          e.target.value;
-                        setCurrentTemplate({
-                          ...currentTemplate,
-                          coverData: newCoverData,
-                        });
-                        setTemplates((prev) =>
-                          prev.map((t) =>
-                            t.id === currentTemplate.id
-                              ? { ...t, coverData: newCoverData }
-                              : t
-                          )
-                        );
-                      }}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-md mb-2 text-sm"
-                      placeholder="Enter subtitle"
-                    />
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="color"
-                        value={
-                          currentTemplate.coverData.front.text.subTitle.color
-                        }
-                        onChange={(e) => {
-                          const newCoverData = { ...currentTemplate.coverData };
-                          newCoverData.front.text.subTitle.color =
-                            e.target.value;
-                          setCurrentTemplate({
-                            ...currentTemplate,
-                            coverData: newCoverData,
-                          });
-                          setTemplates((prev) =>
-                            prev.map((t) =>
-                              t.id === currentTemplate.id
-                                ? { ...t, coverData: newCoverData }
-                                : t
-                            )
-                          );
-                        }}
-                        className="w-20 h-10 rounded-md cursor-pointer border border-gray-300"
-                      />
-                      <input
-                        type="text"
-                        value={
-                          currentTemplate.coverData.front.text.subTitle.color
-                        }
-                        onChange={(e) => {
-                          const newCoverData = { ...currentTemplate.coverData };
-                          newCoverData.front.text.subTitle.color =
-                            e.target.value;
-                          setCurrentTemplate({
-                            ...currentTemplate,
-                            coverData: newCoverData,
-                          });
-                          setTemplates((prev) =>
-                            prev.map((t) =>
-                              t.id === currentTemplate.id
-                                ? { ...t, coverData: newCoverData }
-                                : t
-                            )
-                          );
-                        }}
-                        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm font-mono"
-                        placeholder="#000000"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Author Name
-                    </label>
-                    <input
-                      type="text"
-                      value={
-                        currentTemplate.coverData.front.text.authorName.content
-                      }
-                      onChange={(e) => {
-                        const newCoverData = { ...currentTemplate.coverData };
-                        newCoverData.front.text.authorName.content =
-                          e.target.value;
-                        setCurrentTemplate({
-                          ...currentTemplate,
-                          coverData: newCoverData,
-                        });
-                        setTemplates((prev) =>
-                          prev.map((t) =>
-                            t.id === currentTemplate.id
-                              ? { ...t, coverData: newCoverData }
-                              : t
-                          )
-                        );
-                      }}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-md mb-2 text-sm"
-                      placeholder="Enter author name"
-                    />
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="color"
-                        value={
-                          currentTemplate.coverData.front.text.authorName.color
-                        }
-                        onChange={(e) => {
-                          const newCoverData = { ...currentTemplate.coverData };
-                          newCoverData.front.text.authorName.color =
-                            e.target.value;
-                          setCurrentTemplate({
-                            ...currentTemplate,
-                            coverData: newCoverData,
-                          });
-                          setTemplates((prev) =>
-                            prev.map((t) =>
-                              t.id === currentTemplate.id
-                                ? { ...t, coverData: newCoverData }
-                                : t
-                            )
-                          );
-                        }}
-                        className="w-20 h-10 rounded-md cursor-pointer border border-gray-300"
-                      />
-                      <input
-                        type="text"
-                        value={
-                          currentTemplate.coverData.front.text.authorName.color
-                        }
-                        onChange={(e) => {
-                          const newCoverData = { ...currentTemplate.coverData };
-                          newCoverData.front.text.authorName.color =
-                            e.target.value;
-                          setCurrentTemplate({
-                            ...currentTemplate,
-                            coverData: newCoverData,
-                          });
-                          setTemplates((prev) =>
-                            prev.map((t) =>
-                              t.id === currentTemplate.id
-                                ? { ...t, coverData: newCoverData }
-                                : t
-                            )
-                          );
-                        }}
-                        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm font-mono"
-                        placeholder="#000000"
-                      />
-                    </div>
-                  </div>
-                </div>
               </div>
-            </div>
-          </div>
-
-          {/* Back Cover Editor */}
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
-                Back Cover
-              </h3>
-            </div>
-            <div className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">
-                  Background Color
+                <label className="block text-xs font-medium text-gray-400 mb-2">
+                  Title
                 </label>
-                <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  value={currentTemplate.coverData.front.text.title.content}
+                  onChange={(e) => {
+                    const newCoverData = { ...currentTemplate.coverData };
+                    newCoverData.front.text.title.content = e.target.value;
+                    setCurrentTemplate({
+                      ...currentTemplate,
+                      coverData: newCoverData,
+                    });
+                    setTemplates((prev) =>
+                      prev.map((t) =>
+                        t.id === currentTemplate.id
+                          ? { ...t, coverData: newCoverData }
+                          : t
+                      )
+                    );
+                  }}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md mb-2 text-sm"
+                  placeholder="Enter title"
+                />
+                <select
+                  value={currentTemplate.coverData.front.text.title.font}
+                  onChange={(e) => {
+                    const newCoverData = { ...currentTemplate.coverData };
+                    newCoverData.front.text.title.font = e.target.value;
+                    setCurrentTemplate({
+                      ...currentTemplate,
+                      coverData: newCoverData,
+                    });
+                    setTemplates((prev) =>
+                      prev.map((t) =>
+                        t.id === currentTemplate.id
+                          ? { ...t, coverData: newCoverData }
+                          : t
+                      )
+                    );
+                  }}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md mb-2 text-sm"
+                >
+                  {availableFonts.map((font) => (
+                    <option key={font} value={font}>
+                      {font}
+                    </option>
+                  ))}
+                </select>
+                <div className="flex items-center gap-2">
                   <input
                     type="color"
-                    value={currentTemplate.coverData.back.color.colorCode}
+                    value={currentTemplate.coverData.front.text.title.color}
                     onChange={(e) => {
                       const newCoverData = { ...currentTemplate.coverData };
-                      newCoverData.back.color.colorCode = e.target.value;
+                      newCoverData.front.text.title.color = e.target.value;
                       setCurrentTemplate({
                         ...currentTemplate,
                         coverData: newCoverData,
@@ -1877,14 +1878,14 @@ export default function Admin() {
                         )
                       );
                     }}
-                    className="w-20 h-10 rounded-md cursor-pointer border border-gray-300"
+                    className="w-16 h-9 rounded-md cursor-pointer border border-gray-600"
                   />
                   <input
                     type="text"
-                    value={currentTemplate.coverData.back.color.colorCode}
+                    value={currentTemplate.coverData.front.text.title.color}
                     onChange={(e) => {
                       const newCoverData = { ...currentTemplate.coverData };
-                      newCoverData.back.color.colorCode = e.target.value;
+                      newCoverData.front.text.title.color = e.target.value;
                       setCurrentTemplate({
                         ...currentTemplate,
                         coverData: newCoverData,
@@ -1897,23 +1898,69 @@ export default function Admin() {
                         )
                       );
                     }}
-                    className="flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm font-mono"
-                    placeholder="#FFFFFF"
+                    className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md text-sm font-mono"
+                    placeholder="#000000"
                   />
                 </div>
               </div>
+
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">
-                  Text Color
+                <label className="block text-xs font-medium text-gray-400 mb-2">
+                  Subtitle
                 </label>
-                <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  value={currentTemplate.coverData.front.text.subTitle.content}
+                  onChange={(e) => {
+                    const newCoverData = { ...currentTemplate.coverData };
+                    newCoverData.front.text.subTitle.content = e.target.value;
+                    setCurrentTemplate({
+                      ...currentTemplate,
+                      coverData: newCoverData,
+                    });
+                    setTemplates((prev) =>
+                      prev.map((t) =>
+                        t.id === currentTemplate.id
+                          ? { ...t, coverData: newCoverData }
+                          : t
+                      )
+                    );
+                  }}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md mb-2 text-sm"
+                  placeholder="Enter subtitle"
+                />
+                <select
+                  value={currentTemplate.coverData.front.text.subTitle.font}
+                  onChange={(e) => {
+                    const newCoverData = { ...currentTemplate.coverData };
+                    newCoverData.front.text.subTitle.font = e.target.value;
+                    setCurrentTemplate({
+                      ...currentTemplate,
+                      coverData: newCoverData,
+                    });
+                    setTemplates((prev) =>
+                      prev.map((t) =>
+                        t.id === currentTemplate.id
+                          ? { ...t, coverData: newCoverData }
+                          : t
+                      )
+                    );
+                  }}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md mb-2 text-sm"
+                >
+                  {availableFonts.map((font) => (
+                    <option key={font} value={font}>
+                      {font}
+                    </option>
+                  ))}
+                </select>
+                <div className="flex items-center gap-2">
                   <input
                     type="color"
-                    value={currentTemplate.coverData.back.description.color}
+                    value={currentTemplate.coverData.front.text.subTitle.color}
                     onChange={(e) => {
                       const newCoverData = { ...currentTemplate.coverData };
-                      newCoverData.back.description.color = e.target.value;
-                      newCoverData.back.author.color = e.target.value;
+                      newCoverData.front.text.subTitle.color = e.target.value;
                       setCurrentTemplate({
                         ...currentTemplate,
                         coverData: newCoverData,
@@ -1926,15 +1973,14 @@ export default function Admin() {
                         )
                       );
                     }}
-                    className="w-20 h-10 rounded-md cursor-pointer border border-gray-300"
+                    className="w-16 h-9 rounded-md cursor-pointer border border-gray-600"
                   />
                   <input
                     type="text"
-                    value={currentTemplate.coverData.back.description.color}
+                    value={currentTemplate.coverData.front.text.subTitle.color}
                     onChange={(e) => {
                       const newCoverData = { ...currentTemplate.coverData };
-                      newCoverData.back.description.color = e.target.value;
-                      newCoverData.back.author.color = e.target.value;
+                      newCoverData.front.text.subTitle.color = e.target.value;
                       setCurrentTemplate({
                         ...currentTemplate,
                         coverData: newCoverData,
@@ -1947,7 +1993,108 @@ export default function Admin() {
                         )
                       );
                     }}
-                    className="flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm font-mono"
+                    className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md text-sm font-mono"
+                    placeholder="#000000"
+                  />
+                </div>
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-xs font-medium text-gray-400 mb-2">
+                  Author Name
+                </label>
+                <input
+                  type="text"
+                  value={
+                    currentTemplate.coverData.front.text.authorName.content
+                  }
+                  onChange={(e) => {
+                    const newCoverData = { ...currentTemplate.coverData };
+                    newCoverData.front.text.authorName.content = e.target.value;
+                    setCurrentTemplate({
+                      ...currentTemplate,
+                      coverData: newCoverData,
+                    });
+                    setTemplates((prev) =>
+                      prev.map((t) =>
+                        t.id === currentTemplate.id
+                          ? { ...t, coverData: newCoverData }
+                          : t
+                      )
+                    );
+                  }}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md mb-2 text-sm"
+                  placeholder="Enter author name"
+                />
+                <select
+                  value={currentTemplate.coverData.front.text.authorName.font}
+                  onChange={(e) => {
+                    const newCoverData = { ...currentTemplate.coverData };
+                    newCoverData.front.text.authorName.font = e.target.value;
+                    setCurrentTemplate({
+                      ...currentTemplate,
+                      coverData: newCoverData,
+                    });
+                    setTemplates((prev) =>
+                      prev.map((t) =>
+                        t.id === currentTemplate.id
+                          ? { ...t, coverData: newCoverData }
+                          : t
+                      )
+                    );
+                  }}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md mb-2 text-sm"
+                >
+                  {availableFonts.map((font) => (
+                    <option key={font} value={font}>
+                      {font}
+                    </option>
+                  ))}
+                </select>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={
+                      currentTemplate.coverData.front.text.authorName.color
+                    }
+                    onChange={(e) => {
+                      const newCoverData = { ...currentTemplate.coverData };
+                      newCoverData.front.text.authorName.color = e.target.value;
+                      setCurrentTemplate({
+                        ...currentTemplate,
+                        coverData: newCoverData,
+                      });
+                      setTemplates((prev) =>
+                        prev.map((t) =>
+                          t.id === currentTemplate.id
+                            ? { ...t, coverData: newCoverData }
+                            : t
+                        )
+                      );
+                    }}
+                    className="w-16 h-9 rounded-md cursor-pointer border border-gray-600"
+                  />
+                  <input
+                    type="text"
+                    value={
+                      currentTemplate.coverData.front.text.authorName.color
+                    }
+                    onChange={(e) => {
+                      const newCoverData = { ...currentTemplate.coverData };
+                      newCoverData.front.text.authorName.color = e.target.value;
+                      setCurrentTemplate({
+                        ...currentTemplate,
+                        coverData: newCoverData,
+                      });
+                      setTemplates((prev) =>
+                        prev.map((t) =>
+                          t.id === currentTemplate.id
+                            ? { ...t, coverData: newCoverData }
+                            : t
+                        )
+                      );
+                    }}
+                    className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md text-sm font-mono"
                     placeholder="#000000"
                   />
                 </div>
@@ -1955,18 +2102,187 @@ export default function Admin() {
             </div>
           </div>
 
+          {/* Back Cover Editor */}
+          <div className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
+            <div className="p-4 border-b border-gray-700">
+              <h3 className="text-xs font-semibold text-gray-300 uppercase tracking-wide">
+                Back Cover
+              </h3>
+            </div>
+            <div className="p-4 grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
+                  Background Color
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={currentTemplate.coverData.back.color.colorCode}
+                    onChange={(e) => {
+                      const newCoverData = { ...currentTemplate.coverData };
+                      newCoverData.back.color.colorCode = e.target.value;
+                      setCurrentTemplate({
+                        ...currentTemplate,
+                        coverData: newCoverData,
+                      });
+                      setTemplates((prev) =>
+                        prev.map((t) =>
+                          t.id === currentTemplate.id
+                            ? { ...t, coverData: newCoverData }
+                            : t
+                        )
+                      );
+                    }}
+                    className="w-16 h-9 rounded-md cursor-pointer border border-gray-600"
+                  />
+                  <input
+                    type="text"
+                    value={currentTemplate.coverData.back.color.colorCode}
+                    onChange={(e) => {
+                      const newCoverData = { ...currentTemplate.coverData };
+                      newCoverData.back.color.colorCode = e.target.value;
+                      setCurrentTemplate({
+                        ...currentTemplate,
+                        coverData: newCoverData,
+                      });
+                      setTemplates((prev) =>
+                        prev.map((t) =>
+                          t.id === currentTemplate.id
+                            ? { ...t, coverData: newCoverData }
+                            : t
+                        )
+                      );
+                    }}
+                    className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md text-sm font-mono"
+                    placeholder="#FFFFFF"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
+                  Text Color
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={currentTemplate.coverData.back.description.color}
+                    onChange={(e) => {
+                      const newCoverData = { ...currentTemplate.coverData };
+                      newCoverData.back.description.color = e.target.value;
+                      newCoverData.back.author.color = e.target.value;
+                      setCurrentTemplate({
+                        ...currentTemplate,
+                        coverData: newCoverData,
+                      });
+                      setTemplates((prev) =>
+                        prev.map((t) =>
+                          t.id === currentTemplate.id
+                            ? { ...t, coverData: newCoverData }
+                            : t
+                        )
+                      );
+                    }}
+                    className="w-16 h-9 rounded-md cursor-pointer border border-gray-600"
+                  />
+                  <input
+                    type="text"
+                    value={currentTemplate.coverData.back.description.color}
+                    onChange={(e) => {
+                      const newCoverData = { ...currentTemplate.coverData };
+                      newCoverData.back.description.color = e.target.value;
+                      newCoverData.back.author.color = e.target.value;
+                      setCurrentTemplate({
+                        ...currentTemplate,
+                        coverData: newCoverData,
+                      });
+                      setTemplates((prev) =>
+                        prev.map((t) =>
+                          t.id === currentTemplate.id
+                            ? { ...t, coverData: newCoverData }
+                            : t
+                        )
+                      );
+                    }}
+                    className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md text-sm font-mono"
+                    placeholder="#000000"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
+                  Description Font
+                </label>
+                <select
+                  value={currentTemplate.coverData.back.description.font}
+                  onChange={(e) => {
+                    const newCoverData = { ...currentTemplate.coverData };
+                    newCoverData.back.description.font = e.target.value;
+                    setCurrentTemplate({
+                      ...currentTemplate,
+                      coverData: newCoverData,
+                    });
+                    setTemplates((prev) =>
+                      prev.map((t) =>
+                        t.id === currentTemplate.id
+                          ? { ...t, coverData: newCoverData }
+                          : t
+                      )
+                    );
+                  }}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md text-sm"
+                >
+                  {availableFonts.map((font) => (
+                    <option key={font} value={font}>
+                      {font}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
+                  Author Content Font
+                </label>
+                <select
+                  value={currentTemplate.coverData.back.author.font}
+                  onChange={(e) => {
+                    const newCoverData = { ...currentTemplate.coverData };
+                    newCoverData.back.author.font = e.target.value;
+                    setCurrentTemplate({
+                      ...currentTemplate,
+                      coverData: newCoverData,
+                    });
+                    setTemplates((prev) =>
+                      prev.map((t) =>
+                        t.id === currentTemplate.id
+                          ? { ...t, coverData: newCoverData }
+                          : t
+                      )
+                    );
+                  }}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md text-sm"
+                >
+                  {availableFonts.map((font) => (
+                    <option key={font} value={font}>
+                      {font}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
           {/* Spine Editor */}
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
+            <div className="p-4 border-b border-gray-700">
+              <h3 className="text-xs font-semibold text-gray-300 uppercase tracking-wide">
                 Spine
               </h3>
             </div>
-            <div className="p-6">
-              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">
+            <div className="p-4">
+              <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
                 Spine Color
               </label>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={currentTemplate.coverData.spine.color.colorCode}
@@ -1985,7 +2301,7 @@ export default function Admin() {
                       )
                     );
                   }}
-                  className="w-20 h-10 rounded-md cursor-pointer border border-gray-300"
+                  className="w-16 h-9 rounded-md cursor-pointer border border-gray-600"
                 />
                 <input
                   type="text"
@@ -2005,7 +2321,7 @@ export default function Admin() {
                       )
                     );
                   }}
-                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm font-mono"
+                  className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md text-sm font-mono"
                   placeholder="#3498DB"
                 />
               </div>
@@ -2016,21 +2332,21 @@ export default function Admin() {
 
       {/* Unsplash Image Search Modal */}
       {showImageSearch && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-gray-700">
             {/* Modal Header */}
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+            <div className="p-6 border-b border-gray-700 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-gray-100">
                   Search Images
                 </h3>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-400 mt-1">
                   Powered by Unsplash
                 </p>
               </div>
               <button
                 onClick={() => setShowImageSearch(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-gray-200 transition-colors"
               >
                 <svg
                   className="w-6 h-6"
@@ -2049,7 +2365,7 @@ export default function Admin() {
             </div>
 
             {/* Search Input */}
-            <div className="p-6 border-b border-gray-200">
+            <div className="p-6 border-b border-gray-700">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -2064,12 +2380,12 @@ export default function Admin() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search for images..."
-                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-black focus:border-black"
+                  className="flex-1 px-4 py-2.5 bg-gray-700 border border-gray-600 text-gray-100 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 <button
                   type="submit"
                   disabled={isSearching || !searchQuery.trim()}
-                  className="px-6 py-2.5 bg-black text-white rounded-md hover:bg-gray-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-2.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSearching ? "Searching..." : "Search"}
                 </button>
@@ -2080,7 +2396,7 @@ export default function Admin() {
             <div className="flex-1 overflow-y-auto p-6">
               {isSearching ? (
                 <div className="flex items-center justify-center h-64">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
                 </div>
               ) : searchResults.length > 0 ? (
                 <div className="grid grid-cols-3 gap-4">
@@ -2100,7 +2416,7 @@ export default function Admin() {
                           Select
                         </span>
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
+                      <div className="absolute bottom-0 left-0 right-0 p-2 bg-linear-to-t from-black/60 to-transparent">
                         <p className="text-white text-xs truncate">
                           by {image.user.name}
                         </p>
@@ -2111,7 +2427,7 @@ export default function Admin() {
               ) : (
                 <div className="flex flex-col items-center justify-center h-64 text-center">
                   <svg
-                    className="w-16 h-16 text-gray-300 mb-4"
+                    className="w-16 h-16 text-gray-600 mb-4"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -2123,7 +2439,7 @@ export default function Admin() {
                       d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                     />
                   </svg>
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-gray-400 text-sm">
                     Search for images to get started
                   </p>
                 </div>
@@ -2135,12 +2451,12 @@ export default function Admin() {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmation.show && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
             <div className="flex items-start mb-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+              <div className="shrink-0 w-10 h-10 rounded-full bg-red-900/30 flex items-center justify-center">
                 <svg
-                  className="w-6 h-6 text-red-600"
+                  className="w-6 h-6 text-red-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -2154,17 +2470,19 @@ export default function Admin() {
                 </svg>
               </div>
               <div className="ml-4 flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-gray-100 mb-2">
                   Delete Template
                 </h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Are you sure you want to delete &quot;<strong>{deleteConfirmation.templateName}</strong>&quot;? This action cannot be undone.
+                <p className="text-sm text-gray-300 mb-4">
+                  Are you sure you want to delete &quot;
+                  <strong>{deleteConfirmation.templateName}</strong>&quot;? This
+                  action cannot be undone.
                 </p>
                 <div className="flex gap-3 justify-end">
                   <button
                     onClick={cancelDelete}
                     disabled={isDeleting}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 text-sm font-medium text-gray-200 bg-gray-700 border border-gray-600 rounded-md hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </button>
