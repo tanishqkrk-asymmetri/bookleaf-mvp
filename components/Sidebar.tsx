@@ -74,7 +74,7 @@ export default function Sidebar({
 }) {
   const [selectedFrontView, setSelectedFrontView] = useState<
     "Background" | "Text" | "Template"
-  >("Text");
+  >("Template");
 
   const [imageList, setImageList] = useState([]);
   const [imageQuery, setImageQuery] = useState("");
