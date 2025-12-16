@@ -1379,7 +1379,11 @@ export default function Admin() {
                     Gradient
                   </button>
                   <button
-                    onClick={() => setShowImageSearch(true)}
+                    onClick={() => {
+                      updateTemplate((t) => {
+                        t.coverData.front.backgroundType = "Image";
+                      });
+                    }}
                     className={`px-3 py-2 rounded-md text-xs font-medium transition-all ${
                       currentTemplate.coverData.front.backgroundType === "Image"
                         ? "bg-blue-600 text-white"
