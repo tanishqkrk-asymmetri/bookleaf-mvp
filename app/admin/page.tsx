@@ -943,26 +943,26 @@ export default function Admin() {
 
   return (
     <div className="flex h-screen bg-zinc-900">
-      {/* Left Sidebar */}
-      <div className="w-72 bg-zinc-800 border-r border-zinc-700 flex flex-col">
-        <div className="p-6 border-b border-zinc-700">
+      {/* Column 1: Template Selection */}
+      <div className="w-64 bg-zinc-800 border-r border-zinc-700 flex flex-col">
+        <div className="p-4 border-b border-zinc-700">
           <h2 className="text-sm font-semibold text-zinc-100 uppercase tracking-wide">
             Templates
           </h2>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-1">
+        <div className="flex-1 overflow-y-auto p-3 space-y-1">
           {templates.map((template) => (
             <div
               key={template.id}
-              className={`relative group w-full text-left px-4 py-2.5 rounded-md transition-all text-sm font-medium cursor-pointer flex items-center justify-between ${
+              className={`relative group w-full text-left px-3 py-2 rounded-md transition-all text-sm font-medium cursor-pointer flex items-center justify-between ${
                 selectedTemplateId === template.id
                   ? "bg-blue-600 text-white shadow-sm"
                   : "text-zinc-300 hover:bg-zinc-700"
               }`}
               onClick={() => setSelectedTemplateId(template.id)}
             >
-              <span className="flex-1">{template.name}</span>
+              <span className="flex-1 truncate">{template.name}</span>
               <button
                 onClick={(e) =>
                   handleDeleteClick(e, template.id, template.name)
@@ -993,67 +993,27 @@ export default function Admin() {
           ))}
         </div>
 
-        <div className="p-4 border-t border-zinc-700 space-y-2">
+        <div className="p-3 border-t border-zinc-700">
           <button
             onClick={addNewTemplate}
-            className="w-full px-4 py-2.5 bg-zinc-700 border border-zinc-600 text-zinc-200 rounded-md hover:bg-zinc-600 transition-colors text-sm font-medium"
+            className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-200 rounded-md hover:bg-zinc-600 transition-colors text-sm font-medium"
           >
             + New Template
-          </button>
-
-          <button
-            onClick={saveAllTemplates}
-            disabled={isSaving}
-            className="w-full px-4 py-2.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSaving ? (
-              <span className="flex items-center justify-center">
-                <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Saving...
-              </span>
-            ) : (
-              "Save All"
-            )}
           </button>
         </div>
       </div>
 
-      {/* Main Editor Area */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto p-6 space-y-4">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold text-zinc-100">
-                {currentTemplate.name}
-              </h1>
-              <p className="text-sm text-zinc-400 mt-1">
-                Customize your book cover template
-              </p>
-            </div>
-          </div>
+      {/* Column 2: Controls */}
+      <div className="w-96 bg-zinc-850 border-r border-zinc-700 flex flex-col overflow-hidden">
+        <div className="p-4 border-b border-zinc-700">
+          <h2 className="text-sm font-semibold text-zinc-100 uppercase tracking-wide">
+            Template Settings
+          </h2>
+        </div>
 
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* Template Name Editor */}
-          <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
+          <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-3">
             <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-2">
               Template Name
             </label>
@@ -1069,282 +1029,15 @@ export default function Admin() {
             />
           </div>
 
-          {/* Front Cover Editor */}
+          {/* Front Cover Controls */}
           <div className="bg-zinc-800 border border-zinc-700 rounded-lg overflow-hidden">
-            <div className="p-4 border-b border-zinc-700">
+            <div className="p-3 border-b border-zinc-700">
               <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wide">
                 Front Cover
               </h3>
             </div>
-
-            {/* Front Cover Canvas */}
-            <div className="p-6 bg-zinc-850 flex justify-center">
-              <div className="bg-zinc-900 p-6 rounded-xl shadow-lg">
-                <div
-                  className="relative"
-                  style={{
-                    height: "782px",
-                    width: "487px",
-                    paddingTop: "35px",
-                    paddingLeft: "35px",
-                    paddingRight: "35px",
-                    paddingBottom: "40px",
-                    background:
-                      currentTemplate.coverData.front.backgroundType ===
-                      "Gradient"
-                        ? `linear-gradient(${currentTemplate.coverData.front.gradient.direction}deg, ${currentTemplate.coverData.front.gradient.from}, ${currentTemplate.coverData.front.gradient.to})`
-                        : currentTemplate.coverData.front.color.colorCode,
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "relative",
-                      width: "100%",
-                      height: "100%",
-                    }}
-                  >
-                    {/* Snap Guides */}
-                    {snapGuides.showX && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          bottom: 0,
-                          left: CENTER_X,
-                          width: "2px",
-                          backgroundColor: "rgba(236, 72, 153, 0.8)",
-                          zIndex: 5,
-                        }}
-                      />
-                    )}
-                    {snapGuides.showY && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          left: 0,
-                          right: 0,
-                          top: CENTER_Y,
-                          height: "2px",
-                          backgroundColor: "rgba(236, 72, 153, 0.8)",
-                          zIndex: 5,
-                        }}
-                      />
-                    )}
-
-                    {/* Title */}
-                    <Draggable
-                      key={`title-${currentTemplate.coverData.front.text.title.position.x}-${currentTemplate.coverData.front.text.title.position.y}`}
-                      nodeRef={titleRef}
-                      position={
-                        currentTemplate.coverData.front.text.title.position
-                      }
-                      onStart={handleDragStart}
-                      onDrag={handleTitleDrag}
-                      onStop={handleTitleStop}
-                      bounds="parent"
-                    >
-                      <div
-                        ref={titleRef}
-                        style={{
-                          position: "absolute",
-                          cursor: "move",
-                          zIndex: 10,
-                          maxWidth: "90%",
-                          wordWrap: "break-word",
-                        }}
-                        className="cursor-grab select-none active:cursor-grabbing"
-                      >
-                        <div
-                          style={{
-                            color:
-                              currentTemplate.coverData.front.text.title.color,
-                            fontSize:
-                              currentTemplate.coverData.front.text.title.size +
-                              "px",
-                            fontFamily:
-                              currentTemplate.coverData.front.text.title.font,
-                            fontWeight: currentTemplate.coverData.front.text
-                              .title.bold
-                              ? "bold"
-                              : "normal",
-                            fontStyle: currentTemplate.coverData.front.text
-                              .title.italic
-                              ? "italic"
-                              : "normal",
-                            textDecoration: currentTemplate.coverData.front.text
-                              .title.underline
-                              ? "underline"
-                              : "none",
-                            textAlign:
-                              currentTemplate.coverData.front.text.title.align,
-                            lineHeight:
-                              currentTemplate.coverData.front.text.title
-                                .lineHeight,
-                          }}
-                        >
-                          {currentTemplate.coverData.front.text.title.content}
-                        </div>
-                      </div>
-                    </Draggable>
-
-                    {/* Subtitle */}
-                    <Draggable
-                      key={`subtitle-${currentTemplate.coverData.front.text.subTitle.position.x}-${currentTemplate.coverData.front.text.subTitle.position.y}`}
-                      nodeRef={subtitleRef}
-                      position={
-                        currentTemplate.coverData.front.text.subTitle.position
-                      }
-                      onStart={handleDragStart}
-                      onDrag={handleSubtitleDrag}
-                      onStop={handleSubtitleStop}
-                      bounds="parent"
-                    >
-                      <div
-                        ref={subtitleRef}
-                        style={{
-                          position: "absolute",
-                          cursor: "move",
-                          zIndex: 10,
-                          maxWidth: "90%",
-                          wordWrap: "break-word",
-                        }}
-                        className="cursor-grab select-none active:cursor-grabbing"
-                      >
-                        <div
-                          style={{
-                            color:
-                              currentTemplate.coverData.front.text.subTitle
-                                .color,
-                            fontSize:
-                              currentTemplate.coverData.front.text.subTitle
-                                .size + "px",
-                            fontFamily:
-                              currentTemplate.coverData.front.text.subTitle
-                                .font,
-                            fontWeight: currentTemplate.coverData.front.text
-                              .subTitle.bold
-                              ? "bold"
-                              : "normal",
-                            fontStyle: currentTemplate.coverData.front.text
-                              .subTitle.italic
-                              ? "italic"
-                              : "normal",
-                            textDecoration: currentTemplate.coverData.front.text
-                              .subTitle.underline
-                              ? "underline"
-                              : "none",
-                            textAlign:
-                              currentTemplate.coverData.front.text.subTitle
-                                .align,
-                            lineHeight:
-                              currentTemplate.coverData.front.text.subTitle
-                                .lineHeight,
-                          }}
-                        >
-                          {
-                            currentTemplate.coverData.front.text.subTitle
-                              .content
-                          }
-                        </div>
-                      </div>
-                    </Draggable>
-
-                    {/* Author Name */}
-                    <Draggable
-                      key={`author-${currentTemplate.coverData.front.text.authorName.position.x}-${currentTemplate.coverData.front.text.authorName.position.y}`}
-                      nodeRef={authorNameRef}
-                      position={
-                        currentTemplate.coverData.front.text.authorName.position
-                      }
-                      onStart={handleDragStart}
-                      onDrag={handleAuthorNameDrag}
-                      onStop={handleAuthorNameStop}
-                      bounds="parent"
-                    >
-                      <div
-                        ref={authorNameRef}
-                        style={{
-                          position: "absolute",
-                          cursor: "move",
-                          zIndex: 10,
-                          maxWidth: "90%",
-                          wordWrap: "break-word",
-                        }}
-                        className="cursor-grab select-none active:cursor-grabbing"
-                      >
-                        <div
-                          style={{
-                            color:
-                              currentTemplate.coverData.front.text.authorName
-                                .color,
-                            fontSize:
-                              currentTemplate.coverData.front.text.authorName
-                                .size + "px",
-                            fontFamily:
-                              currentTemplate.coverData.front.text.authorName
-                                .font,
-                            fontWeight: currentTemplate.coverData.front.text
-                              .authorName.bold
-                              ? "bold"
-                              : "normal",
-                            fontStyle: currentTemplate.coverData.front.text
-                              .authorName.italic
-                              ? "italic"
-                              : "normal",
-                            textDecoration: currentTemplate.coverData.front.text
-                              .authorName.underline
-                              ? "underline"
-                              : "none",
-                            textAlign:
-                              currentTemplate.coverData.front.text.authorName
-                                .align,
-                            lineHeight:
-                              currentTemplate.coverData.front.text.authorName
-                                .lineHeight,
-                          }}
-                        >
-                          {
-                            currentTemplate.coverData.front.text.authorName
-                              .content
-                          }
-                        </div>
-                      </div>
-                    </Draggable>
-
-                    {/* Background Image (if selected) */}
-                    {currentTemplate.coverData.front.backgroundType ===
-                      "Image" &&
-                      currentTemplate.coverData.front.image.imageUrl && (
-                        <>
-                          <img
-                            src={currentTemplate.coverData.front.image.imageUrl}
-                            className="w-full h-full absolute top-0 left-0 object-cover"
-                            alt="Background"
-                            // style={{ zIndex: -1 }}
-                          />
-                          <div
-                            className="w-full h-full absolute top-0 left-0"
-                            style={{
-                              backgroundColor:
-                                currentTemplate.coverData.front.image
-                                  .overlayColor,
-                              opacity:
-                                currentTemplate.coverData.front.image
-                                  .overlayOpacity,
-                              pointerEvents: "none",
-                              zIndex: 0,
-                            }}
-                          ></div>
-                        </>
-                      )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Front Cover Controls */}
-            <div className="p-4 grid grid-cols-2 gap-4">
-              <div className="col-span-2">
+            <div className="p-3 space-y-4">
+              <div>
                 <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-2">
                   Background Type
                 </label>
@@ -1355,13 +1048,13 @@ export default function Admin() {
                         t.coverData.front.backgroundType = "Color";
                       });
                     }}
-                    className={`px-3 py-2 rounded-md text-xs font-medium transition-all ${
+                    className={`px-2 py-1.5 rounded-md text-xs font-medium transition-all ${
                       currentTemplate.coverData.front.backgroundType === "Color"
                         ? "bg-blue-600 text-white"
                         : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                     }`}
                   >
-                    Solid Color
+                    Color
                   </button>
                   <button
                     onClick={() => {
@@ -1369,7 +1062,7 @@ export default function Admin() {
                         t.coverData.front.backgroundType = "Gradient";
                       });
                     }}
-                    className={`px-3 py-2 rounded-md text-xs font-medium transition-all ${
+                    className={`px-2 py-1.5 rounded-md text-xs font-medium transition-all ${
                       currentTemplate.coverData.front.backgroundType ===
                       "Gradient"
                         ? "bg-blue-600 text-white"
@@ -1384,7 +1077,7 @@ export default function Admin() {
                         t.coverData.front.backgroundType = "Image";
                       });
                     }}
-                    className={`px-3 py-2 rounded-md text-xs font-medium transition-all ${
+                    className={`px-2 py-1.5 rounded-md text-xs font-medium transition-all ${
                       currentTemplate.coverData.front.backgroundType === "Image"
                         ? "bg-blue-600 text-white"
                         : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
@@ -1396,7 +1089,7 @@ export default function Admin() {
               </div>
 
               {currentTemplate.coverData.front.backgroundType === "Color" && (
-                <div className="col-span-2">
+                <div>
                   <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-2">
                     Background Color
                   </label>
@@ -1442,7 +1135,7 @@ export default function Admin() {
                             t.coverData.front.gradient.from = e.target.value;
                           });
                         }}
-                        className="w-16 h-9 rounded-md cursor-pointer border border-zinc-600"
+                        className="w-12 h-8 rounded-md cursor-pointer border border-zinc-600"
                       />
                       <input
                         type="text"
@@ -1452,7 +1145,7 @@ export default function Admin() {
                             t.coverData.front.gradient.from = e.target.value;
                           });
                         }}
-                        className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-sm font-mono"
+                        className="flex-1 px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs font-mono"
                         placeholder="#FFFFFF"
                       />
                     </div>
@@ -1470,7 +1163,7 @@ export default function Admin() {
                             t.coverData.front.gradient.to = e.target.value;
                           });
                         }}
-                        className="w-16 h-9 rounded-md cursor-pointer border border-zinc-600"
+                        className="w-12 h-8 rounded-md cursor-pointer border border-zinc-600"
                       />
                       <input
                         type="text"
@@ -1480,12 +1173,12 @@ export default function Admin() {
                             t.coverData.front.gradient.to = e.target.value;
                           });
                         }}
-                        className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-sm font-mono"
+                        className="flex-1 px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs font-mono"
                         placeholder="#000000"
                       />
                     </div>
                   </div>
-                  <div className="col-span-2">
+                  <div>
                     <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-2">
                       Direction
                     </label>
@@ -1516,26 +1209,26 @@ export default function Admin() {
 
               {currentTemplate.coverData.front.backgroundType === "Image" && (
                 <>
-                  <div className="col-span-2">
+                  <div>
                     <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-2">
                       Background Image
                     </label>
                     {currentTemplate.coverData.front.image.imageUrl ? (
-                      <div className="relative mb-3">
+                      <div className="relative mb-2">
                         <img
                           src={currentTemplate.coverData.front.image.imageUrl}
                           alt="Background"
-                          className="w-full h-24 object-cover rounded-md"
+                          className="w-full h-20 object-cover rounded-md"
                         />
-                        <div className="absolute top-2 right-2 flex gap-2">
+                        <div className="absolute top-1.5 right-1.5 flex gap-1.5">
                           <button
                             onClick={() => setShowImageSearch(true)}
-                            className="px-2 py-1 bg-zinc-800/90 text-zinc-200 rounded-md text-xs font-medium shadow-md hover:bg-zinc-700 backdrop-blur-sm"
+                            className="px-2 py-1 bg-zinc-800/90 text-zinc-200 rounded text-xs font-medium shadow-md hover:bg-zinc-700 backdrop-blur-sm"
                           >
                             Search
                           </button>
-                          <label className="px-2 py-1 bg-zinc-800/90 text-zinc-200 rounded-md text-xs font-medium shadow-md hover:bg-zinc-700 backdrop-blur-sm cursor-pointer">
-                            {isUploadingImage ? "Uploading..." : "Upload"}
+                          <label className="px-2 py-1 bg-zinc-800/90 text-zinc-200 rounded text-xs font-medium shadow-md hover:bg-zinc-700 backdrop-blur-sm cursor-pointer">
+                            {isUploadingImage ? "..." : "Upload"}
                             <input
                               type="file"
                               accept="image/*"
@@ -1550,15 +1243,15 @@ export default function Admin() {
                       <div className="space-y-2">
                         <button
                           onClick={() => setShowImageSearch(true)}
-                          className="w-full px-3 py-4 border-2 border-dashed border-zinc-600 rounded-md text-sm text-zinc-400 hover:border-zinc-500 hover:text-zinc-300 transition-colors"
+                          className="w-full px-2 py-3 border-2 border-dashed border-zinc-600 rounded-md text-xs text-zinc-400 hover:border-zinc-500 hover:text-zinc-300 transition-colors"
                         >
-                          Search from Unsplash
+                          Search Unsplash
                         </button>
-                        <label className="w-full px-3 py-4 border-2 border-dashed border-zinc-600 rounded-md text-sm text-zinc-400 hover:border-zinc-500 hover:text-zinc-300 transition-colors flex items-center justify-center cursor-pointer">
+                        <label className="w-full px-2 py-3 border-2 border-dashed border-zinc-600 rounded-md text-xs text-zinc-400 hover:border-zinc-500 hover:text-zinc-300 transition-colors flex items-center justify-center cursor-pointer">
                           {isUploadingImage ? (
                             <span className="flex items-center gap-2">
                               <svg
-                                className="animate-spin h-4 w-4 text-zinc-400"
+                                className="animate-spin h-3 w-3 text-zinc-400"
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
@@ -1580,7 +1273,7 @@ export default function Admin() {
                               Uploading...
                             </span>
                           ) : (
-                            "Upload Custom Image"
+                            "Upload Image"
                           )}
                           <input
                             type="file"
@@ -1664,13 +1357,13 @@ export default function Admin() {
               )}
 
               {/* Text Content Editors */}
-              <div className="col-span-2 pt-4 border-t border-zinc-700">
-                <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-3">
+              <div className="pt-2 border-t border-zinc-700">
+                <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-2">
                   Text Elements
                 </label>
               </div>
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-2">
+                <label className="block text-xs font-medium text-zinc-400 mb-1.5">
                   Title
                 </label>
                 <input
@@ -1681,7 +1374,7 @@ export default function Admin() {
                       t.coverData.front.text.title.content = e.target.value;
                     });
                   }}
-                  className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-2 text-sm"
+                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs"
                   placeholder="Enter title"
                 />
                 <select
@@ -1691,7 +1384,7 @@ export default function Admin() {
                       t.coverData.front.text.title.font = e.target.value;
                     });
                   }}
-                  className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-2 text-sm"
+                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs"
                 >
                   {availableFonts.map((font) => (
                     <option key={font} value={font}>
@@ -1708,7 +1401,7 @@ export default function Admin() {
                         t.coverData.front.text.title.color = e.target.value;
                       });
                     }}
-                    className="w-16 h-9 rounded-md cursor-pointer border border-zinc-600"
+                    className="w-12 h-8 rounded-md cursor-pointer border border-zinc-600"
                   />
                   <input
                     type="text"
@@ -1718,14 +1411,14 @@ export default function Admin() {
                         t.coverData.front.text.title.color = e.target.value;
                       });
                     }}
-                    className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-sm font-mono"
+                    className="flex-1 px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs font-mono"
                     placeholder="#000000"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-2">
+                <label className="block text-xs font-medium text-zinc-400 mb-1.5">
                   Subtitle
                 </label>
                 <input
@@ -1736,7 +1429,7 @@ export default function Admin() {
                       t.coverData.front.text.subTitle.content = e.target.value;
                     });
                   }}
-                  className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-2 text-sm"
+                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs"
                   placeholder="Enter subtitle"
                 />
                 <select
@@ -1746,7 +1439,7 @@ export default function Admin() {
                       t.coverData.front.text.subTitle.font = e.target.value;
                     });
                   }}
-                  className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-2 text-sm"
+                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs"
                 >
                   {availableFonts.map((font) => (
                     <option key={font} value={font}>
@@ -1763,7 +1456,7 @@ export default function Admin() {
                         t.coverData.front.text.subTitle.color = e.target.value;
                       });
                     }}
-                    className="w-16 h-9 rounded-md cursor-pointer border border-zinc-600"
+                    className="w-12 h-8 rounded-md cursor-pointer border border-zinc-600"
                   />
                   <input
                     type="text"
@@ -1773,14 +1466,14 @@ export default function Admin() {
                         t.coverData.front.text.subTitle.color = e.target.value;
                       });
                     }}
-                    className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-sm font-mono"
+                    className="flex-1 px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs font-mono"
                     placeholder="#000000"
                   />
                 </div>
               </div>
 
-              <div className="col-span-2">
-                <label className="block text-xs font-medium text-zinc-400 mb-2">
+              <div>
+                <label className="block text-xs font-medium text-zinc-400 mb-1.5">
                   Author Name
                 </label>
                 <input
@@ -1794,7 +1487,7 @@ export default function Admin() {
                         e.target.value;
                     });
                   }}
-                  className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-2 text-sm"
+                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs"
                   placeholder="Enter author name"
                 />
                 <select
@@ -1804,7 +1497,7 @@ export default function Admin() {
                       t.coverData.front.text.authorName.font = e.target.value;
                     });
                   }}
-                  className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-2 text-sm"
+                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs"
                 >
                   {availableFonts.map((font) => (
                     <option key={font} value={font}>
@@ -1824,7 +1517,7 @@ export default function Admin() {
                           e.target.value;
                       });
                     }}
-                    className="w-16 h-9 rounded-md cursor-pointer border border-zinc-600"
+                    className="w-12 h-8 rounded-md cursor-pointer border border-zinc-600"
                   />
                   <input
                     type="text"
@@ -1837,7 +1530,7 @@ export default function Admin() {
                           e.target.value;
                       });
                     }}
-                    className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-sm font-mono"
+                    className="flex-1 px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs font-mono"
                     placeholder="#000000"
                   />
                 </div>
@@ -1847,12 +1540,12 @@ export default function Admin() {
 
           {/* Back Cover Editor */}
           <div className="bg-zinc-800 border border-zinc-700 rounded-lg overflow-hidden">
-            <div className="p-4 border-b border-zinc-700">
+            <div className="p-3 border-b border-zinc-700">
               <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wide">
                 Back Cover
               </h3>
             </div>
-            <div className="p-4 grid grid-cols-2 gap-4">
+            <div className="p-3 space-y-3">
               <div>
                 <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-2">
                   Background Color
@@ -1866,7 +1559,7 @@ export default function Admin() {
                         t.coverData.back.color.colorCode = e.target.value;
                       });
                     }}
-                    className="w-16 h-9 rounded-md cursor-pointer border border-zinc-600"
+                    className="w-12 h-8 rounded-md cursor-pointer border border-zinc-600"
                   />
                   <input
                     type="text"
@@ -1876,7 +1569,7 @@ export default function Admin() {
                         t.coverData.back.color.colorCode = e.target.value;
                       });
                     }}
-                    className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-sm font-mono"
+                    className="flex-1 px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs font-mono"
                     placeholder="#FFFFFF"
                   />
                 </div>
@@ -1895,7 +1588,7 @@ export default function Admin() {
                         t.coverData.back.author.color = e.target.value;
                       });
                     }}
-                    className="w-16 h-9 rounded-md cursor-pointer border border-zinc-600"
+                    className="w-12 h-8 rounded-md cursor-pointer border border-zinc-600"
                   />
                   <input
                     type="text"
@@ -1906,7 +1599,7 @@ export default function Admin() {
                         t.coverData.back.author.color = e.target.value;
                       });
                     }}
-                    className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-sm font-mono"
+                    className="flex-1 px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs font-mono"
                     placeholder="#000000"
                   />
                 </div>
@@ -1922,7 +1615,7 @@ export default function Admin() {
                       t.coverData.back.description.font = e.target.value;
                     });
                   }}
-                  className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-sm"
+                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs"
                 >
                   {availableFonts.map((font) => (
                     <option key={font} value={font}>
@@ -1942,7 +1635,7 @@ export default function Admin() {
                       t.coverData.back.author.font = e.target.value;
                     });
                   }}
-                  className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-sm"
+                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs"
                 >
                   {availableFonts.map((font) => (
                     <option key={font} value={font}>
@@ -1956,12 +1649,12 @@ export default function Admin() {
 
           {/* Spine Editor */}
           <div className="bg-zinc-800 border border-zinc-700 rounded-lg overflow-hidden">
-            <div className="p-4 border-b border-zinc-700">
+            <div className="p-3 border-b border-zinc-700">
               <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wide">
                 Spine
               </h3>
             </div>
-            <div className="p-4">
+            <div className="p-3">
               <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-2">
                 Spine Color
               </label>
@@ -1974,7 +1667,7 @@ export default function Admin() {
                       t.coverData.spine.color.colorCode = e.target.value;
                     });
                   }}
-                  className="w-16 h-9 rounded-md cursor-pointer border border-zinc-600"
+                  className="w-12 h-8 rounded-md cursor-pointer border border-zinc-600"
                 />
                 <input
                   type="text"
@@ -1984,10 +1677,290 @@ export default function Admin() {
                       t.coverData.spine.color.colorCode = e.target.value;
                     });
                   }}
-                  className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-sm font-mono"
+                  className="flex-1 px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs font-mono"
                   placeholder="#3498DB"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Save Button at Bottom */}
+        <div className="p-4 border-t border-zinc-700">
+          <button
+            onClick={saveAllTemplates}
+            disabled={isSaving}
+            className="w-full px-4 py-2.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSaving ? (
+              <span className="flex items-center justify-center">
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Saving...
+              </span>
+            ) : (
+              "Save All Templates"
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Column 3: Preview */}
+      <div className="flex-1 bg-zinc-900 flex items-center justify-center p-6 overflow-auto">
+        <div className="bg-zinc-850 p-6 rounded-xl shadow-2xl">
+          <div
+            className="relative"
+            style={{
+              height: "782px",
+              width: "487px",
+              paddingTop: "35px",
+              paddingLeft: "35px",
+              paddingRight: "35px",
+              paddingBottom: "40px",
+              background:
+                currentTemplate.coverData.front.backgroundType === "Gradient"
+                  ? `linear-gradient(${currentTemplate.coverData.front.gradient.direction}deg, ${currentTemplate.coverData.front.gradient.from}, ${currentTemplate.coverData.front.gradient.to})`
+                  : currentTemplate.coverData.front.color.colorCode,
+            }}
+          >
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                height: "100%",
+              }}
+            >
+              {/* Snap Guides */}
+              {snapGuides.showX && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    bottom: 0,
+                    left: CENTER_X,
+                    width: "2px",
+                    backgroundColor: "rgba(236, 72, 153, 0.8)",
+                    zIndex: 5,
+                  }}
+                />
+              )}
+              {snapGuides.showY && (
+                <div
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    right: 0,
+                    top: CENTER_Y,
+                    height: "2px",
+                    backgroundColor: "rgba(236, 72, 153, 0.8)",
+                    zIndex: 5,
+                  }}
+                />
+              )}
+
+              {/* Title */}
+              <Draggable
+                key={`title-${currentTemplate.coverData.front.text.title.position.x}-${currentTemplate.coverData.front.text.title.position.y}`}
+                nodeRef={titleRef}
+                position={currentTemplate.coverData.front.text.title.position}
+                onStart={handleDragStart}
+                onDrag={handleTitleDrag}
+                onStop={handleTitleStop}
+                bounds="parent"
+              >
+                <div
+                  ref={titleRef}
+                  style={{
+                    position: "absolute",
+                    cursor: "move",
+                    zIndex: 10,
+                    maxWidth: "90%",
+                    wordWrap: "break-word",
+                  }}
+                  className="cursor-grab select-none active:cursor-grabbing"
+                >
+                  <div
+                    style={{
+                      color: currentTemplate.coverData.front.text.title.color,
+                      fontSize:
+                        currentTemplate.coverData.front.text.title.size + "px",
+                      fontFamily:
+                        currentTemplate.coverData.front.text.title.font,
+                      fontWeight: currentTemplate.coverData.front.text.title
+                        .bold
+                        ? "bold"
+                        : "normal",
+                      fontStyle: currentTemplate.coverData.front.text.title
+                        .italic
+                        ? "italic"
+                        : "normal",
+                      textDecoration: currentTemplate.coverData.front.text.title
+                        .underline
+                        ? "underline"
+                        : "none",
+                      textAlign:
+                        currentTemplate.coverData.front.text.title.align,
+                      lineHeight:
+                        currentTemplate.coverData.front.text.title.lineHeight,
+                    }}
+                  >
+                    {currentTemplate.coverData.front.text.title.content}
+                  </div>
+                </div>
+              </Draggable>
+
+              {/* Subtitle */}
+              <Draggable
+                key={`subtitle-${currentTemplate.coverData.front.text.subTitle.position.x}-${currentTemplate.coverData.front.text.subTitle.position.y}`}
+                nodeRef={subtitleRef}
+                position={
+                  currentTemplate.coverData.front.text.subTitle.position
+                }
+                onStart={handleDragStart}
+                onDrag={handleSubtitleDrag}
+                onStop={handleSubtitleStop}
+                bounds="parent"
+              >
+                <div
+                  ref={subtitleRef}
+                  style={{
+                    position: "absolute",
+                    cursor: "move",
+                    zIndex: 10,
+                    maxWidth: "90%",
+                    wordWrap: "break-word",
+                  }}
+                  className="cursor-grab select-none active:cursor-grabbing"
+                >
+                  <div
+                    style={{
+                      color:
+                        currentTemplate.coverData.front.text.subTitle.color,
+                      fontSize:
+                        currentTemplate.coverData.front.text.subTitle.size +
+                        "px",
+                      fontFamily:
+                        currentTemplate.coverData.front.text.subTitle.font,
+                      fontWeight: currentTemplate.coverData.front.text.subTitle
+                        .bold
+                        ? "bold"
+                        : "normal",
+                      fontStyle: currentTemplate.coverData.front.text.subTitle
+                        .italic
+                        ? "italic"
+                        : "normal",
+                      textDecoration: currentTemplate.coverData.front.text
+                        .subTitle.underline
+                        ? "underline"
+                        : "none",
+                      textAlign:
+                        currentTemplate.coverData.front.text.subTitle.align,
+                      lineHeight:
+                        currentTemplate.coverData.front.text.subTitle
+                          .lineHeight,
+                    }}
+                  >
+                    {currentTemplate.coverData.front.text.subTitle.content}
+                  </div>
+                </div>
+              </Draggable>
+
+              {/* Author Name */}
+              <Draggable
+                key={`author-${currentTemplate.coverData.front.text.authorName.position.x}-${currentTemplate.coverData.front.text.authorName.position.y}`}
+                nodeRef={authorNameRef}
+                position={
+                  currentTemplate.coverData.front.text.authorName.position
+                }
+                onStart={handleDragStart}
+                onDrag={handleAuthorNameDrag}
+                onStop={handleAuthorNameStop}
+                bounds="parent"
+              >
+                <div
+                  ref={authorNameRef}
+                  style={{
+                    position: "absolute",
+                    cursor: "move",
+                    zIndex: 10,
+                    maxWidth: "90%",
+                    wordWrap: "break-word",
+                  }}
+                  className="cursor-grab select-none active:cursor-grabbing"
+                >
+                  <div
+                    style={{
+                      color:
+                        currentTemplate.coverData.front.text.authorName.color,
+                      fontSize:
+                        currentTemplate.coverData.front.text.authorName.size +
+                        "px",
+                      fontFamily:
+                        currentTemplate.coverData.front.text.authorName.font,
+                      fontWeight: currentTemplate.coverData.front.text
+                        .authorName.bold
+                        ? "bold"
+                        : "normal",
+                      fontStyle: currentTemplate.coverData.front.text.authorName
+                        .italic
+                        ? "italic"
+                        : "normal",
+                      textDecoration: currentTemplate.coverData.front.text
+                        .authorName.underline
+                        ? "underline"
+                        : "none",
+                      textAlign:
+                        currentTemplate.coverData.front.text.authorName.align,
+                      lineHeight:
+                        currentTemplate.coverData.front.text.authorName
+                          .lineHeight,
+                    }}
+                  >
+                    {currentTemplate.coverData.front.text.authorName.content}
+                  </div>
+                </div>
+              </Draggable>
+
+              {/* Background Image (if selected) */}
+              {currentTemplate.coverData.front.backgroundType === "Image" &&
+                currentTemplate.coverData.front.image.imageUrl && (
+                  <>
+                    <img
+                      src={currentTemplate.coverData.front.image.imageUrl}
+                      className="w-full h-full absolute top-0 left-0 object-cover"
+                      alt="Background"
+                    />
+                    <div
+                      className="w-full h-full absolute top-0 left-0"
+                      style={{
+                        backgroundColor:
+                          currentTemplate.coverData.front.image.overlayColor,
+                        opacity:
+                          currentTemplate.coverData.front.image.overlayOpacity,
+                        pointerEvents: "none",
+                        zIndex: 0,
+                      }}
+                    ></div>
+                  </>
+                )}
             </div>
           </div>
         </div>
