@@ -335,6 +335,28 @@ export default function Admin() {
     "Garamond",
     "Bookman",
     "Avant Garde",
+    "Roboto",
+    "Open Sans",
+    "Lato",
+    "Montserrat",
+    "Playfair Display",
+    "Merriweather",
+    "Raleway",
+    "Oswald",
+    "PT Sans",
+    "PT Serif",
+    "Libre Baskerville",
+    "Crimson Text",
+    "Poppins",
+    "Ubuntu",
+    "Nunito",
+    "Source Sans Pro",
+    "Bebas Neue",
+    "Archivo",
+    "Inter",
+    "Josefin Sans",
+    "Quicksand",
+    "Work Sans",
   ];
 
   // Constants for snapping
@@ -1364,17 +1386,20 @@ export default function Admin() {
               </div>
               <div>
                 <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-                  Title
+                  Title (Max 2 lines)
                 </label>
-                <input
-                  type="text"
+                <textarea
+                  rows={2}
                   value={currentTemplate.coverData.front.text.title.content}
                   onChange={(e) => {
-                    updateTemplate((t) => {
-                      t.coverData.front.text.title.content = e.target.value;
-                    });
+                    const lines = e.target.value.split('\n');
+                    if (lines.length <= 2) {
+                      updateTemplate((t) => {
+                        t.coverData.front.text.title.content = e.target.value;
+                      });
+                    }
                   }}
-                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs"
+                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs resize-none"
                   placeholder="Enter title"
                 />
                 <select
@@ -1415,21 +1440,87 @@ export default function Admin() {
                     placeholder="#000000"
                   />
                 </div>
+                <div>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                    Alignment
+                  </label>
+                  <div className="grid grid-cols-4 gap-1">
+                    <button
+                      onClick={() => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.title.align = "left";
+                        });
+                      }}
+                      className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
+                        currentTemplate.coverData.front.text.title.align === "left"
+                          ? "bg-blue-600 text-white"
+                          : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                      }`}
+                    >
+                      Left
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.title.align = "center";
+                        });
+                      }}
+                      className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
+                        currentTemplate.coverData.front.text.title.align === "center"
+                          ? "bg-blue-600 text-white"
+                          : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                      }`}
+                    >
+                      Center
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.title.align = "right";
+                        });
+                      }}
+                      className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
+                        currentTemplate.coverData.front.text.title.align === "right"
+                          ? "bg-blue-600 text-white"
+                          : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                      }`}
+                    >
+                      Right
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.title.align = "justify";
+                        });
+                      }}
+                      className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
+                        currentTemplate.coverData.front.text.title.align === "justify"
+                          ? "bg-blue-600 text-white"
+                          : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                      }`}
+                    >
+                      Justify
+                    </button>
+                  </div>
+                </div>
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-                  Subtitle
+                  Subtitle (Max 2 lines)
                 </label>
-                <input
-                  type="text"
+                <textarea
+                  rows={2}
                   value={currentTemplate.coverData.front.text.subTitle.content}
                   onChange={(e) => {
-                    updateTemplate((t) => {
-                      t.coverData.front.text.subTitle.content = e.target.value;
-                    });
+                    const lines = e.target.value.split('\n');
+                    if (lines.length <= 2) {
+                      updateTemplate((t) => {
+                        t.coverData.front.text.subTitle.content = e.target.value;
+                      });
+                    }
                   }}
-                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs"
+                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs resize-none"
                   placeholder="Enter subtitle"
                 />
                 <select
@@ -1469,6 +1560,69 @@ export default function Admin() {
                     className="flex-1 px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs font-mono"
                     placeholder="#000000"
                   />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                    Alignment
+                  </label>
+                  <div className="grid grid-cols-4 gap-1">
+                    <button
+                      onClick={() => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.subTitle.align = "left";
+                        });
+                      }}
+                      className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
+                        currentTemplate.coverData.front.text.subTitle.align === "left"
+                          ? "bg-blue-600 text-white"
+                          : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                      }`}
+                    >
+                      Left
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.subTitle.align = "center";
+                        });
+                      }}
+                      className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
+                        currentTemplate.coverData.front.text.subTitle.align === "center"
+                          ? "bg-blue-600 text-white"
+                          : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                      }`}
+                    >
+                      Center
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.subTitle.align = "right";
+                        });
+                      }}
+                      className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
+                        currentTemplate.coverData.front.text.subTitle.align === "right"
+                          ? "bg-blue-600 text-white"
+                          : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                      }`}
+                    >
+                      Right
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.subTitle.align = "justify";
+                        });
+                      }}
+                      className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
+                        currentTemplate.coverData.front.text.subTitle.align === "justify"
+                          ? "bg-blue-600 text-white"
+                          : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                      }`}
+                    >
+                      Justify
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -1533,6 +1687,69 @@ export default function Admin() {
                     className="flex-1 px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs font-mono"
                     placeholder="#000000"
                   />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                    Alignment
+                  </label>
+                  <div className="grid grid-cols-4 gap-1">
+                    <button
+                      onClick={() => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.authorName.align = "left";
+                        });
+                      }}
+                      className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
+                        currentTemplate.coverData.front.text.authorName.align === "left"
+                          ? "bg-blue-600 text-white"
+                          : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                      }`}
+                    >
+                      Left
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.authorName.align = "center";
+                        });
+                      }}
+                      className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
+                        currentTemplate.coverData.front.text.authorName.align === "center"
+                          ? "bg-blue-600 text-white"
+                          : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                      }`}
+                    >
+                      Center
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.authorName.align = "right";
+                        });
+                      }}
+                      className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
+                        currentTemplate.coverData.front.text.authorName.align === "right"
+                          ? "bg-blue-600 text-white"
+                          : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                      }`}
+                    >
+                      Right
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.authorName.align = "justify";
+                        });
+                      }}
+                      className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
+                        currentTemplate.coverData.front.text.authorName.align === "justify"
+                          ? "bg-blue-600 text-white"
+                          : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                      }`}
+                    >
+                      Justify
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1792,7 +2009,7 @@ export default function Admin() {
                     position: "absolute",
                     cursor: "move",
                     zIndex: 10,
-                    maxWidth: "90%",
+                    width: "90%",
                     wordWrap: "break-word",
                   }}
                   className="cursor-grab select-none active:cursor-grabbing"
@@ -1820,6 +2037,8 @@ export default function Admin() {
                         currentTemplate.coverData.front.text.title.align,
                       lineHeight:
                         currentTemplate.coverData.front.text.title.lineHeight,
+                      whiteSpace: "pre-wrap",
+                      width: "100%",
                     }}
                   >
                     {currentTemplate.coverData.front.text.title.content}
@@ -1845,7 +2064,7 @@ export default function Admin() {
                     position: "absolute",
                     cursor: "move",
                     zIndex: 10,
-                    maxWidth: "90%",
+                    width: "90%",
                     wordWrap: "break-word",
                   }}
                   className="cursor-grab select-none active:cursor-grabbing"
@@ -1876,6 +2095,8 @@ export default function Admin() {
                       lineHeight:
                         currentTemplate.coverData.front.text.subTitle
                           .lineHeight,
+                      whiteSpace: "pre-wrap",
+                      width: "100%",
                     }}
                   >
                     {currentTemplate.coverData.front.text.subTitle.content}

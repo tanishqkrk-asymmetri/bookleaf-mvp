@@ -1528,13 +1528,19 @@ export default function Sidebar({
             ) : selectedFrontView === "Text" ? (
               <div className="divide-y-2 divide-zinc-500">
                 <div className="space-y-2 py-3">
-                  <div>Title</div>
-                  <input
+                  <div>Title (Max 2 lines)</div>
+                  <textarea
+                    rows={2}
                     value={designData.coverData.front.text.title.content}
-                    onChange={(e) => handleTitleContentChange(e.target.value)}
-                    className="w-full p-2 rounded-lg bg-[#F3EDEB]"
+                    onChange={(e) => {
+                      const lines = e.target.value.split('\n');
+                      if (lines.length <= 2) {
+                        handleTitleContentChange(e.target.value);
+                      }
+                    }}
+                    className="w-full p-2 rounded-lg bg-[#F3EDEB] resize-none"
                     placeholder="Title"
-                  ></input>
+                  ></textarea>
                   <div className="space-y-3 py-3">
                     <div>Title color</div>
                     <div className="grid grid-cols-5 gap-1">
@@ -1627,6 +1633,28 @@ export default function Sidebar({
                       <option value="Garamond">Garamond</option>
                       <option value="Bookman">Bookman</option>
                       <option value="Avant Garde">Avant Garde</option>
+                      <option value="Roboto">Roboto</option>
+                      <option value="Open Sans">Open Sans</option>
+                      <option value="Lato">Lato</option>
+                      <option value="Montserrat">Montserrat</option>
+                      <option value="Playfair Display">Playfair Display</option>
+                      <option value="Merriweather">Merriweather</option>
+                      <option value="Raleway">Raleway</option>
+                      <option value="Oswald">Oswald</option>
+                      <option value="PT Sans">PT Sans</option>
+                      <option value="PT Serif">PT Serif</option>
+                      <option value="Libre Baskerville">Libre Baskerville</option>
+                      <option value="Crimson Text">Crimson Text</option>
+                      <option value="Poppins">Poppins</option>
+                      <option value="Ubuntu">Ubuntu</option>
+                      <option value="Nunito">Nunito</option>
+                      <option value="Source Sans Pro">Source Sans Pro</option>
+                      <option value="Bebas Neue">Bebas Neue</option>
+                      <option value="Archivo">Archivo</option>
+                      <option value="Inter">Inter</option>
+                      <option value="Josefin Sans">Josefin Sans</option>
+                      <option value="Quicksand">Quicksand</option>
+                      <option value="Work Sans">Work Sans</option>
                     </select>
                   </div>
                   <div className="space-y-3 py-3">
@@ -1733,15 +1761,19 @@ export default function Sidebar({
                   </div>
                 </div>
                 <div className="space-y-2 py-3">
-                  <div>Subtitle</div>
-                  <input
+                  <div>Subtitle (Max 2 lines)</div>
+                  <textarea
+                    rows={2}
                     value={designData.coverData.front.text.subTitle.content}
-                    onChange={(e) =>
-                      handleSubtitleContentChange(e.target.value)
-                    }
-                    className="w-full p-2 rounded-lg bg-[#F3EDEB]"
+                    onChange={(e) => {
+                      const lines = e.target.value.split('\n');
+                      if (lines.length <= 2) {
+                        handleSubtitleContentChange(e.target.value);
+                      }
+                    }}
+                    className="w-full p-2 rounded-lg bg-[#F3EDEB] resize-none"
                     placeholder="Subtitle"
-                  ></input>
+                  ></textarea>
                   <div className="space-y-3 py-3">
                     <div>Subtitle color</div>
                     <div className="grid grid-cols-5 gap-1">
@@ -1835,6 +1867,28 @@ export default function Sidebar({
                       <option value="Garamond">Garamond</option>
                       <option value="Bookman">Bookman</option>
                       <option value="Avant Garde">Avant Garde</option>
+                      <option value="Roboto">Roboto</option>
+                      <option value="Open Sans">Open Sans</option>
+                      <option value="Lato">Lato</option>
+                      <option value="Montserrat">Montserrat</option>
+                      <option value="Playfair Display">Playfair Display</option>
+                      <option value="Merriweather">Merriweather</option>
+                      <option value="Raleway">Raleway</option>
+                      <option value="Oswald">Oswald</option>
+                      <option value="PT Sans">PT Sans</option>
+                      <option value="PT Serif">PT Serif</option>
+                      <option value="Libre Baskerville">Libre Baskerville</option>
+                      <option value="Crimson Text">Crimson Text</option>
+                      <option value="Poppins">Poppins</option>
+                      <option value="Ubuntu">Ubuntu</option>
+                      <option value="Nunito">Nunito</option>
+                      <option value="Source Sans Pro">Source Sans Pro</option>
+                      <option value="Bebas Neue">Bebas Neue</option>
+                      <option value="Archivo">Archivo</option>
+                      <option value="Inter">Inter</option>
+                      <option value="Josefin Sans">Josefin Sans</option>
+                      <option value="Quicksand">Quicksand</option>
+                      <option value="Work Sans">Work Sans</option>
                     </select>
                   </div>
                   <div className="space-y-3 py-3">
@@ -2052,6 +2106,28 @@ export default function Sidebar({
                       <option value="Garamond">Garamond</option>
                       <option value="Bookman">Bookman</option>
                       <option value="Avant Garde">Avant Garde</option>
+                      <option value="Roboto">Roboto</option>
+                      <option value="Open Sans">Open Sans</option>
+                      <option value="Lato">Lato</option>
+                      <option value="Montserrat">Montserrat</option>
+                      <option value="Playfair Display">Playfair Display</option>
+                      <option value="Merriweather">Merriweather</option>
+                      <option value="Raleway">Raleway</option>
+                      <option value="Oswald">Oswald</option>
+                      <option value="PT Sans">PT Sans</option>
+                      <option value="PT Serif">PT Serif</option>
+                      <option value="Libre Baskerville">Libre Baskerville</option>
+                      <option value="Crimson Text">Crimson Text</option>
+                      <option value="Poppins">Poppins</option>
+                      <option value="Ubuntu">Ubuntu</option>
+                      <option value="Nunito">Nunito</option>
+                      <option value="Source Sans Pro">Source Sans Pro</option>
+                      <option value="Bebas Neue">Bebas Neue</option>
+                      <option value="Archivo">Archivo</option>
+                      <option value="Inter">Inter</option>
+                      <option value="Josefin Sans">Josefin Sans</option>
+                      <option value="Quicksand">Quicksand</option>
+                      <option value="Work Sans">Work Sans</option>
                     </select>
                   </div>
                   <div className="space-y-3 py-3">
@@ -2269,33 +2345,40 @@ export default function Sidebar({
                                     temp.front.text.title.position.y *
                                     thumbnailScale
                                   }px`,
-                                  color: temp.front.text.title.color,
-                                  fontSize: `${
-                                    temp.front.text.title.size * thumbnailScale
-                                  }px`,
-                                  fontFamily:
-                                    temp.front.text.title.font === "Default"
-                                      ? "inherit"
-                                      : temp.front.text.title.font,
-                                  fontWeight: temp.front.text.title.bold
-                                    ? "bold"
-                                    : "normal",
-                                  fontStyle: temp.front.text.title.italic
-                                    ? "italic"
-                                    : "normal",
-                                  textDecoration: temp.front.text.title
-                                    .underline
-                                    ? "underline"
-                                    : "none",
-                                  textAlign: temp.front.text.title.align,
-                                  lineHeight: temp.front.text.title.lineHeight,
-                                  maxWidth: "90%",
-                                  wordWrap: "break-word",
-                                  overflowWrap: "break-word",
+                                  width: "90%",
                                 }}
                                 className="select-none"
                               >
-                                {temp.front.text.title.content}
+                                <div
+                                  style={{
+                                    color: temp.front.text.title.color,
+                                    fontSize: `${
+                                      temp.front.text.title.size * thumbnailScale
+                                    }px`,
+                                    fontFamily:
+                                      temp.front.text.title.font === "Default"
+                                        ? "inherit"
+                                        : temp.front.text.title.font,
+                                    fontWeight: temp.front.text.title.bold
+                                      ? "bold"
+                                      : "normal",
+                                    fontStyle: temp.front.text.title.italic
+                                      ? "italic"
+                                      : "normal",
+                                    textDecoration: temp.front.text.title
+                                      .underline
+                                      ? "underline"
+                                      : "none",
+                                    textAlign: temp.front.text.title.align,
+                                    lineHeight: temp.front.text.title.lineHeight,
+                                    wordWrap: "break-word",
+                                    overflowWrap: "break-word",
+                                    whiteSpace: "pre-wrap",
+                                    width: "100%",
+                                  }}
+                                >
+                                  {temp.front.text.title.content}
+                                </div>
                               </div>
                               {/* Subtitle */}
                               <div
@@ -2310,35 +2393,42 @@ export default function Sidebar({
                                     temp.front.text.subTitle.position.y *
                                     thumbnailScale
                                   }px`,
-                                  color: temp.front.text.subTitle.color,
-                                  fontSize: `${
-                                    temp.front.text.subTitle.size *
-                                    thumbnailScale
-                                  }px`,
-                                  fontFamily:
-                                    temp.front.text.subTitle.font === "Default"
-                                      ? "inherit"
-                                      : temp.front.text.subTitle.font,
-                                  fontWeight: temp.front.text.subTitle.bold
-                                    ? "bold"
-                                    : "normal",
-                                  fontStyle: temp.front.text.subTitle.italic
-                                    ? "italic"
-                                    : "normal",
-                                  textDecoration: temp.front.text.subTitle
-                                    .underline
-                                    ? "underline"
-                                    : "none",
-                                  textAlign: temp.front.text.subTitle.align,
-                                  lineHeight:
-                                    temp.front.text.subTitle.lineHeight,
-                                  maxWidth: "90%",
-                                  wordWrap: "break-word",
-                                  overflowWrap: "break-word",
+                                  width: "90%",
                                 }}
                                 className="select-none"
                               >
-                                {temp.front.text.subTitle.content}
+                                <div
+                                  style={{
+                                    color: temp.front.text.subTitle.color,
+                                    fontSize: `${
+                                      temp.front.text.subTitle.size *
+                                      thumbnailScale
+                                    }px`,
+                                    fontFamily:
+                                      temp.front.text.subTitle.font === "Default"
+                                        ? "inherit"
+                                        : temp.front.text.subTitle.font,
+                                    fontWeight: temp.front.text.subTitle.bold
+                                      ? "bold"
+                                      : "normal",
+                                    fontStyle: temp.front.text.subTitle.italic
+                                      ? "italic"
+                                      : "normal",
+                                    textDecoration: temp.front.text.subTitle
+                                      .underline
+                                      ? "underline"
+                                      : "none",
+                                    textAlign: temp.front.text.subTitle.align,
+                                    lineHeight:
+                                      temp.front.text.subTitle.lineHeight,
+                                    wordWrap: "break-word",
+                                    overflowWrap: "break-word",
+                                    whiteSpace: "pre-wrap",
+                                    width: "100%",
+                                  }}
+                                >
+                                  {temp.front.text.subTitle.content}
+                                </div>
                               </div>
                               {/* Author Name */}
                               <div
@@ -2575,6 +2665,23 @@ export default function Sidebar({
                     <option value="Georgia">Georgia</option>
                     <option value="Courier New">Courier New</option>
                     <option value="Verdana">Verdana</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Open Sans">Open Sans</option>
+                    <option value="Lato">Lato</option>
+                    <option value="Montserrat">Montserrat</option>
+                    <option value="Playfair Display">Playfair Display</option>
+                    <option value="Merriweather">Merriweather</option>
+                    <option value="Raleway">Raleway</option>
+                    <option value="PT Sans">PT Sans</option>
+                    <option value="PT Serif">PT Serif</option>
+                    <option value="Libre Baskerville">Libre Baskerville</option>
+                    <option value="Crimson Text">Crimson Text</option>
+                    <option value="Poppins">Poppins</option>
+                    <option value="Ubuntu">Ubuntu</option>
+                    <option value="Nunito">Nunito</option>
+                    <option value="Source Sans Pro">Source Sans Pro</option>
+                    <option value="Inter">Inter</option>
+                    <option value="Work Sans">Work Sans</option>
                   </select>
                 </div>
               </div>
@@ -2681,6 +2788,23 @@ export default function Sidebar({
                     <option value="Georgia">Georgia</option>
                     <option value="Courier New">Courier New</option>
                     <option value="Verdana">Verdana</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Open Sans">Open Sans</option>
+                    <option value="Lato">Lato</option>
+                    <option value="Montserrat">Montserrat</option>
+                    <option value="Playfair Display">Playfair Display</option>
+                    <option value="Merriweather">Merriweather</option>
+                    <option value="Raleway">Raleway</option>
+                    <option value="PT Sans">PT Sans</option>
+                    <option value="PT Serif">PT Serif</option>
+                    <option value="Libre Baskerville">Libre Baskerville</option>
+                    <option value="Crimson Text">Crimson Text</option>
+                    <option value="Poppins">Poppins</option>
+                    <option value="Ubuntu">Ubuntu</option>
+                    <option value="Nunito">Nunito</option>
+                    <option value="Source Sans Pro">Source Sans Pro</option>
+                    <option value="Inter">Inter</option>
+                    <option value="Work Sans">Work Sans</option>
                   </select>
                 </div>
               </div>
