@@ -319,43 +319,71 @@ export default function Admin() {
   });
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Available fonts
+  // Available fonts (sorted alphabetically, with Default first)
   const availableFonts = [
     "Default",
-    "Arial",
-    "Helvetica",
-    "Times New Roman",
-    "Georgia",
-    "Verdana",
-    "Courier New",
-    "Trebuchet MS",
-    "Comic Sans MS",
-    "Impact",
-    "Palatino",
-    "Garamond",
-    "Bookman",
-    "Avant Garde",
-    "Roboto",
-    "Open Sans",
-    "Lato",
-    "Montserrat",
-    "Playfair Display",
-    "Merriweather",
-    "Raleway",
-    "Oswald",
-    "PT Sans",
-    "PT Serif",
-    "Libre Baskerville",
-    "Crimson Text",
-    "Poppins",
-    "Ubuntu",
-    "Nunito",
-    "Source Sans Pro",
-    "Bebas Neue",
+    "Alex Brush",
+    "Allura",
+    "Anton",
     "Archivo",
+    "Architects Daughter",
+    "Arial",
+    "Arimo",
+    "Avant Garde",
+    "Bebas Neue",
+    "Bookman",
+    "Cinzel",
+    "Comic Sans MS",
+    "Cormorant",
+    "Cormorant Garamond",
+    "Courier New",
+    "Courgette",
+    "Crimson Text",
+    "Dancing Script",
+    "Fjalla One",
+    "Forum",
+    "Futura",
+    "Garamond",
+    "Georgia",
+    "Georgia Pro",
+    "Great Vibes",
+    "Helvetica",
+    "Impact",
     "Inter",
     "Josefin Sans",
+    "Lato",
+    "Libre Baskerville",
+    "Lora",
+    "Merriweather",
+    "Montserrat",
+    "Mr Dafoe",
+    "Nunito",
+    "Open Sans",
+    "Oswald",
+    "Pacifico",
+    "Palatino",
+    "Playfair Display",
+    "Playfair Display SC",
+    "Plus Jakarta Sans",
+    "Poppins",
+    "PT Sans",
+    "PT Serif",
     "Quicksand",
+    "Racing Sans One",
+    "Raleway",
+    "Roboto",
+    "Sacramento",
+    "Satisfy",
+    "Shadows Into Light",
+    "Source Sans Pro",
+    "Spectral",
+    "Tangerine",
+    "Times New Roman",
+    "Trebuchet MS",
+    "Ubuntu",
+    "Ultra",
+    "Verdana",
+    "Vidaloka",
     "Work Sans",
   ];
 
@@ -1412,7 +1440,11 @@ export default function Admin() {
                   className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs"
                 >
                   {availableFonts.map((font) => (
-                    <option key={font} value={font}>
+                    <option 
+                      key={font} 
+                      value={font}
+                      style={{ fontFamily: font === "Default" ? "inherit" : font }}
+                    >
                       {font}
                     </option>
                   ))}
@@ -1533,7 +1565,11 @@ export default function Admin() {
                   className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs"
                 >
                   {availableFonts.map((font) => (
-                    <option key={font} value={font}>
+                    <option 
+                      key={font} 
+                      value={font}
+                      style={{ fontFamily: font === "Default" ? "inherit" : font }}
+                    >
                       {font}
                     </option>
                   ))}
@@ -1654,7 +1690,11 @@ export default function Admin() {
                   className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs"
                 >
                   {availableFonts.map((font) => (
-                    <option key={font} value={font}>
+                    <option 
+                      key={font} 
+                      value={font}
+                      style={{ fontFamily: font === "Default" ? "inherit" : font }}
+                    >
                       {font}
                     </option>
                   ))}
@@ -1835,7 +1875,11 @@ export default function Admin() {
                   className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs"
                 >
                   {availableFonts.map((font) => (
-                    <option key={font} value={font}>
+                    <option 
+                      key={font} 
+                      value={font}
+                      style={{ fontFamily: font === "Default" ? "inherit" : font }}
+                    >
                       {font}
                     </option>
                   ))}
@@ -1855,7 +1899,11 @@ export default function Admin() {
                   className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs"
                 >
                   {availableFonts.map((font) => (
-                    <option key={font} value={font}>
+                    <option 
+                      key={font} 
+                      value={font}
+                      style={{ fontFamily: font === "Default" ? "inherit" : font }}
+                    >
                       {font}
                     </option>
                   ))}

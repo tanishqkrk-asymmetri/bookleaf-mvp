@@ -34,6 +34,17 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Font family definitions for system fonts and fallbacks */
+* {
+  /* System fonts that aren't available on Google Fonts */
+  --font-futura: Futura, "Trebuchet MS", Arial, sans-serif;
+  --font-georgia-pro: "Georgia Pro", Georgia, serif;
+  --font-bookman: Bookman, "Palatino Linotype", serif;
+  --font-avant-garde: "Avant Garde", "Century Gothic", sans-serif;
+  --font-palatino: Palatino, "Palatino Linotype", "Book Antiqua", serif;
+  --font-garamond: Garamond, "Times New Roman", serif;
+}
+
 /*
 Source - https://stackoverflow.com/a/38163892
 Posted by deathangel908, modified by community. See post 'Timeline' for change history
