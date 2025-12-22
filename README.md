@@ -26,7 +26,7 @@ The following fonts were not available on Google Fonts, so similar alternatives 
 - **Majesty** → **Cinzel**
 - **ADIREK SERIF** → **Spectral**
 - **Breathing** → **Dancing Script**
-- **Lucy Rose** → **Pacifico**, **Sacramento**
+- **Lucy Rose** → **Lora**
 - **The Seasons** → **Playfair Display SC**, **Cormorant**
 - **Cinzel Monterchi** → **Cinzel**
 - **TC Chaddlewood** → **Fjalla One**
