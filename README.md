@@ -3,41 +3,65 @@ admin123
 
 ---
 
-## Font Alternatives Used
+Mr Dafoe
 
-The following fonts were not available on Google Fonts, so similar alternatives were used:
+ADIREK SERIF - Spectral
 
-### Not Available - System Font Fallbacks:
+Arimo
 
-- **Georgia Pro** → Uses system Georgia with fallback
-- **Futura** → Uses system Futura with Trebuchet MS fallback
-- **Bookman** → Uses system Bookman with Palatino fallback
-- **Avant Garde** → Uses system Avant Garde with Century Gothic fallback
-- **Palatino** → Uses system Palatino with Palatino Linotype fallback
-- **Garamond** → Uses system Garamond with Times New Roman fallback
+JOSEFIN SANS
 
-### Not Available - Google Font Alternatives:
+Georgia Pro - Cormorant Garamond
 
-- **Gellatio** → **Great Vibes**, **Allura**
-- **OPEN SAUCE** → **Inter**
-- **Apricots** → **Playfair Display**
-- **CANVA SANS** → **Plus Jakarta Sans**
-- **Bright Sunshine** → **Cormorant Garamond**
-- **Majesty** → **Cinzel**
-- **ADIREK SERIF** → **Spectral**
-- **Breathing** → **Dancing Script**
-- **Lucy Rose** → **Lora**
-- **The Seasons** → **Playfair Display SC**, **Cormorant**
-- **Cinzel Monterchi** → **Cinzel**
-- **TC Chaddlewood** → **Fjalla One**
-- **Le Jour Serif** → **Merriweather**
-- **Handsome Britany** → **Bebas Neue**
-- **Eyesome Script** → **Allura**
-- **Della Respira** → **Alex Brush**, **Allura**
-- **Better Saturday** → **Great Vibes**
-- **Boston Angel** → **Ultra**, **Racing Sans One**
-- **Norwester** → **Oswald**, **Anton**
+Oswald
 
-### Available on Google Fonts (Used as-is):
+Gellatio - Allura
 
-✓ Mr Dafoe, Arimo, Playfair Display, Great Vibes, Josefin Sans, Oswald, Forum, Vidaloka, Montserrat, Inter, Cinzel, Dancing Script, Pacifico, Sacramento, Merriweather, Bebas Neue, Allura, Anton, and all other standard fonts
+Forum
+
+Playfair Display
+
+Breathing - Dancing Script
+
+Great Vibes
+
+Vidaloka
+
+Open sauce - Inter
+
+Lucy Rose - Crimson Text
+
+Apricots - Courgette
+
+The Seasons - Cormorant
+
+CANVA SANS - Plus Jakarta Sans
+
+Cinzel
+
+Bright Sunshine - Satisfy
+
+Monterchi- Nunito
+Futura
+
+TC Chaddlewood - shadows into light
+
+Majesty - null
+
+Le Jour Serif - Merriweather
+
+Handsome - Dancing Script
+
+della respira - Cormorant
+
+Britany - null
+
+Better Saturday - Great Vibes
+
+Eyesome Script - Alex brush
+
+Boston Angel - Georgia
+
+Montserrat
+
+Norwester - Anton

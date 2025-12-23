@@ -1420,7 +1420,7 @@ export default function Admin() {
                   rows={2}
                   value={currentTemplate.coverData.front.text.title.content}
                   onChange={(e) => {
-                    const lines = e.target.value.split('\n');
+                    const lines = e.target.value.split("\n");
                     if (lines.length <= 2) {
                       updateTemplate((t) => {
                         t.coverData.front.text.title.content = e.target.value;
@@ -1440,15 +1440,51 @@ export default function Admin() {
                   className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs"
                 >
                   {availableFonts.map((font) => (
-                    <option 
-                      key={font} 
+                    <option
+                      key={font}
                       value={font}
-                      style={{ fontFamily: font === "Default" ? "inherit" : font }}
+                      style={{
+                        fontFamily: font === "Default" ? "inherit" : font,
+                      }}
                     >
                       {font}
                     </option>
                   ))}
                 </select>
+                <div className="mb-1.5">
+                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                    Font Size
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="range"
+                      min="12"
+                      max="120"
+                      value={currentTemplate.coverData.front.text.title.size}
+                      onChange={(e) => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.title.size = parseInt(
+                            e.target.value
+                          );
+                        });
+                      }}
+                      className="flex-1"
+                    />
+                    <input
+                      type="number"
+                      min="12"
+                      max="120"
+                      value={currentTemplate.coverData.front.text.title.size}
+                      onChange={(e) => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.title.size =
+                            parseInt(e.target.value) || 48;
+                        });
+                      }}
+                      className="w-16 px-2 py-1 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs text-center"
+                    />
+                  </div>
+                </div>
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
@@ -1484,7 +1520,8 @@ export default function Admin() {
                         });
                       }}
                       className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
-                        currentTemplate.coverData.front.text.title.align === "left"
+                        currentTemplate.coverData.front.text.title.align ===
+                        "left"
                           ? "bg-blue-600 text-white"
                           : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                       }`}
@@ -1498,7 +1535,8 @@ export default function Admin() {
                         });
                       }}
                       className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
-                        currentTemplate.coverData.front.text.title.align === "center"
+                        currentTemplate.coverData.front.text.title.align ===
+                        "center"
                           ? "bg-blue-600 text-white"
                           : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                       }`}
@@ -1512,7 +1550,8 @@ export default function Admin() {
                         });
                       }}
                       className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
-                        currentTemplate.coverData.front.text.title.align === "right"
+                        currentTemplate.coverData.front.text.title.align ===
+                        "right"
                           ? "bg-blue-600 text-white"
                           : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                       }`}
@@ -1526,7 +1565,8 @@ export default function Admin() {
                         });
                       }}
                       className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
-                        currentTemplate.coverData.front.text.title.align === "justify"
+                        currentTemplate.coverData.front.text.title.align ===
+                        "justify"
                           ? "bg-blue-600 text-white"
                           : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                       }`}
@@ -1545,10 +1585,11 @@ export default function Admin() {
                   rows={2}
                   value={currentTemplate.coverData.front.text.subTitle.content}
                   onChange={(e) => {
-                    const lines = e.target.value.split('\n');
+                    const lines = e.target.value.split("\n");
                     if (lines.length <= 2) {
                       updateTemplate((t) => {
-                        t.coverData.front.text.subTitle.content = e.target.value;
+                        t.coverData.front.text.subTitle.content =
+                          e.target.value;
                       });
                     }
                   }}
@@ -1565,15 +1606,51 @@ export default function Admin() {
                   className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs"
                 >
                   {availableFonts.map((font) => (
-                    <option 
-                      key={font} 
+                    <option
+                      key={font}
                       value={font}
-                      style={{ fontFamily: font === "Default" ? "inherit" : font }}
+                      style={{
+                        fontFamily: font === "Default" ? "inherit" : font,
+                      }}
                     >
                       {font}
                     </option>
                   ))}
                 </select>
+                <div className="mb-1.5">
+                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                    Font Size
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="range"
+                      min="12"
+                      max="80"
+                      value={currentTemplate.coverData.front.text.subTitle.size}
+                      onChange={(e) => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.subTitle.size = parseInt(
+                            e.target.value
+                          );
+                        });
+                      }}
+                      className="flex-1"
+                    />
+                    <input
+                      type="number"
+                      min="12"
+                      max="80"
+                      value={currentTemplate.coverData.front.text.subTitle.size}
+                      onChange={(e) => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.subTitle.size =
+                            parseInt(e.target.value) || 24;
+                        });
+                      }}
+                      className="w-16 px-2 py-1 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs text-center"
+                    />
+                  </div>
+                </div>
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
@@ -1609,7 +1686,8 @@ export default function Admin() {
                         });
                       }}
                       className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
-                        currentTemplate.coverData.front.text.subTitle.align === "left"
+                        currentTemplate.coverData.front.text.subTitle.align ===
+                        "left"
                           ? "bg-blue-600 text-white"
                           : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                       }`}
@@ -1623,7 +1701,8 @@ export default function Admin() {
                         });
                       }}
                       className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
-                        currentTemplate.coverData.front.text.subTitle.align === "center"
+                        currentTemplate.coverData.front.text.subTitle.align ===
+                        "center"
                           ? "bg-blue-600 text-white"
                           : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                       }`}
@@ -1637,7 +1716,8 @@ export default function Admin() {
                         });
                       }}
                       className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
-                        currentTemplate.coverData.front.text.subTitle.align === "right"
+                        currentTemplate.coverData.front.text.subTitle.align ===
+                        "right"
                           ? "bg-blue-600 text-white"
                           : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                       }`}
@@ -1651,7 +1731,8 @@ export default function Admin() {
                         });
                       }}
                       className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
-                        currentTemplate.coverData.front.text.subTitle.align === "justify"
+                        currentTemplate.coverData.front.text.subTitle.align ===
+                        "justify"
                           ? "bg-blue-600 text-white"
                           : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                       }`}
@@ -1690,15 +1771,55 @@ export default function Admin() {
                   className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs"
                 >
                   {availableFonts.map((font) => (
-                    <option 
-                      key={font} 
+                    <option
+                      key={font}
                       value={font}
-                      style={{ fontFamily: font === "Default" ? "inherit" : font }}
+                      style={{
+                        fontFamily: font === "Default" ? "inherit" : font,
+                      }}
                     >
                       {font}
                     </option>
                   ))}
                 </select>
+                <div className="mb-1.5">
+                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                    Font Size
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="range"
+                      min="12"
+                      max="60"
+                      value={
+                        currentTemplate.coverData.front.text.authorName.size
+                      }
+                      onChange={(e) => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.authorName.size = parseInt(
+                            e.target.value
+                          );
+                        });
+                      }}
+                      className="flex-1"
+                    />
+                    <input
+                      type="number"
+                      min="12"
+                      max="60"
+                      value={
+                        currentTemplate.coverData.front.text.authorName.size
+                      }
+                      onChange={(e) => {
+                        updateTemplate((t) => {
+                          t.coverData.front.text.authorName.size =
+                            parseInt(e.target.value) || 20;
+                        });
+                      }}
+                      className="w-16 px-2 py-1 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs text-center"
+                    />
+                  </div>
+                </div>
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
@@ -1740,7 +1861,8 @@ export default function Admin() {
                         });
                       }}
                       className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
-                        currentTemplate.coverData.front.text.authorName.align === "left"
+                        currentTemplate.coverData.front.text.authorName
+                          .align === "left"
                           ? "bg-blue-600 text-white"
                           : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                       }`}
@@ -1754,7 +1876,8 @@ export default function Admin() {
                         });
                       }}
                       className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
-                        currentTemplate.coverData.front.text.authorName.align === "center"
+                        currentTemplate.coverData.front.text.authorName
+                          .align === "center"
                           ? "bg-blue-600 text-white"
                           : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                       }`}
@@ -1768,7 +1891,8 @@ export default function Admin() {
                         });
                       }}
                       className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
-                        currentTemplate.coverData.front.text.authorName.align === "right"
+                        currentTemplate.coverData.front.text.authorName
+                          .align === "right"
                           ? "bg-blue-600 text-white"
                           : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                       }`}
@@ -1782,7 +1906,8 @@ export default function Admin() {
                         });
                       }}
                       className={`px-2 py-1.5 rounded text-xs font-medium transition-all ${
-                        currentTemplate.coverData.front.text.authorName.align === "justify"
+                        currentTemplate.coverData.front.text.authorName
+                          .align === "justify"
                           ? "bg-blue-600 text-white"
                           : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                       }`}
@@ -1875,10 +2000,12 @@ export default function Admin() {
                   className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs"
                 >
                   {availableFonts.map((font) => (
-                    <option 
-                      key={font} 
+                    <option
+                      key={font}
                       value={font}
-                      style={{ fontFamily: font === "Default" ? "inherit" : font }}
+                      style={{
+                        fontFamily: font === "Default" ? "inherit" : font,
+                      }}
                     >
                       {font}
                     </option>
@@ -1899,10 +2026,12 @@ export default function Admin() {
                   className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md text-xs"
                 >
                   {availableFonts.map((font) => (
-                    <option 
-                      key={font} 
+                    <option
+                      key={font}
                       value={font}
-                      style={{ fontFamily: font === "Default" ? "inherit" : font }}
+                      style={{
+                        fontFamily: font === "Default" ? "inherit" : font,
+                      }}
                     >
                       {font}
                     </option>
