@@ -566,7 +566,7 @@ export default function Canvas({
                   cursor: "move",
                   zIndex: 10,
                   touchAction: "none",
-                  width: "90%",
+                  maxWidth: "90%",
                   wordWrap: "break-word",
                   overflowWrap: "break-word",
                 }}
@@ -594,7 +594,6 @@ export default function Canvas({
                     lineHeight:
                       designData.coverData.front.text.title.lineHeight,
                     whiteSpace: "pre-wrap",
-                    width: "100%",
                   }}
                 >
                   {designData.coverData.front.text.title.content}
@@ -622,7 +621,7 @@ export default function Canvas({
                   cursor: "move",
                   zIndex: 10,
                   touchAction: "none",
-                  width: "90%",
+                  maxWidth: "90%",
                   wordWrap: "break-word",
                   overflowWrap: "break-word",
                 }}
@@ -652,7 +651,6 @@ export default function Canvas({
                     lineHeight:
                       designData.coverData.front.text.subTitle.lineHeight,
                     whiteSpace: "pre-wrap",
-                    width: "100%",
                   }}
                 >
                   {designData.coverData.front.text.subTitle.content}

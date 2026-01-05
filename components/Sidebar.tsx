@@ -1528,17 +1528,14 @@ export default function Sidebar({
             ) : selectedFrontView === "Text" ? (
               <div className="divide-y-2 divide-zinc-500">
                 <div className="space-y-2 py-3">
-                  <div>Title (Max 2 lines)</div>
+                  <div>Title</div>
                   <textarea
-                    rows={2}
+                    rows={3}
                     value={designData.coverData.front.text.title.content}
                     onChange={(e) => {
-                      const lines = e.target.value.split('\n');
-                      if (lines.length <= 2) {
-                        handleTitleContentChange(e.target.value);
-                      }
+                      handleTitleContentChange(e.target.value);
                     }}
-                    className="w-full p-2 rounded-lg bg-[#F3EDEB] resize-none"
+                    className="w-full p-2 rounded-lg bg-[#F3EDEB] resize-y"
                     placeholder="Title"
                   ></textarea>
                   <div className="space-y-3 py-3">
@@ -1789,17 +1786,14 @@ export default function Sidebar({
                   </div>
                 </div>
                 <div className="space-y-2 py-3">
-                  <div>Subtitle (Max 2 lines)</div>
+                  <div>Subtitle</div>
                   <textarea
-                    rows={2}
+                    rows={3}
                     value={designData.coverData.front.text.subTitle.content}
                     onChange={(e) => {
-                      const lines = e.target.value.split('\n');
-                      if (lines.length <= 2) {
-                        handleSubtitleContentChange(e.target.value);
-                      }
+                      handleSubtitleContentChange(e.target.value);
                     }}
-                    className="w-full p-2 rounded-lg bg-[#F3EDEB] resize-none"
+                    className="w-full p-2 rounded-lg bg-[#F3EDEB] resize-y"
                     placeholder="Subtitle"
                   ></textarea>
                   <div className="space-y-3 py-3">

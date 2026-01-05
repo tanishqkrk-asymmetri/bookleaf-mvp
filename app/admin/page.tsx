@@ -1414,20 +1414,17 @@ export default function Admin() {
               </div>
               <div>
                 <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-                  Title (Max 2 lines)
+                  Title
                 </label>
                 <textarea
-                  rows={2}
+                  rows={3}
                   value={currentTemplate.coverData.front.text.title.content}
                   onChange={(e) => {
-                    const lines = e.target.value.split("\n");
-                    if (lines.length <= 2) {
-                      updateTemplate((t) => {
-                        t.coverData.front.text.title.content = e.target.value;
-                      });
-                    }
+                    updateTemplate((t) => {
+                      t.coverData.front.text.title.content = e.target.value;
+                    });
                   }}
-                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs resize-none"
+                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs resize-y"
                   placeholder="Enter title"
                 />
                 <select
@@ -1579,21 +1576,18 @@ export default function Admin() {
 
               <div>
                 <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-                  Subtitle (Max 2 lines)
+                  Subtitle
                 </label>
                 <textarea
-                  rows={2}
+                  rows={3}
                   value={currentTemplate.coverData.front.text.subTitle.content}
                   onChange={(e) => {
-                    const lines = e.target.value.split("\n");
-                    if (lines.length <= 2) {
-                      updateTemplate((t) => {
-                        t.coverData.front.text.subTitle.content =
-                          e.target.value;
-                      });
-                    }
+                    updateTemplate((t) => {
+                      t.coverData.front.text.subTitle.content =
+                        e.target.value;
+                    });
                   }}
-                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs resize-none"
+                  className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs resize-y"
                   placeholder="Enter subtitle"
                 />
                 <select
@@ -2186,7 +2180,7 @@ export default function Admin() {
                     position: "absolute",
                     cursor: "move",
                     zIndex: 10,
-                    width: "90%",
+                    maxWidth: "90%",
                     wordWrap: "break-word",
                   }}
                   className="cursor-grab select-none active:cursor-grabbing"
@@ -2215,7 +2209,6 @@ export default function Admin() {
                       lineHeight:
                         currentTemplate.coverData.front.text.title.lineHeight,
                       whiteSpace: "pre-wrap",
-                      width: "100%",
                     }}
                   >
                     {currentTemplate.coverData.front.text.title.content}
@@ -2241,7 +2234,7 @@ export default function Admin() {
                     position: "absolute",
                     cursor: "move",
                     zIndex: 10,
-                    width: "90%",
+                    maxWidth: "90%",
                     wordWrap: "break-word",
                   }}
                   className="cursor-grab select-none active:cursor-grabbing"
@@ -2273,7 +2266,6 @@ export default function Admin() {
                         currentTemplate.coverData.front.text.subTitle
                           .lineHeight,
                       whiteSpace: "pre-wrap",
-                      width: "100%",
                     }}
                   >
                     {currentTemplate.coverData.front.text.subTitle.content}
