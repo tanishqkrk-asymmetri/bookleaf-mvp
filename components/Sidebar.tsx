@@ -23,43 +23,20 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CoverData } from "../types/Book";
-import * as htmlToImage from "html-to-image";
 
-// Helper function to convert uploaded file to base64 using htmlToImage
-const fileToBase64WithHtmlToImage = async (file: File): Promise<string> => {
+// Helper function to convert uploaded file to base64
+const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const img = document.createElement("img");
-    const url = URL.createObjectURL(file);
-
-    img.onload = async () => {
-      try {
-        // Create a container for the image
-        const container = document.createElement("div");
-        container.style.position = "absolute";
-        container.style.left = "-9999px";
-        container.appendChild(img);
-        document.body.appendChild(container);
-
-        // Convert to base64 using htmlToImage
-        const dataUrl = await htmlToImage.toPng(img, { quality: 1 });
-
-        // Cleanup
-        document.body.removeChild(container);
-        URL.revokeObjectURL(url);
-
-        resolve(dataUrl);
-      } catch (error) {
-        URL.revokeObjectURL(url);
-        reject(error);
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+      } else {
+        reject(new Error("Failed to read file as base64"));
       }
     };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Failed to load image"));
-    };
-
-    img.src = url;
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
   });
 };
 
@@ -282,43 +259,32 @@ export default function Sidebar({
       }
 
       try {
-        // Convert file to base64 using htmlToImage
-        const base64Data = await fileToBase64WithHtmlToImage(file);
+        // Convert file to base64
+        const base64Data = await fileToBase64(file);
+        const base64Content = base64Data.split(",")[1]; // Remove data:image/...;base64, prefix
 
-        // First, set a temporary preview
-        setDesignData((org) => ({
-          ...org,
-          coverData: {
-            ...org.coverData,
-            front: {
-              ...org.coverData.front,
-              backgroundType: "Image",
-              image: {
-                ...org.coverData.front.image,
-                imageUrl: base64Data,
-              },
-            },
-          },
-        }));
+        // Upload to S3
+        const timestamp = Date.now();
+        const extension = file.name.split(".").pop() || "jpg";
+        const filename = `frontcover_${timestamp}.${extension}`;
 
-        // Upload to server
         const response = await fetch("/api/uploadImage", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            filename: `frontcover${Date.now()}.jpg`,
+            filename: filename,
             upload_file: {
-              filename: `frontcover${Date.now()}.jpg`,
-              contents: base64Data.split(",")[1],
+              filename: filename,
+              contents: base64Content,
             },
           }),
         });
 
         const result = await response.json();
 
-        // Update with hosted URL
+        // Update with hosted URL from S3
         if (result.hosted_link) {
           setDesignData((org) => ({
             ...org,
@@ -334,6 +300,8 @@ export default function Sidebar({
               },
             },
           }));
+        } else {
+          throw new Error("No hosted link returned from server");
         }
       } catch (error) {
         console.error("Error uploading image:", error);
@@ -1029,42 +997,32 @@ export default function Sidebar({
       }
 
       try {
-        // Convert file to base64 using htmlToImage
-        const base64Data = await fileToBase64WithHtmlToImage(file);
+        // Convert file to base64
+        const base64Data = await fileToBase64(file);
+        const base64Content = base64Data.split(",")[1]; // Remove data:image/...;base64, prefix
 
-        // First, set a temporary preview
-        setDesignData((org) => ({
-          ...org,
-          coverData: {
-            ...org.coverData,
-            back: {
-              ...org.coverData.back,
-              author: {
-                ...org.coverData.back.author,
-                imageUrl: base64Data,
-              },
-            },
-          },
-        }));
+        // Upload to S3
+        const timestamp = Date.now();
+        const extension = file.name.split(".").pop() || "jpg";
+        const filename = `author_${timestamp}.${extension}`;
 
-        // Upload to server
         const response = await fetch("/api/uploadImage", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            filename: `author${Date.now()}.jpg`,
+            filename: filename,
             upload_file: {
-              filename: `author${Date.now()}.jpg`,
-              contents: base64Data.split(",")[1],
+              filename: filename,
+              contents: base64Content,
             },
           }),
         });
 
         const result = await response.json();
 
-        // Update with hosted URL
+        // Update with hosted URL from S3
         if (result.hosted_link) {
           setDesignData((org) => ({
             ...org,
@@ -1079,6 +1037,8 @@ export default function Sidebar({
               },
             },
           }));
+        } else {
+          throw new Error("No hosted link returned from server");
         }
       } catch (error) {
         console.error("Error uploading author image:", error);
@@ -1622,64 +1582,35 @@ export default function Sidebar({
                       <option value="Anton" style={{ fontFamily: "Anton" }}>Anton</option>
                       <option value="Archivo" style={{ fontFamily: "Archivo" }}>Archivo</option>
                       <option value="Architects Daughter" style={{ fontFamily: "Architects Daughter" }}>Architects Daughter</option>
-                      <option value="Arial" style={{ fontFamily: "Arial" }}>Arial</option>
                       <option value="Arimo" style={{ fontFamily: "Arimo" }}>Arimo</option>
-                      <option value="Avant Garde" style={{ fontFamily: "Avant Garde" }}>Avant Garde</option>
                       <option value="Bebas Neue" style={{ fontFamily: "Bebas Neue" }}>Bebas Neue</option>
-                      <option value="Bookman" style={{ fontFamily: "Bookman" }}>Bookman</option>
                       <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>Cinzel</option>
                       <option value="Comic Sans MS" style={{ fontFamily: "Comic Sans MS" }}>Comic Sans MS</option>
-                      <option value="Cormorant" style={{ fontFamily: "Cormorant" }}>Cormorant</option>
                       <option value="Cormorant Garamond" style={{ fontFamily: "Cormorant Garamond" }}>Cormorant Garamond</option>
                       <option value="Courier New" style={{ fontFamily: "Courier New" }}>Courier New</option>
                       <option value="Courgette" style={{ fontFamily: "Courgette" }}>Courgette</option>
-                      <option value="Crimson Text" style={{ fontFamily: "Crimson Text" }}>Crimson Text</option>
                       <option value="Dancing Script" style={{ fontFamily: "Dancing Script" }}>Dancing Script</option>
-                      <option value="Fjalla One" style={{ fontFamily: "Fjalla One" }}>Fjalla One</option>
                       <option value="Forum" style={{ fontFamily: "Forum" }}>Forum</option>
                       <option value="Futura" style={{ fontFamily: "Futura" }}>Futura</option>
-                      <option value="Garamond" style={{ fontFamily: "Garamond" }}>Garamond</option>
                       <option value="Georgia" style={{ fontFamily: "Georgia" }}>Georgia</option>
-                      <option value="Georgia Pro" style={{ fontFamily: "Georgia Pro" }}>Georgia Pro</option>
                       <option value="Great Vibes" style={{ fontFamily: "Great Vibes" }}>Great Vibes</option>
-                      <option value="Helvetica" style={{ fontFamily: "Helvetica" }}>Helvetica</option>
                       <option value="Impact" style={{ fontFamily: "Impact" }}>Impact</option>
-                      <option value="Inter" style={{ fontFamily: "Inter" }}>Inter</option>
                       <option value="Josefin Sans" style={{ fontFamily: "Josefin Sans" }}>Josefin Sans</option>
                       <option value="Lato" style={{ fontFamily: "Lato" }}>Lato</option>
-                      <option value="Libre Baskerville" style={{ fontFamily: "Libre Baskerville" }}>Libre Baskerville</option>
-                      <option value="Lora" style={{ fontFamily: "Lora" }}>Lora</option>
                       <option value="Merriweather" style={{ fontFamily: "Merriweather" }}>Merriweather</option>
                       <option value="Montserrat" style={{ fontFamily: "Montserrat" }}>Montserrat</option>
                       <option value="Mr Dafoe" style={{ fontFamily: "Mr Dafoe" }}>Mr Dafoe</option>
                       <option value="Nunito" style={{ fontFamily: "Nunito" }}>Nunito</option>
-                      <option value="Open Sans" style={{ fontFamily: "Open Sans" }}>Open Sans</option>
                       <option value="Oswald" style={{ fontFamily: "Oswald" }}>Oswald</option>
                       <option value="Pacifico" style={{ fontFamily: "Pacifico" }}>Pacifico</option>
                       <option value="Palatino" style={{ fontFamily: "Palatino" }}>Palatino</option>
                       <option value="Playfair Display" style={{ fontFamily: "Playfair Display" }}>Playfair Display</option>
                       <option value="Playfair Display SC" style={{ fontFamily: "Playfair Display SC" }}>Playfair Display SC</option>
-                      <option value="Plus Jakarta Sans" style={{ fontFamily: "Plus Jakarta Sans" }}>Plus Jakarta Sans</option>
                       <option value="Poppins" style={{ fontFamily: "Poppins" }}>Poppins</option>
-                      <option value="PT Sans" style={{ fontFamily: "PT Sans" }}>PT Sans</option>
-                      <option value="PT Serif" style={{ fontFamily: "PT Serif" }}>PT Serif</option>
                       <option value="Quicksand" style={{ fontFamily: "Quicksand" }}>Quicksand</option>
-                      <option value="Racing Sans One" style={{ fontFamily: "Racing Sans One" }}>Racing Sans One</option>
-                      <option value="Raleway" style={{ fontFamily: "Raleway" }}>Raleway</option>
-                      <option value="Roboto" style={{ fontFamily: "Roboto" }}>Roboto</option>
-                      <option value="Sacramento" style={{ fontFamily: "Sacramento" }}>Sacramento</option>
                       <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>Satisfy</option>
-                      <option value="Shadows Into Light" style={{ fontFamily: "Shadows Into Light" }}>Shadows Into Light</option>
-                      <option value="Source Sans Pro" style={{ fontFamily: "Source Sans Pro" }}>Source Sans Pro</option>
-                      <option value="Spectral" style={{ fontFamily: "Spectral" }}>Spectral</option>
                       <option value="Tangerine" style={{ fontFamily: "Tangerine" }}>Tangerine</option>
-                      <option value="Times New Roman" style={{ fontFamily: "Times New Roman" }}>Times New Roman</option>
-                      <option value="Trebuchet MS" style={{ fontFamily: "Trebuchet MS" }}>Trebuchet MS</option>
-                      <option value="Ubuntu" style={{ fontFamily: "Ubuntu" }}>Ubuntu</option>
-                      <option value="Ultra" style={{ fontFamily: "Ultra" }}>Ultra</option>
-                      <option value="Verdana" style={{ fontFamily: "Verdana" }}>Verdana</option>
                       <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>Vidaloka</option>
-                      <option value="Work Sans" style={{ fontFamily: "Work Sans" }}>Work Sans</option>
                     </select>
                   </div>
                   <div className="space-y-3 py-3">
@@ -1881,64 +1812,35 @@ export default function Sidebar({
                       <option value="Anton" style={{ fontFamily: "Anton" }}>Anton</option>
                       <option value="Archivo" style={{ fontFamily: "Archivo" }}>Archivo</option>
                       <option value="Architects Daughter" style={{ fontFamily: "Architects Daughter" }}>Architects Daughter</option>
-                      <option value="Arial" style={{ fontFamily: "Arial" }}>Arial</option>
                       <option value="Arimo" style={{ fontFamily: "Arimo" }}>Arimo</option>
-                      <option value="Avant Garde" style={{ fontFamily: "Avant Garde" }}>Avant Garde</option>
                       <option value="Bebas Neue" style={{ fontFamily: "Bebas Neue" }}>Bebas Neue</option>
-                      <option value="Bookman" style={{ fontFamily: "Bookman" }}>Bookman</option>
                       <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>Cinzel</option>
                       <option value="Comic Sans MS" style={{ fontFamily: "Comic Sans MS" }}>Comic Sans MS</option>
-                      <option value="Cormorant" style={{ fontFamily: "Cormorant" }}>Cormorant</option>
                       <option value="Cormorant Garamond" style={{ fontFamily: "Cormorant Garamond" }}>Cormorant Garamond</option>
                       <option value="Courier New" style={{ fontFamily: "Courier New" }}>Courier New</option>
                       <option value="Courgette" style={{ fontFamily: "Courgette" }}>Courgette</option>
-                      <option value="Crimson Text" style={{ fontFamily: "Crimson Text" }}>Crimson Text</option>
                       <option value="Dancing Script" style={{ fontFamily: "Dancing Script" }}>Dancing Script</option>
-                      <option value="Fjalla One" style={{ fontFamily: "Fjalla One" }}>Fjalla One</option>
                       <option value="Forum" style={{ fontFamily: "Forum" }}>Forum</option>
                       <option value="Futura" style={{ fontFamily: "Futura" }}>Futura</option>
-                      <option value="Garamond" style={{ fontFamily: "Garamond" }}>Garamond</option>
                       <option value="Georgia" style={{ fontFamily: "Georgia" }}>Georgia</option>
-                      <option value="Georgia Pro" style={{ fontFamily: "Georgia Pro" }}>Georgia Pro</option>
                       <option value="Great Vibes" style={{ fontFamily: "Great Vibes" }}>Great Vibes</option>
-                      <option value="Helvetica" style={{ fontFamily: "Helvetica" }}>Helvetica</option>
                       <option value="Impact" style={{ fontFamily: "Impact" }}>Impact</option>
-                      <option value="Inter" style={{ fontFamily: "Inter" }}>Inter</option>
                       <option value="Josefin Sans" style={{ fontFamily: "Josefin Sans" }}>Josefin Sans</option>
                       <option value="Lato" style={{ fontFamily: "Lato" }}>Lato</option>
-                      <option value="Libre Baskerville" style={{ fontFamily: "Libre Baskerville" }}>Libre Baskerville</option>
-                      <option value="Lora" style={{ fontFamily: "Lora" }}>Lora</option>
                       <option value="Merriweather" style={{ fontFamily: "Merriweather" }}>Merriweather</option>
                       <option value="Montserrat" style={{ fontFamily: "Montserrat" }}>Montserrat</option>
                       <option value="Mr Dafoe" style={{ fontFamily: "Mr Dafoe" }}>Mr Dafoe</option>
                       <option value="Nunito" style={{ fontFamily: "Nunito" }}>Nunito</option>
-                      <option value="Open Sans" style={{ fontFamily: "Open Sans" }}>Open Sans</option>
                       <option value="Oswald" style={{ fontFamily: "Oswald" }}>Oswald</option>
                       <option value="Pacifico" style={{ fontFamily: "Pacifico" }}>Pacifico</option>
                       <option value="Palatino" style={{ fontFamily: "Palatino" }}>Palatino</option>
                       <option value="Playfair Display" style={{ fontFamily: "Playfair Display" }}>Playfair Display</option>
                       <option value="Playfair Display SC" style={{ fontFamily: "Playfair Display SC" }}>Playfair Display SC</option>
-                      <option value="Plus Jakarta Sans" style={{ fontFamily: "Plus Jakarta Sans" }}>Plus Jakarta Sans</option>
                       <option value="Poppins" style={{ fontFamily: "Poppins" }}>Poppins</option>
-                      <option value="PT Sans" style={{ fontFamily: "PT Sans" }}>PT Sans</option>
-                      <option value="PT Serif" style={{ fontFamily: "PT Serif" }}>PT Serif</option>
                       <option value="Quicksand" style={{ fontFamily: "Quicksand" }}>Quicksand</option>
-                      <option value="Racing Sans One" style={{ fontFamily: "Racing Sans One" }}>Racing Sans One</option>
-                      <option value="Raleway" style={{ fontFamily: "Raleway" }}>Raleway</option>
-                      <option value="Roboto" style={{ fontFamily: "Roboto" }}>Roboto</option>
-                      <option value="Sacramento" style={{ fontFamily: "Sacramento" }}>Sacramento</option>
                       <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>Satisfy</option>
-                      <option value="Shadows Into Light" style={{ fontFamily: "Shadows Into Light" }}>Shadows Into Light</option>
-                      <option value="Source Sans Pro" style={{ fontFamily: "Source Sans Pro" }}>Source Sans Pro</option>
-                      <option value="Spectral" style={{ fontFamily: "Spectral" }}>Spectral</option>
                       <option value="Tangerine" style={{ fontFamily: "Tangerine" }}>Tangerine</option>
-                      <option value="Times New Roman" style={{ fontFamily: "Times New Roman" }}>Times New Roman</option>
-                      <option value="Trebuchet MS" style={{ fontFamily: "Trebuchet MS" }}>Trebuchet MS</option>
-                      <option value="Ubuntu" style={{ fontFamily: "Ubuntu" }}>Ubuntu</option>
-                      <option value="Ultra" style={{ fontFamily: "Ultra" }}>Ultra</option>
-                      <option value="Verdana" style={{ fontFamily: "Verdana" }}>Verdana</option>
                       <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>Vidaloka</option>
-                      <option value="Work Sans" style={{ fontFamily: "Work Sans" }}>Work Sans</option>
                     </select>
                   </div>
                   <div className="space-y-3 py-3">
@@ -2148,64 +2050,35 @@ export default function Sidebar({
                       <option value="Anton" style={{ fontFamily: "Anton" }}>Anton</option>
                       <option value="Archivo" style={{ fontFamily: "Archivo" }}>Archivo</option>
                       <option value="Architects Daughter" style={{ fontFamily: "Architects Daughter" }}>Architects Daughter</option>
-                      <option value="Arial" style={{ fontFamily: "Arial" }}>Arial</option>
                       <option value="Arimo" style={{ fontFamily: "Arimo" }}>Arimo</option>
-                      <option value="Avant Garde" style={{ fontFamily: "Avant Garde" }}>Avant Garde</option>
                       <option value="Bebas Neue" style={{ fontFamily: "Bebas Neue" }}>Bebas Neue</option>
-                      <option value="Bookman" style={{ fontFamily: "Bookman" }}>Bookman</option>
                       <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>Cinzel</option>
                       <option value="Comic Sans MS" style={{ fontFamily: "Comic Sans MS" }}>Comic Sans MS</option>
-                      <option value="Cormorant" style={{ fontFamily: "Cormorant" }}>Cormorant</option>
                       <option value="Cormorant Garamond" style={{ fontFamily: "Cormorant Garamond" }}>Cormorant Garamond</option>
                       <option value="Courier New" style={{ fontFamily: "Courier New" }}>Courier New</option>
                       <option value="Courgette" style={{ fontFamily: "Courgette" }}>Courgette</option>
-                      <option value="Crimson Text" style={{ fontFamily: "Crimson Text" }}>Crimson Text</option>
                       <option value="Dancing Script" style={{ fontFamily: "Dancing Script" }}>Dancing Script</option>
-                      <option value="Fjalla One" style={{ fontFamily: "Fjalla One" }}>Fjalla One</option>
                       <option value="Forum" style={{ fontFamily: "Forum" }}>Forum</option>
                       <option value="Futura" style={{ fontFamily: "Futura" }}>Futura</option>
-                      <option value="Garamond" style={{ fontFamily: "Garamond" }}>Garamond</option>
                       <option value="Georgia" style={{ fontFamily: "Georgia" }}>Georgia</option>
-                      <option value="Georgia Pro" style={{ fontFamily: "Georgia Pro" }}>Georgia Pro</option>
                       <option value="Great Vibes" style={{ fontFamily: "Great Vibes" }}>Great Vibes</option>
-                      <option value="Helvetica" style={{ fontFamily: "Helvetica" }}>Helvetica</option>
                       <option value="Impact" style={{ fontFamily: "Impact" }}>Impact</option>
-                      <option value="Inter" style={{ fontFamily: "Inter" }}>Inter</option>
                       <option value="Josefin Sans" style={{ fontFamily: "Josefin Sans" }}>Josefin Sans</option>
                       <option value="Lato" style={{ fontFamily: "Lato" }}>Lato</option>
-                      <option value="Libre Baskerville" style={{ fontFamily: "Libre Baskerville" }}>Libre Baskerville</option>
-                      <option value="Lora" style={{ fontFamily: "Lora" }}>Lora</option>
                       <option value="Merriweather" style={{ fontFamily: "Merriweather" }}>Merriweather</option>
                       <option value="Montserrat" style={{ fontFamily: "Montserrat" }}>Montserrat</option>
                       <option value="Mr Dafoe" style={{ fontFamily: "Mr Dafoe" }}>Mr Dafoe</option>
                       <option value="Nunito" style={{ fontFamily: "Nunito" }}>Nunito</option>
-                      <option value="Open Sans" style={{ fontFamily: "Open Sans" }}>Open Sans</option>
                       <option value="Oswald" style={{ fontFamily: "Oswald" }}>Oswald</option>
                       <option value="Pacifico" style={{ fontFamily: "Pacifico" }}>Pacifico</option>
                       <option value="Palatino" style={{ fontFamily: "Palatino" }}>Palatino</option>
                       <option value="Playfair Display" style={{ fontFamily: "Playfair Display" }}>Playfair Display</option>
                       <option value="Playfair Display SC" style={{ fontFamily: "Playfair Display SC" }}>Playfair Display SC</option>
-                      <option value="Plus Jakarta Sans" style={{ fontFamily: "Plus Jakarta Sans" }}>Plus Jakarta Sans</option>
                       <option value="Poppins" style={{ fontFamily: "Poppins" }}>Poppins</option>
-                      <option value="PT Sans" style={{ fontFamily: "PT Sans" }}>PT Sans</option>
-                      <option value="PT Serif" style={{ fontFamily: "PT Serif" }}>PT Serif</option>
                       <option value="Quicksand" style={{ fontFamily: "Quicksand" }}>Quicksand</option>
-                      <option value="Racing Sans One" style={{ fontFamily: "Racing Sans One" }}>Racing Sans One</option>
-                      <option value="Raleway" style={{ fontFamily: "Raleway" }}>Raleway</option>
-                      <option value="Roboto" style={{ fontFamily: "Roboto" }}>Roboto</option>
-                      <option value="Sacramento" style={{ fontFamily: "Sacramento" }}>Sacramento</option>
                       <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>Satisfy</option>
-                      <option value="Shadows Into Light" style={{ fontFamily: "Shadows Into Light" }}>Shadows Into Light</option>
-                      <option value="Source Sans Pro" style={{ fontFamily: "Source Sans Pro" }}>Source Sans Pro</option>
-                      <option value="Spectral" style={{ fontFamily: "Spectral" }}>Spectral</option>
                       <option value="Tangerine" style={{ fontFamily: "Tangerine" }}>Tangerine</option>
-                      <option value="Times New Roman" style={{ fontFamily: "Times New Roman" }}>Times New Roman</option>
-                      <option value="Trebuchet MS" style={{ fontFamily: "Trebuchet MS" }}>Trebuchet MS</option>
-                      <option value="Ubuntu" style={{ fontFamily: "Ubuntu" }}>Ubuntu</option>
-                      <option value="Ultra" style={{ fontFamily: "Ultra" }}>Ultra</option>
-                      <option value="Verdana" style={{ fontFamily: "Verdana" }}>Verdana</option>
                       <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>Vidaloka</option>
-                      <option value="Work Sans" style={{ fontFamily: "Work Sans" }}>Work Sans</option>
                     </select>
                   </div>
                   <div className="space-y-3 py-3">
@@ -2742,64 +2615,35 @@ export default function Sidebar({
                     <option value="Anton" style={{ fontFamily: "Anton" }}>Anton</option>
                     <option value="Archivo" style={{ fontFamily: "Archivo" }}>Archivo</option>
                     <option value="Architects Daughter" style={{ fontFamily: "Architects Daughter" }}>Architects Daughter</option>
-                    <option value="Arial" style={{ fontFamily: "Arial" }}>Arial</option>
                     <option value="Arimo" style={{ fontFamily: "Arimo" }}>Arimo</option>
-                    <option value="Avant Garde" style={{ fontFamily: "Avant Garde" }}>Avant Garde</option>
                     <option value="Bebas Neue" style={{ fontFamily: "Bebas Neue" }}>Bebas Neue</option>
-                    <option value="Bookman" style={{ fontFamily: "Bookman" }}>Bookman</option>
                     <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>Cinzel</option>
                     <option value="Comic Sans MS" style={{ fontFamily: "Comic Sans MS" }}>Comic Sans MS</option>
-                    <option value="Cormorant" style={{ fontFamily: "Cormorant" }}>Cormorant</option>
                     <option value="Cormorant Garamond" style={{ fontFamily: "Cormorant Garamond" }}>Cormorant Garamond</option>
                     <option value="Courier New" style={{ fontFamily: "Courier New" }}>Courier New</option>
                     <option value="Courgette" style={{ fontFamily: "Courgette" }}>Courgette</option>
-                    <option value="Crimson Text" style={{ fontFamily: "Crimson Text" }}>Crimson Text</option>
                     <option value="Dancing Script" style={{ fontFamily: "Dancing Script" }}>Dancing Script</option>
-                    <option value="Fjalla One" style={{ fontFamily: "Fjalla One" }}>Fjalla One</option>
                     <option value="Forum" style={{ fontFamily: "Forum" }}>Forum</option>
                     <option value="Futura" style={{ fontFamily: "Futura" }}>Futura</option>
-                    <option value="Garamond" style={{ fontFamily: "Garamond" }}>Garamond</option>
                     <option value="Georgia" style={{ fontFamily: "Georgia" }}>Georgia</option>
-                    <option value="Georgia Pro" style={{ fontFamily: "Georgia Pro" }}>Georgia Pro</option>
                     <option value="Great Vibes" style={{ fontFamily: "Great Vibes" }}>Great Vibes</option>
-                    <option value="Helvetica" style={{ fontFamily: "Helvetica" }}>Helvetica</option>
                     <option value="Impact" style={{ fontFamily: "Impact" }}>Impact</option>
-                    <option value="Inter" style={{ fontFamily: "Inter" }}>Inter</option>
                     <option value="Josefin Sans" style={{ fontFamily: "Josefin Sans" }}>Josefin Sans</option>
                     <option value="Lato" style={{ fontFamily: "Lato" }}>Lato</option>
-                    <option value="Libre Baskerville" style={{ fontFamily: "Libre Baskerville" }}>Libre Baskerville</option>
-                    <option value="Lora" style={{ fontFamily: "Lora" }}>Lora</option>
                     <option value="Merriweather" style={{ fontFamily: "Merriweather" }}>Merriweather</option>
                     <option value="Montserrat" style={{ fontFamily: "Montserrat" }}>Montserrat</option>
                     <option value="Mr Dafoe" style={{ fontFamily: "Mr Dafoe" }}>Mr Dafoe</option>
                     <option value="Nunito" style={{ fontFamily: "Nunito" }}>Nunito</option>
-                    <option value="Open Sans" style={{ fontFamily: "Open Sans" }}>Open Sans</option>
                     <option value="Oswald" style={{ fontFamily: "Oswald" }}>Oswald</option>
                     <option value="Pacifico" style={{ fontFamily: "Pacifico" }}>Pacifico</option>
                     <option value="Palatino" style={{ fontFamily: "Palatino" }}>Palatino</option>
                     <option value="Playfair Display" style={{ fontFamily: "Playfair Display" }}>Playfair Display</option>
                     <option value="Playfair Display SC" style={{ fontFamily: "Playfair Display SC" }}>Playfair Display SC</option>
-                    <option value="Plus Jakarta Sans" style={{ fontFamily: "Plus Jakarta Sans" }}>Plus Jakarta Sans</option>
                     <option value="Poppins" style={{ fontFamily: "Poppins" }}>Poppins</option>
-                    <option value="PT Sans" style={{ fontFamily: "PT Sans" }}>PT Sans</option>
-                    <option value="PT Serif" style={{ fontFamily: "PT Serif" }}>PT Serif</option>
                     <option value="Quicksand" style={{ fontFamily: "Quicksand" }}>Quicksand</option>
-                    <option value="Racing Sans One" style={{ fontFamily: "Racing Sans One" }}>Racing Sans One</option>
-                    <option value="Raleway" style={{ fontFamily: "Raleway" }}>Raleway</option>
-                    <option value="Roboto" style={{ fontFamily: "Roboto" }}>Roboto</option>
-                    <option value="Sacramento" style={{ fontFamily: "Sacramento" }}>Sacramento</option>
                     <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>Satisfy</option>
-                    <option value="Shadows Into Light" style={{ fontFamily: "Shadows Into Light" }}>Shadows Into Light</option>
-                    <option value="Source Sans Pro" style={{ fontFamily: "Source Sans Pro" }}>Source Sans Pro</option>
-                    <option value="Spectral" style={{ fontFamily: "Spectral" }}>Spectral</option>
                     <option value="Tangerine" style={{ fontFamily: "Tangerine" }}>Tangerine</option>
-                    <option value="Times New Roman" style={{ fontFamily: "Times New Roman" }}>Times New Roman</option>
-                    <option value="Trebuchet MS" style={{ fontFamily: "Trebuchet MS" }}>Trebuchet MS</option>
-                    <option value="Ubuntu" style={{ fontFamily: "Ubuntu" }}>Ubuntu</option>
-                    <option value="Ultra" style={{ fontFamily: "Ultra" }}>Ultra</option>
-                    <option value="Verdana" style={{ fontFamily: "Verdana" }}>Verdana</option>
                     <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>Vidaloka</option>
-                    <option value="Work Sans" style={{ fontFamily: "Work Sans" }}>Work Sans</option>
                   </select>
                 </div>
               </div>
@@ -2905,64 +2749,35 @@ export default function Sidebar({
                     <option value="Anton" style={{ fontFamily: "Anton" }}>Anton</option>
                     <option value="Archivo" style={{ fontFamily: "Archivo" }}>Archivo</option>
                     <option value="Architects Daughter" style={{ fontFamily: "Architects Daughter" }}>Architects Daughter</option>
-                    <option value="Arial" style={{ fontFamily: "Arial" }}>Arial</option>
                     <option value="Arimo" style={{ fontFamily: "Arimo" }}>Arimo</option>
-                    <option value="Avant Garde" style={{ fontFamily: "Avant Garde" }}>Avant Garde</option>
                     <option value="Bebas Neue" style={{ fontFamily: "Bebas Neue" }}>Bebas Neue</option>
-                    <option value="Bookman" style={{ fontFamily: "Bookman" }}>Bookman</option>
                     <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>Cinzel</option>
                     <option value="Comic Sans MS" style={{ fontFamily: "Comic Sans MS" }}>Comic Sans MS</option>
-                    <option value="Cormorant" style={{ fontFamily: "Cormorant" }}>Cormorant</option>
                     <option value="Cormorant Garamond" style={{ fontFamily: "Cormorant Garamond" }}>Cormorant Garamond</option>
                     <option value="Courier New" style={{ fontFamily: "Courier New" }}>Courier New</option>
                     <option value="Courgette" style={{ fontFamily: "Courgette" }}>Courgette</option>
-                    <option value="Crimson Text" style={{ fontFamily: "Crimson Text" }}>Crimson Text</option>
                     <option value="Dancing Script" style={{ fontFamily: "Dancing Script" }}>Dancing Script</option>
-                    <option value="Fjalla One" style={{ fontFamily: "Fjalla One" }}>Fjalla One</option>
                     <option value="Forum" style={{ fontFamily: "Forum" }}>Forum</option>
                     <option value="Futura" style={{ fontFamily: "Futura" }}>Futura</option>
-                    <option value="Garamond" style={{ fontFamily: "Garamond" }}>Garamond</option>
                     <option value="Georgia" style={{ fontFamily: "Georgia" }}>Georgia</option>
-                    <option value="Georgia Pro" style={{ fontFamily: "Georgia Pro" }}>Georgia Pro</option>
                     <option value="Great Vibes" style={{ fontFamily: "Great Vibes" }}>Great Vibes</option>
-                    <option value="Helvetica" style={{ fontFamily: "Helvetica" }}>Helvetica</option>
                     <option value="Impact" style={{ fontFamily: "Impact" }}>Impact</option>
-                    <option value="Inter" style={{ fontFamily: "Inter" }}>Inter</option>
                     <option value="Josefin Sans" style={{ fontFamily: "Josefin Sans" }}>Josefin Sans</option>
                     <option value="Lato" style={{ fontFamily: "Lato" }}>Lato</option>
-                    <option value="Libre Baskerville" style={{ fontFamily: "Libre Baskerville" }}>Libre Baskerville</option>
-                    <option value="Lora" style={{ fontFamily: "Lora" }}>Lora</option>
                     <option value="Merriweather" style={{ fontFamily: "Merriweather" }}>Merriweather</option>
                     <option value="Montserrat" style={{ fontFamily: "Montserrat" }}>Montserrat</option>
                     <option value="Mr Dafoe" style={{ fontFamily: "Mr Dafoe" }}>Mr Dafoe</option>
                     <option value="Nunito" style={{ fontFamily: "Nunito" }}>Nunito</option>
-                    <option value="Open Sans" style={{ fontFamily: "Open Sans" }}>Open Sans</option>
                     <option value="Oswald" style={{ fontFamily: "Oswald" }}>Oswald</option>
                     <option value="Pacifico" style={{ fontFamily: "Pacifico" }}>Pacifico</option>
                     <option value="Palatino" style={{ fontFamily: "Palatino" }}>Palatino</option>
                     <option value="Playfair Display" style={{ fontFamily: "Playfair Display" }}>Playfair Display</option>
                     <option value="Playfair Display SC" style={{ fontFamily: "Playfair Display SC" }}>Playfair Display SC</option>
-                    <option value="Plus Jakarta Sans" style={{ fontFamily: "Plus Jakarta Sans" }}>Plus Jakarta Sans</option>
                     <option value="Poppins" style={{ fontFamily: "Poppins" }}>Poppins</option>
-                    <option value="PT Sans" style={{ fontFamily: "PT Sans" }}>PT Sans</option>
-                    <option value="PT Serif" style={{ fontFamily: "PT Serif" }}>PT Serif</option>
                     <option value="Quicksand" style={{ fontFamily: "Quicksand" }}>Quicksand</option>
-                    <option value="Racing Sans One" style={{ fontFamily: "Racing Sans One" }}>Racing Sans One</option>
-                    <option value="Raleway" style={{ fontFamily: "Raleway" }}>Raleway</option>
-                    <option value="Roboto" style={{ fontFamily: "Roboto" }}>Roboto</option>
-                    <option value="Sacramento" style={{ fontFamily: "Sacramento" }}>Sacramento</option>
                     <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>Satisfy</option>
-                    <option value="Shadows Into Light" style={{ fontFamily: "Shadows Into Light" }}>Shadows Into Light</option>
-                    <option value="Source Sans Pro" style={{ fontFamily: "Source Sans Pro" }}>Source Sans Pro</option>
-                    <option value="Spectral" style={{ fontFamily: "Spectral" }}>Spectral</option>
                     <option value="Tangerine" style={{ fontFamily: "Tangerine" }}>Tangerine</option>
-                    <option value="Times New Roman" style={{ fontFamily: "Times New Roman" }}>Times New Roman</option>
-                    <option value="Trebuchet MS" style={{ fontFamily: "Trebuchet MS" }}>Trebuchet MS</option>
-                    <option value="Ubuntu" style={{ fontFamily: "Ubuntu" }}>Ubuntu</option>
-                    <option value="Ultra" style={{ fontFamily: "Ultra" }}>Ultra</option>
-                    <option value="Verdana" style={{ fontFamily: "Verdana" }}>Verdana</option>
                     <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>Vidaloka</option>
-                    <option value="Work Sans" style={{ fontFamily: "Work Sans" }}>Work Sans</option>
                   </select>
                 </div>
               </div>

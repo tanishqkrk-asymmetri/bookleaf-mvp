@@ -3,44 +3,21 @@
 import useDesign from "@/context/DesignContext";
 import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
 import { useEffect, useRef, useState } from "react";
-import * as htmlToImage from "html-to-image";
 import JsBarcode from "jsbarcode";
 
-// Helper function to convert uploaded file to base64 using htmlToImage
-const fileToBase64WithHtmlToImage = async (file: File): Promise<string> => {
+// Helper function to convert uploaded file to base64
+const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const img = document.createElement("img");
-    const url = URL.createObjectURL(file);
-
-    img.onload = async () => {
-      try {
-        // Create a container for the image
-        const container = document.createElement("div");
-        container.style.position = "absolute";
-        container.style.left = "-9999px";
-        container.appendChild(img);
-        document.body.appendChild(container);
-
-        // Convert to base64 using htmlToImage
-        const dataUrl = await htmlToImage.toPng(img, { quality: 1 });
-
-        // Cleanup
-        document.body.removeChild(container);
-        URL.revokeObjectURL(url);
-
-        resolve(dataUrl);
-      } catch (error) {
-        URL.revokeObjectURL(url);
-        reject(error);
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+      } else {
+        reject(new Error("Failed to read file as base64"));
       }
     };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Failed to load image"));
-    };
-
-    img.src = url;
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
   });
 };
 
@@ -146,42 +123,32 @@ export default function Canvas({
       }
 
       try {
-        // Convert file to base64 using htmlToImage
-        const base64Data = await fileToBase64WithHtmlToImage(file);
+        // Convert file to base64
+        const base64Data = await fileToBase64(file);
+        const base64Content = base64Data.split(",")[1]; // Remove data:image/...;base64, prefix
 
-        // First, set a temporary preview
-        setDesignData((org) => ({
-          ...org,
-          coverData: {
-            ...org.coverData,
-            back: {
-              ...org.coverData.back,
-              author: {
-                ...org.coverData.back.author,
-                imageUrl: base64Data,
-              },
-            },
-          },
-        }));
+        // Upload to S3
+        const timestamp = Date.now();
+        const extension = file.name.split(".").pop() || "jpg";
+        const filename = `author_${timestamp}.${extension}`;
 
-        // Upload to server
         const response = await fetch("/api/uploadImage", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            filename: `author${Date.now()}.jpg`,
+            filename: filename,
             upload_file: {
-              filename: `author${Date.now()}.jpg`,
-              contents: base64Data.split(",")[1],
+              filename: filename,
+              contents: base64Content,
             },
           }),
         });
 
         const result = await response.json();
 
-        // Update with hosted URL
+        // Update with hosted URL from S3
         if (result.hosted_link) {
           setDesignData((org) => ({
             ...org,
@@ -196,6 +163,8 @@ export default function Canvas({
               },
             },
           }));
+        } else {
+          throw new Error("No hosted link returned from server");
         }
       } catch (error) {
         console.error("Error uploading author image:", error);
