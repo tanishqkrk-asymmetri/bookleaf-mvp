@@ -258,6 +258,11 @@ export default function Sidebar({
         return;
       }
 
+      if (file.size > 2097152) {
+        alert("Size too big");
+        return;
+      }
+
       try {
         // Convert file to base64
         const base64Data = await fileToBase64(file);
@@ -1576,41 +1581,171 @@ export default function Sidebar({
                       onChange={(e) => handleTitleFontChange(e.target.value)}
                       className="w-full p-2 rounded-lg bg-[#F3EDEB] border border-foreground/20"
                     >
-                      <option value="Default" style={{ fontFamily: "inherit" }}>Default</option>
-                      <option value="Alex Brush" style={{ fontFamily: "Alex Brush" }}>Alex Brush</option>
-                      <option value="Allura" style={{ fontFamily: "Allura" }}>Allura</option>
-                      <option value="Anton" style={{ fontFamily: "Anton" }}>Anton</option>
-                      <option value="Archivo" style={{ fontFamily: "Archivo" }}>Archivo</option>
-                      <option value="Architects Daughter" style={{ fontFamily: "Architects Daughter" }}>Architects Daughter</option>
-                      <option value="Arimo" style={{ fontFamily: "Arimo" }}>Arimo</option>
-                      <option value="Bebas Neue" style={{ fontFamily: "Bebas Neue" }}>Bebas Neue</option>
-                      <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>Cinzel</option>
-                      <option value="Comic Sans MS" style={{ fontFamily: "Comic Sans MS" }}>Comic Sans MS</option>
-                      <option value="Cormorant Garamond" style={{ fontFamily: "Cormorant Garamond" }}>Cormorant Garamond</option>
-                      <option value="Courier New" style={{ fontFamily: "Courier New" }}>Courier New</option>
-                      <option value="Courgette" style={{ fontFamily: "Courgette" }}>Courgette</option>
-                      <option value="Dancing Script" style={{ fontFamily: "Dancing Script" }}>Dancing Script</option>
-                      <option value="Forum" style={{ fontFamily: "Forum" }}>Forum</option>
-                      <option value="Futura" style={{ fontFamily: "Futura" }}>Futura</option>
-                      <option value="Georgia" style={{ fontFamily: "Georgia" }}>Georgia</option>
-                      <option value="Great Vibes" style={{ fontFamily: "Great Vibes" }}>Great Vibes</option>
-                      <option value="Impact" style={{ fontFamily: "Impact" }}>Impact</option>
-                      <option value="Josefin Sans" style={{ fontFamily: "Josefin Sans" }}>Josefin Sans</option>
-                      <option value="Lato" style={{ fontFamily: "Lato" }}>Lato</option>
-                      <option value="Merriweather" style={{ fontFamily: "Merriweather" }}>Merriweather</option>
-                      <option value="Montserrat" style={{ fontFamily: "Montserrat" }}>Montserrat</option>
-                      <option value="Mr Dafoe" style={{ fontFamily: "Mr Dafoe" }}>Mr Dafoe</option>
-                      <option value="Nunito" style={{ fontFamily: "Nunito" }}>Nunito</option>
-                      <option value="Oswald" style={{ fontFamily: "Oswald" }}>Oswald</option>
-                      <option value="Pacifico" style={{ fontFamily: "Pacifico" }}>Pacifico</option>
-                      <option value="Palatino" style={{ fontFamily: "Palatino" }}>Palatino</option>
-                      <option value="Playfair Display" style={{ fontFamily: "Playfair Display" }}>Playfair Display</option>
-                      <option value="Playfair Display SC" style={{ fontFamily: "Playfair Display SC" }}>Playfair Display SC</option>
-                      <option value="Poppins" style={{ fontFamily: "Poppins" }}>Poppins</option>
-                      <option value="Quicksand" style={{ fontFamily: "Quicksand" }}>Quicksand</option>
-                      <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>Satisfy</option>
-                      <option value="Tangerine" style={{ fontFamily: "Tangerine" }}>Tangerine</option>
-                      <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>Vidaloka</option>
+                      <option value="Default" style={{ fontFamily: "inherit" }}>
+                        Default
+                      </option>
+                      <option
+                        value="Alex Brush"
+                        style={{ fontFamily: "Alex Brush" }}
+                      >
+                        Alex Brush
+                      </option>
+                      <option value="Allura" style={{ fontFamily: "Allura" }}>
+                        Allura
+                      </option>
+                      <option value="Anton" style={{ fontFamily: "Anton" }}>
+                        Anton
+                      </option>
+                      <option value="Archivo" style={{ fontFamily: "Archivo" }}>
+                        Archivo
+                      </option>
+                      <option
+                        value="Architects Daughter"
+                        style={{ fontFamily: "Architects Daughter" }}
+                      >
+                        Architects Daughter
+                      </option>
+                      <option value="Arimo" style={{ fontFamily: "Arimo" }}>
+                        Arimo
+                      </option>
+                      <option
+                        value="Bebas Neue"
+                        style={{ fontFamily: "Bebas Neue" }}
+                      >
+                        Bebas Neue
+                      </option>
+                      <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>
+                        Cinzel
+                      </option>
+                      <option
+                        value="Comic Sans MS"
+                        style={{ fontFamily: "Comic Sans MS" }}
+                      >
+                        Comic Sans MS
+                      </option>
+                      <option
+                        value="Cormorant Garamond"
+                        style={{ fontFamily: "Cormorant Garamond" }}
+                      >
+                        Cormorant Garamond
+                      </option>
+                      <option
+                        value="Courier New"
+                        style={{ fontFamily: "Courier New" }}
+                      >
+                        Courier New
+                      </option>
+                      <option
+                        value="Courgette"
+                        style={{ fontFamily: "Courgette" }}
+                      >
+                        Courgette
+                      </option>
+                      <option
+                        value="Dancing Script"
+                        style={{ fontFamily: "Dancing Script" }}
+                      >
+                        Dancing Script
+                      </option>
+                      <option value="Forum" style={{ fontFamily: "Forum" }}>
+                        Forum
+                      </option>
+                      <option value="Futura" style={{ fontFamily: "Futura" }}>
+                        Futura
+                      </option>
+                      <option value="Georgia" style={{ fontFamily: "Georgia" }}>
+                        Georgia
+                      </option>
+                      <option
+                        value="Great Vibes"
+                        style={{ fontFamily: "Great Vibes" }}
+                      >
+                        Great Vibes
+                      </option>
+                      <option value="Impact" style={{ fontFamily: "Impact" }}>
+                        Impact
+                      </option>
+                      <option
+                        value="Josefin Sans"
+                        style={{ fontFamily: "Josefin Sans" }}
+                      >
+                        Josefin Sans
+                      </option>
+                      <option value="Lato" style={{ fontFamily: "Lato" }}>
+                        Lato
+                      </option>
+                      <option
+                        value="Merriweather"
+                        style={{ fontFamily: "Merriweather" }}
+                      >
+                        Merriweather
+                      </option>
+                      <option
+                        value="Montserrat"
+                        style={{ fontFamily: "Montserrat" }}
+                      >
+                        Montserrat
+                      </option>
+                      <option
+                        value="Mr Dafoe"
+                        style={{ fontFamily: "Mr Dafoe" }}
+                      >
+                        Mr Dafoe
+                      </option>
+                      <option value="Nunito" style={{ fontFamily: "Nunito" }}>
+                        Nunito
+                      </option>
+                      <option value="Oswald" style={{ fontFamily: "Oswald" }}>
+                        Oswald
+                      </option>
+                      <option
+                        value="Pacifico"
+                        style={{ fontFamily: "Pacifico" }}
+                      >
+                        Pacifico
+                      </option>
+                      <option
+                        value="Palatino"
+                        style={{ fontFamily: "Palatino" }}
+                      >
+                        Palatino
+                      </option>
+                      <option
+                        value="Playfair Display"
+                        style={{ fontFamily: "Playfair Display" }}
+                      >
+                        Playfair Display
+                      </option>
+                      <option
+                        value="Playfair Display SC"
+                        style={{ fontFamily: "Playfair Display SC" }}
+                      >
+                        Playfair Display SC
+                      </option>
+                      <option value="Poppins" style={{ fontFamily: "Poppins" }}>
+                        Poppins
+                      </option>
+                      <option
+                        value="Quicksand"
+                        style={{ fontFamily: "Quicksand" }}
+                      >
+                        Quicksand
+                      </option>
+                      <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>
+                        Satisfy
+                      </option>
+                      <option
+                        value="Tangerine"
+                        style={{ fontFamily: "Tangerine" }}
+                      >
+                        Tangerine
+                      </option>
+                      <option
+                        value="Vidaloka"
+                        style={{ fontFamily: "Vidaloka" }}
+                      >
+                        Vidaloka
+                      </option>
                     </select>
                   </div>
                   <div className="space-y-3 py-3">
@@ -1806,41 +1941,171 @@ export default function Sidebar({
                       onChange={(e) => handleSubtitleFontChange(e.target.value)}
                       className="w-full p-2 rounded-lg bg-[#F3EDEB] border border-foreground/20"
                     >
-                      <option value="Default" style={{ fontFamily: "inherit" }}>Default</option>
-                      <option value="Alex Brush" style={{ fontFamily: "Alex Brush" }}>Alex Brush</option>
-                      <option value="Allura" style={{ fontFamily: "Allura" }}>Allura</option>
-                      <option value="Anton" style={{ fontFamily: "Anton" }}>Anton</option>
-                      <option value="Archivo" style={{ fontFamily: "Archivo" }}>Archivo</option>
-                      <option value="Architects Daughter" style={{ fontFamily: "Architects Daughter" }}>Architects Daughter</option>
-                      <option value="Arimo" style={{ fontFamily: "Arimo" }}>Arimo</option>
-                      <option value="Bebas Neue" style={{ fontFamily: "Bebas Neue" }}>Bebas Neue</option>
-                      <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>Cinzel</option>
-                      <option value="Comic Sans MS" style={{ fontFamily: "Comic Sans MS" }}>Comic Sans MS</option>
-                      <option value="Cormorant Garamond" style={{ fontFamily: "Cormorant Garamond" }}>Cormorant Garamond</option>
-                      <option value="Courier New" style={{ fontFamily: "Courier New" }}>Courier New</option>
-                      <option value="Courgette" style={{ fontFamily: "Courgette" }}>Courgette</option>
-                      <option value="Dancing Script" style={{ fontFamily: "Dancing Script" }}>Dancing Script</option>
-                      <option value="Forum" style={{ fontFamily: "Forum" }}>Forum</option>
-                      <option value="Futura" style={{ fontFamily: "Futura" }}>Futura</option>
-                      <option value="Georgia" style={{ fontFamily: "Georgia" }}>Georgia</option>
-                      <option value="Great Vibes" style={{ fontFamily: "Great Vibes" }}>Great Vibes</option>
-                      <option value="Impact" style={{ fontFamily: "Impact" }}>Impact</option>
-                      <option value="Josefin Sans" style={{ fontFamily: "Josefin Sans" }}>Josefin Sans</option>
-                      <option value="Lato" style={{ fontFamily: "Lato" }}>Lato</option>
-                      <option value="Merriweather" style={{ fontFamily: "Merriweather" }}>Merriweather</option>
-                      <option value="Montserrat" style={{ fontFamily: "Montserrat" }}>Montserrat</option>
-                      <option value="Mr Dafoe" style={{ fontFamily: "Mr Dafoe" }}>Mr Dafoe</option>
-                      <option value="Nunito" style={{ fontFamily: "Nunito" }}>Nunito</option>
-                      <option value="Oswald" style={{ fontFamily: "Oswald" }}>Oswald</option>
-                      <option value="Pacifico" style={{ fontFamily: "Pacifico" }}>Pacifico</option>
-                      <option value="Palatino" style={{ fontFamily: "Palatino" }}>Palatino</option>
-                      <option value="Playfair Display" style={{ fontFamily: "Playfair Display" }}>Playfair Display</option>
-                      <option value="Playfair Display SC" style={{ fontFamily: "Playfair Display SC" }}>Playfair Display SC</option>
-                      <option value="Poppins" style={{ fontFamily: "Poppins" }}>Poppins</option>
-                      <option value="Quicksand" style={{ fontFamily: "Quicksand" }}>Quicksand</option>
-                      <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>Satisfy</option>
-                      <option value="Tangerine" style={{ fontFamily: "Tangerine" }}>Tangerine</option>
-                      <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>Vidaloka</option>
+                      <option value="Default" style={{ fontFamily: "inherit" }}>
+                        Default
+                      </option>
+                      <option
+                        value="Alex Brush"
+                        style={{ fontFamily: "Alex Brush" }}
+                      >
+                        Alex Brush
+                      </option>
+                      <option value="Allura" style={{ fontFamily: "Allura" }}>
+                        Allura
+                      </option>
+                      <option value="Anton" style={{ fontFamily: "Anton" }}>
+                        Anton
+                      </option>
+                      <option value="Archivo" style={{ fontFamily: "Archivo" }}>
+                        Archivo
+                      </option>
+                      <option
+                        value="Architects Daughter"
+                        style={{ fontFamily: "Architects Daughter" }}
+                      >
+                        Architects Daughter
+                      </option>
+                      <option value="Arimo" style={{ fontFamily: "Arimo" }}>
+                        Arimo
+                      </option>
+                      <option
+                        value="Bebas Neue"
+                        style={{ fontFamily: "Bebas Neue" }}
+                      >
+                        Bebas Neue
+                      </option>
+                      <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>
+                        Cinzel
+                      </option>
+                      <option
+                        value="Comic Sans MS"
+                        style={{ fontFamily: "Comic Sans MS" }}
+                      >
+                        Comic Sans MS
+                      </option>
+                      <option
+                        value="Cormorant Garamond"
+                        style={{ fontFamily: "Cormorant Garamond" }}
+                      >
+                        Cormorant Garamond
+                      </option>
+                      <option
+                        value="Courier New"
+                        style={{ fontFamily: "Courier New" }}
+                      >
+                        Courier New
+                      </option>
+                      <option
+                        value="Courgette"
+                        style={{ fontFamily: "Courgette" }}
+                      >
+                        Courgette
+                      </option>
+                      <option
+                        value="Dancing Script"
+                        style={{ fontFamily: "Dancing Script" }}
+                      >
+                        Dancing Script
+                      </option>
+                      <option value="Forum" style={{ fontFamily: "Forum" }}>
+                        Forum
+                      </option>
+                      <option value="Futura" style={{ fontFamily: "Futura" }}>
+                        Futura
+                      </option>
+                      <option value="Georgia" style={{ fontFamily: "Georgia" }}>
+                        Georgia
+                      </option>
+                      <option
+                        value="Great Vibes"
+                        style={{ fontFamily: "Great Vibes" }}
+                      >
+                        Great Vibes
+                      </option>
+                      <option value="Impact" style={{ fontFamily: "Impact" }}>
+                        Impact
+                      </option>
+                      <option
+                        value="Josefin Sans"
+                        style={{ fontFamily: "Josefin Sans" }}
+                      >
+                        Josefin Sans
+                      </option>
+                      <option value="Lato" style={{ fontFamily: "Lato" }}>
+                        Lato
+                      </option>
+                      <option
+                        value="Merriweather"
+                        style={{ fontFamily: "Merriweather" }}
+                      >
+                        Merriweather
+                      </option>
+                      <option
+                        value="Montserrat"
+                        style={{ fontFamily: "Montserrat" }}
+                      >
+                        Montserrat
+                      </option>
+                      <option
+                        value="Mr Dafoe"
+                        style={{ fontFamily: "Mr Dafoe" }}
+                      >
+                        Mr Dafoe
+                      </option>
+                      <option value="Nunito" style={{ fontFamily: "Nunito" }}>
+                        Nunito
+                      </option>
+                      <option value="Oswald" style={{ fontFamily: "Oswald" }}>
+                        Oswald
+                      </option>
+                      <option
+                        value="Pacifico"
+                        style={{ fontFamily: "Pacifico" }}
+                      >
+                        Pacifico
+                      </option>
+                      <option
+                        value="Palatino"
+                        style={{ fontFamily: "Palatino" }}
+                      >
+                        Palatino
+                      </option>
+                      <option
+                        value="Playfair Display"
+                        style={{ fontFamily: "Playfair Display" }}
+                      >
+                        Playfair Display
+                      </option>
+                      <option
+                        value="Playfair Display SC"
+                        style={{ fontFamily: "Playfair Display SC" }}
+                      >
+                        Playfair Display SC
+                      </option>
+                      <option value="Poppins" style={{ fontFamily: "Poppins" }}>
+                        Poppins
+                      </option>
+                      <option
+                        value="Quicksand"
+                        style={{ fontFamily: "Quicksand" }}
+                      >
+                        Quicksand
+                      </option>
+                      <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>
+                        Satisfy
+                      </option>
+                      <option
+                        value="Tangerine"
+                        style={{ fontFamily: "Tangerine" }}
+                      >
+                        Tangerine
+                      </option>
+                      <option
+                        value="Vidaloka"
+                        style={{ fontFamily: "Vidaloka" }}
+                      >
+                        Vidaloka
+                      </option>
                     </select>
                   </div>
                   <div className="space-y-3 py-3">
@@ -2044,41 +2309,171 @@ export default function Sidebar({
                       }
                       className="w-full p-2 rounded-lg bg-[#F3EDEB] border border-foreground/20"
                     >
-                      <option value="Default" style={{ fontFamily: "inherit" }}>Default</option>
-                      <option value="Alex Brush" style={{ fontFamily: "Alex Brush" }}>Alex Brush</option>
-                      <option value="Allura" style={{ fontFamily: "Allura" }}>Allura</option>
-                      <option value="Anton" style={{ fontFamily: "Anton" }}>Anton</option>
-                      <option value="Archivo" style={{ fontFamily: "Archivo" }}>Archivo</option>
-                      <option value="Architects Daughter" style={{ fontFamily: "Architects Daughter" }}>Architects Daughter</option>
-                      <option value="Arimo" style={{ fontFamily: "Arimo" }}>Arimo</option>
-                      <option value="Bebas Neue" style={{ fontFamily: "Bebas Neue" }}>Bebas Neue</option>
-                      <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>Cinzel</option>
-                      <option value="Comic Sans MS" style={{ fontFamily: "Comic Sans MS" }}>Comic Sans MS</option>
-                      <option value="Cormorant Garamond" style={{ fontFamily: "Cormorant Garamond" }}>Cormorant Garamond</option>
-                      <option value="Courier New" style={{ fontFamily: "Courier New" }}>Courier New</option>
-                      <option value="Courgette" style={{ fontFamily: "Courgette" }}>Courgette</option>
-                      <option value="Dancing Script" style={{ fontFamily: "Dancing Script" }}>Dancing Script</option>
-                      <option value="Forum" style={{ fontFamily: "Forum" }}>Forum</option>
-                      <option value="Futura" style={{ fontFamily: "Futura" }}>Futura</option>
-                      <option value="Georgia" style={{ fontFamily: "Georgia" }}>Georgia</option>
-                      <option value="Great Vibes" style={{ fontFamily: "Great Vibes" }}>Great Vibes</option>
-                      <option value="Impact" style={{ fontFamily: "Impact" }}>Impact</option>
-                      <option value="Josefin Sans" style={{ fontFamily: "Josefin Sans" }}>Josefin Sans</option>
-                      <option value="Lato" style={{ fontFamily: "Lato" }}>Lato</option>
-                      <option value="Merriweather" style={{ fontFamily: "Merriweather" }}>Merriweather</option>
-                      <option value="Montserrat" style={{ fontFamily: "Montserrat" }}>Montserrat</option>
-                      <option value="Mr Dafoe" style={{ fontFamily: "Mr Dafoe" }}>Mr Dafoe</option>
-                      <option value="Nunito" style={{ fontFamily: "Nunito" }}>Nunito</option>
-                      <option value="Oswald" style={{ fontFamily: "Oswald" }}>Oswald</option>
-                      <option value="Pacifico" style={{ fontFamily: "Pacifico" }}>Pacifico</option>
-                      <option value="Palatino" style={{ fontFamily: "Palatino" }}>Palatino</option>
-                      <option value="Playfair Display" style={{ fontFamily: "Playfair Display" }}>Playfair Display</option>
-                      <option value="Playfair Display SC" style={{ fontFamily: "Playfair Display SC" }}>Playfair Display SC</option>
-                      <option value="Poppins" style={{ fontFamily: "Poppins" }}>Poppins</option>
-                      <option value="Quicksand" style={{ fontFamily: "Quicksand" }}>Quicksand</option>
-                      <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>Satisfy</option>
-                      <option value="Tangerine" style={{ fontFamily: "Tangerine" }}>Tangerine</option>
-                      <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>Vidaloka</option>
+                      <option value="Default" style={{ fontFamily: "inherit" }}>
+                        Default
+                      </option>
+                      <option
+                        value="Alex Brush"
+                        style={{ fontFamily: "Alex Brush" }}
+                      >
+                        Alex Brush
+                      </option>
+                      <option value="Allura" style={{ fontFamily: "Allura" }}>
+                        Allura
+                      </option>
+                      <option value="Anton" style={{ fontFamily: "Anton" }}>
+                        Anton
+                      </option>
+                      <option value="Archivo" style={{ fontFamily: "Archivo" }}>
+                        Archivo
+                      </option>
+                      <option
+                        value="Architects Daughter"
+                        style={{ fontFamily: "Architects Daughter" }}
+                      >
+                        Architects Daughter
+                      </option>
+                      <option value="Arimo" style={{ fontFamily: "Arimo" }}>
+                        Arimo
+                      </option>
+                      <option
+                        value="Bebas Neue"
+                        style={{ fontFamily: "Bebas Neue" }}
+                      >
+                        Bebas Neue
+                      </option>
+                      <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>
+                        Cinzel
+                      </option>
+                      <option
+                        value="Comic Sans MS"
+                        style={{ fontFamily: "Comic Sans MS" }}
+                      >
+                        Comic Sans MS
+                      </option>
+                      <option
+                        value="Cormorant Garamond"
+                        style={{ fontFamily: "Cormorant Garamond" }}
+                      >
+                        Cormorant Garamond
+                      </option>
+                      <option
+                        value="Courier New"
+                        style={{ fontFamily: "Courier New" }}
+                      >
+                        Courier New
+                      </option>
+                      <option
+                        value="Courgette"
+                        style={{ fontFamily: "Courgette" }}
+                      >
+                        Courgette
+                      </option>
+                      <option
+                        value="Dancing Script"
+                        style={{ fontFamily: "Dancing Script" }}
+                      >
+                        Dancing Script
+                      </option>
+                      <option value="Forum" style={{ fontFamily: "Forum" }}>
+                        Forum
+                      </option>
+                      <option value="Futura" style={{ fontFamily: "Futura" }}>
+                        Futura
+                      </option>
+                      <option value="Georgia" style={{ fontFamily: "Georgia" }}>
+                        Georgia
+                      </option>
+                      <option
+                        value="Great Vibes"
+                        style={{ fontFamily: "Great Vibes" }}
+                      >
+                        Great Vibes
+                      </option>
+                      <option value="Impact" style={{ fontFamily: "Impact" }}>
+                        Impact
+                      </option>
+                      <option
+                        value="Josefin Sans"
+                        style={{ fontFamily: "Josefin Sans" }}
+                      >
+                        Josefin Sans
+                      </option>
+                      <option value="Lato" style={{ fontFamily: "Lato" }}>
+                        Lato
+                      </option>
+                      <option
+                        value="Merriweather"
+                        style={{ fontFamily: "Merriweather" }}
+                      >
+                        Merriweather
+                      </option>
+                      <option
+                        value="Montserrat"
+                        style={{ fontFamily: "Montserrat" }}
+                      >
+                        Montserrat
+                      </option>
+                      <option
+                        value="Mr Dafoe"
+                        style={{ fontFamily: "Mr Dafoe" }}
+                      >
+                        Mr Dafoe
+                      </option>
+                      <option value="Nunito" style={{ fontFamily: "Nunito" }}>
+                        Nunito
+                      </option>
+                      <option value="Oswald" style={{ fontFamily: "Oswald" }}>
+                        Oswald
+                      </option>
+                      <option
+                        value="Pacifico"
+                        style={{ fontFamily: "Pacifico" }}
+                      >
+                        Pacifico
+                      </option>
+                      <option
+                        value="Palatino"
+                        style={{ fontFamily: "Palatino" }}
+                      >
+                        Palatino
+                      </option>
+                      <option
+                        value="Playfair Display"
+                        style={{ fontFamily: "Playfair Display" }}
+                      >
+                        Playfair Display
+                      </option>
+                      <option
+                        value="Playfair Display SC"
+                        style={{ fontFamily: "Playfair Display SC" }}
+                      >
+                        Playfair Display SC
+                      </option>
+                      <option value="Poppins" style={{ fontFamily: "Poppins" }}>
+                        Poppins
+                      </option>
+                      <option
+                        value="Quicksand"
+                        style={{ fontFamily: "Quicksand" }}
+                      >
+                        Quicksand
+                      </option>
+                      <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>
+                        Satisfy
+                      </option>
+                      <option
+                        value="Tangerine"
+                        style={{ fontFamily: "Tangerine" }}
+                      >
+                        Tangerine
+                      </option>
+                      <option
+                        value="Vidaloka"
+                        style={{ fontFamily: "Vidaloka" }}
+                      >
+                        Vidaloka
+                      </option>
                     </select>
                   </div>
                   <div className="space-y-3 py-3">
@@ -2304,7 +2699,8 @@ export default function Sidebar({
                                   style={{
                                     color: temp.front.text.title.color,
                                     fontSize: `${
-                                      temp.front.text.title.size * thumbnailScale
+                                      temp.front.text.title.size *
+                                      thumbnailScale
                                     }px`,
                                     fontFamily:
                                       temp.front.text.title.font === "Default"
@@ -2321,7 +2717,8 @@ export default function Sidebar({
                                       ? "underline"
                                       : "none",
                                     textAlign: temp.front.text.title.align,
-                                    lineHeight: temp.front.text.title.lineHeight,
+                                    lineHeight:
+                                      temp.front.text.title.lineHeight,
                                     wordWrap: "break-word",
                                     overflowWrap: "break-word",
                                     whiteSpace: "pre-wrap",
@@ -2356,7 +2753,8 @@ export default function Sidebar({
                                       thumbnailScale
                                     }px`,
                                     fontFamily:
-                                      temp.front.text.subTitle.font === "Default"
+                                      temp.front.text.subTitle.font ===
+                                      "Default"
                                         ? "inherit"
                                         : temp.front.text.subTitle.font,
                                     fontWeight: temp.front.text.subTitle.bold
@@ -2609,41 +3007,159 @@ export default function Sidebar({
                     }
                     className="w-full p-2 rounded-lg bg-[#F3EDEB] border border-foreground/20"
                   >
-                    <option value="Default" style={{ fontFamily: "inherit" }}>Default</option>
-                    <option value="Alex Brush" style={{ fontFamily: "Alex Brush" }}>Alex Brush</option>
-                    <option value="Allura" style={{ fontFamily: "Allura" }}>Allura</option>
-                    <option value="Anton" style={{ fontFamily: "Anton" }}>Anton</option>
-                    <option value="Archivo" style={{ fontFamily: "Archivo" }}>Archivo</option>
-                    <option value="Architects Daughter" style={{ fontFamily: "Architects Daughter" }}>Architects Daughter</option>
-                    <option value="Arimo" style={{ fontFamily: "Arimo" }}>Arimo</option>
-                    <option value="Bebas Neue" style={{ fontFamily: "Bebas Neue" }}>Bebas Neue</option>
-                    <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>Cinzel</option>
-                    <option value="Comic Sans MS" style={{ fontFamily: "Comic Sans MS" }}>Comic Sans MS</option>
-                    <option value="Cormorant Garamond" style={{ fontFamily: "Cormorant Garamond" }}>Cormorant Garamond</option>
-                    <option value="Courier New" style={{ fontFamily: "Courier New" }}>Courier New</option>
-                    <option value="Courgette" style={{ fontFamily: "Courgette" }}>Courgette</option>
-                    <option value="Dancing Script" style={{ fontFamily: "Dancing Script" }}>Dancing Script</option>
-                    <option value="Forum" style={{ fontFamily: "Forum" }}>Forum</option>
-                    <option value="Futura" style={{ fontFamily: "Futura" }}>Futura</option>
-                    <option value="Georgia" style={{ fontFamily: "Georgia" }}>Georgia</option>
-                    <option value="Great Vibes" style={{ fontFamily: "Great Vibes" }}>Great Vibes</option>
-                    <option value="Impact" style={{ fontFamily: "Impact" }}>Impact</option>
-                    <option value="Josefin Sans" style={{ fontFamily: "Josefin Sans" }}>Josefin Sans</option>
-                    <option value="Lato" style={{ fontFamily: "Lato" }}>Lato</option>
-                    <option value="Merriweather" style={{ fontFamily: "Merriweather" }}>Merriweather</option>
-                    <option value="Montserrat" style={{ fontFamily: "Montserrat" }}>Montserrat</option>
-                    <option value="Mr Dafoe" style={{ fontFamily: "Mr Dafoe" }}>Mr Dafoe</option>
-                    <option value="Nunito" style={{ fontFamily: "Nunito" }}>Nunito</option>
-                    <option value="Oswald" style={{ fontFamily: "Oswald" }}>Oswald</option>
-                    <option value="Pacifico" style={{ fontFamily: "Pacifico" }}>Pacifico</option>
-                    <option value="Palatino" style={{ fontFamily: "Palatino" }}>Palatino</option>
-                    <option value="Playfair Display" style={{ fontFamily: "Playfair Display" }}>Playfair Display</option>
-                    <option value="Playfair Display SC" style={{ fontFamily: "Playfair Display SC" }}>Playfair Display SC</option>
-                    <option value="Poppins" style={{ fontFamily: "Poppins" }}>Poppins</option>
-                    <option value="Quicksand" style={{ fontFamily: "Quicksand" }}>Quicksand</option>
-                    <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>Satisfy</option>
-                    <option value="Tangerine" style={{ fontFamily: "Tangerine" }}>Tangerine</option>
-                    <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>Vidaloka</option>
+                    <option value="Default" style={{ fontFamily: "inherit" }}>
+                      Default
+                    </option>
+                    <option
+                      value="Alex Brush"
+                      style={{ fontFamily: "Alex Brush" }}
+                    >
+                      Alex Brush
+                    </option>
+                    <option value="Allura" style={{ fontFamily: "Allura" }}>
+                      Allura
+                    </option>
+                    <option value="Anton" style={{ fontFamily: "Anton" }}>
+                      Anton
+                    </option>
+                    <option value="Archivo" style={{ fontFamily: "Archivo" }}>
+                      Archivo
+                    </option>
+                    <option
+                      value="Architects Daughter"
+                      style={{ fontFamily: "Architects Daughter" }}
+                    >
+                      Architects Daughter
+                    </option>
+                    <option value="Arimo" style={{ fontFamily: "Arimo" }}>
+                      Arimo
+                    </option>
+                    <option
+                      value="Bebas Neue"
+                      style={{ fontFamily: "Bebas Neue" }}
+                    >
+                      Bebas Neue
+                    </option>
+                    <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>
+                      Cinzel
+                    </option>
+                    <option
+                      value="Comic Sans MS"
+                      style={{ fontFamily: "Comic Sans MS" }}
+                    >
+                      Comic Sans MS
+                    </option>
+                    <option
+                      value="Cormorant Garamond"
+                      style={{ fontFamily: "Cormorant Garamond" }}
+                    >
+                      Cormorant Garamond
+                    </option>
+                    <option
+                      value="Courier New"
+                      style={{ fontFamily: "Courier New" }}
+                    >
+                      Courier New
+                    </option>
+                    <option
+                      value="Courgette"
+                      style={{ fontFamily: "Courgette" }}
+                    >
+                      Courgette
+                    </option>
+                    <option
+                      value="Dancing Script"
+                      style={{ fontFamily: "Dancing Script" }}
+                    >
+                      Dancing Script
+                    </option>
+                    <option value="Forum" style={{ fontFamily: "Forum" }}>
+                      Forum
+                    </option>
+                    <option value="Futura" style={{ fontFamily: "Futura" }}>
+                      Futura
+                    </option>
+                    <option value="Georgia" style={{ fontFamily: "Georgia" }}>
+                      Georgia
+                    </option>
+                    <option
+                      value="Great Vibes"
+                      style={{ fontFamily: "Great Vibes" }}
+                    >
+                      Great Vibes
+                    </option>
+                    <option value="Impact" style={{ fontFamily: "Impact" }}>
+                      Impact
+                    </option>
+                    <option
+                      value="Josefin Sans"
+                      style={{ fontFamily: "Josefin Sans" }}
+                    >
+                      Josefin Sans
+                    </option>
+                    <option value="Lato" style={{ fontFamily: "Lato" }}>
+                      Lato
+                    </option>
+                    <option
+                      value="Merriweather"
+                      style={{ fontFamily: "Merriweather" }}
+                    >
+                      Merriweather
+                    </option>
+                    <option
+                      value="Montserrat"
+                      style={{ fontFamily: "Montserrat" }}
+                    >
+                      Montserrat
+                    </option>
+                    <option value="Mr Dafoe" style={{ fontFamily: "Mr Dafoe" }}>
+                      Mr Dafoe
+                    </option>
+                    <option value="Nunito" style={{ fontFamily: "Nunito" }}>
+                      Nunito
+                    </option>
+                    <option value="Oswald" style={{ fontFamily: "Oswald" }}>
+                      Oswald
+                    </option>
+                    <option value="Pacifico" style={{ fontFamily: "Pacifico" }}>
+                      Pacifico
+                    </option>
+                    <option value="Palatino" style={{ fontFamily: "Palatino" }}>
+                      Palatino
+                    </option>
+                    <option
+                      value="Playfair Display"
+                      style={{ fontFamily: "Playfair Display" }}
+                    >
+                      Playfair Display
+                    </option>
+                    <option
+                      value="Playfair Display SC"
+                      style={{ fontFamily: "Playfair Display SC" }}
+                    >
+                      Playfair Display SC
+                    </option>
+                    <option value="Poppins" style={{ fontFamily: "Poppins" }}>
+                      Poppins
+                    </option>
+                    <option
+                      value="Quicksand"
+                      style={{ fontFamily: "Quicksand" }}
+                    >
+                      Quicksand
+                    </option>
+                    <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>
+                      Satisfy
+                    </option>
+                    <option
+                      value="Tangerine"
+                      style={{ fontFamily: "Tangerine" }}
+                    >
+                      Tangerine
+                    </option>
+                    <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>
+                      Vidaloka
+                    </option>
                   </select>
                 </div>
               </div>
@@ -2743,41 +3259,159 @@ export default function Sidebar({
                     onChange={(e) => handleAuthorFontChange(e.target.value)}
                     className="w-full p-2 rounded-lg bg-[#F3EDEB] border border-foreground/20"
                   >
-                    <option value="Default" style={{ fontFamily: "inherit" }}>Default</option>
-                    <option value="Alex Brush" style={{ fontFamily: "Alex Brush" }}>Alex Brush</option>
-                    <option value="Allura" style={{ fontFamily: "Allura" }}>Allura</option>
-                    <option value="Anton" style={{ fontFamily: "Anton" }}>Anton</option>
-                    <option value="Archivo" style={{ fontFamily: "Archivo" }}>Archivo</option>
-                    <option value="Architects Daughter" style={{ fontFamily: "Architects Daughter" }}>Architects Daughter</option>
-                    <option value="Arimo" style={{ fontFamily: "Arimo" }}>Arimo</option>
-                    <option value="Bebas Neue" style={{ fontFamily: "Bebas Neue" }}>Bebas Neue</option>
-                    <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>Cinzel</option>
-                    <option value="Comic Sans MS" style={{ fontFamily: "Comic Sans MS" }}>Comic Sans MS</option>
-                    <option value="Cormorant Garamond" style={{ fontFamily: "Cormorant Garamond" }}>Cormorant Garamond</option>
-                    <option value="Courier New" style={{ fontFamily: "Courier New" }}>Courier New</option>
-                    <option value="Courgette" style={{ fontFamily: "Courgette" }}>Courgette</option>
-                    <option value="Dancing Script" style={{ fontFamily: "Dancing Script" }}>Dancing Script</option>
-                    <option value="Forum" style={{ fontFamily: "Forum" }}>Forum</option>
-                    <option value="Futura" style={{ fontFamily: "Futura" }}>Futura</option>
-                    <option value="Georgia" style={{ fontFamily: "Georgia" }}>Georgia</option>
-                    <option value="Great Vibes" style={{ fontFamily: "Great Vibes" }}>Great Vibes</option>
-                    <option value="Impact" style={{ fontFamily: "Impact" }}>Impact</option>
-                    <option value="Josefin Sans" style={{ fontFamily: "Josefin Sans" }}>Josefin Sans</option>
-                    <option value="Lato" style={{ fontFamily: "Lato" }}>Lato</option>
-                    <option value="Merriweather" style={{ fontFamily: "Merriweather" }}>Merriweather</option>
-                    <option value="Montserrat" style={{ fontFamily: "Montserrat" }}>Montserrat</option>
-                    <option value="Mr Dafoe" style={{ fontFamily: "Mr Dafoe" }}>Mr Dafoe</option>
-                    <option value="Nunito" style={{ fontFamily: "Nunito" }}>Nunito</option>
-                    <option value="Oswald" style={{ fontFamily: "Oswald" }}>Oswald</option>
-                    <option value="Pacifico" style={{ fontFamily: "Pacifico" }}>Pacifico</option>
-                    <option value="Palatino" style={{ fontFamily: "Palatino" }}>Palatino</option>
-                    <option value="Playfair Display" style={{ fontFamily: "Playfair Display" }}>Playfair Display</option>
-                    <option value="Playfair Display SC" style={{ fontFamily: "Playfair Display SC" }}>Playfair Display SC</option>
-                    <option value="Poppins" style={{ fontFamily: "Poppins" }}>Poppins</option>
-                    <option value="Quicksand" style={{ fontFamily: "Quicksand" }}>Quicksand</option>
-                    <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>Satisfy</option>
-                    <option value="Tangerine" style={{ fontFamily: "Tangerine" }}>Tangerine</option>
-                    <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>Vidaloka</option>
+                    <option value="Default" style={{ fontFamily: "inherit" }}>
+                      Default
+                    </option>
+                    <option
+                      value="Alex Brush"
+                      style={{ fontFamily: "Alex Brush" }}
+                    >
+                      Alex Brush
+                    </option>
+                    <option value="Allura" style={{ fontFamily: "Allura" }}>
+                      Allura
+                    </option>
+                    <option value="Anton" style={{ fontFamily: "Anton" }}>
+                      Anton
+                    </option>
+                    <option value="Archivo" style={{ fontFamily: "Archivo" }}>
+                      Archivo
+                    </option>
+                    <option
+                      value="Architects Daughter"
+                      style={{ fontFamily: "Architects Daughter" }}
+                    >
+                      Architects Daughter
+                    </option>
+                    <option value="Arimo" style={{ fontFamily: "Arimo" }}>
+                      Arimo
+                    </option>
+                    <option
+                      value="Bebas Neue"
+                      style={{ fontFamily: "Bebas Neue" }}
+                    >
+                      Bebas Neue
+                    </option>
+                    <option value="Cinzel" style={{ fontFamily: "Cinzel" }}>
+                      Cinzel
+                    </option>
+                    <option
+                      value="Comic Sans MS"
+                      style={{ fontFamily: "Comic Sans MS" }}
+                    >
+                      Comic Sans MS
+                    </option>
+                    <option
+                      value="Cormorant Garamond"
+                      style={{ fontFamily: "Cormorant Garamond" }}
+                    >
+                      Cormorant Garamond
+                    </option>
+                    <option
+                      value="Courier New"
+                      style={{ fontFamily: "Courier New" }}
+                    >
+                      Courier New
+                    </option>
+                    <option
+                      value="Courgette"
+                      style={{ fontFamily: "Courgette" }}
+                    >
+                      Courgette
+                    </option>
+                    <option
+                      value="Dancing Script"
+                      style={{ fontFamily: "Dancing Script" }}
+                    >
+                      Dancing Script
+                    </option>
+                    <option value="Forum" style={{ fontFamily: "Forum" }}>
+                      Forum
+                    </option>
+                    <option value="Futura" style={{ fontFamily: "Futura" }}>
+                      Futura
+                    </option>
+                    <option value="Georgia" style={{ fontFamily: "Georgia" }}>
+                      Georgia
+                    </option>
+                    <option
+                      value="Great Vibes"
+                      style={{ fontFamily: "Great Vibes" }}
+                    >
+                      Great Vibes
+                    </option>
+                    <option value="Impact" style={{ fontFamily: "Impact" }}>
+                      Impact
+                    </option>
+                    <option
+                      value="Josefin Sans"
+                      style={{ fontFamily: "Josefin Sans" }}
+                    >
+                      Josefin Sans
+                    </option>
+                    <option value="Lato" style={{ fontFamily: "Lato" }}>
+                      Lato
+                    </option>
+                    <option
+                      value="Merriweather"
+                      style={{ fontFamily: "Merriweather" }}
+                    >
+                      Merriweather
+                    </option>
+                    <option
+                      value="Montserrat"
+                      style={{ fontFamily: "Montserrat" }}
+                    >
+                      Montserrat
+                    </option>
+                    <option value="Mr Dafoe" style={{ fontFamily: "Mr Dafoe" }}>
+                      Mr Dafoe
+                    </option>
+                    <option value="Nunito" style={{ fontFamily: "Nunito" }}>
+                      Nunito
+                    </option>
+                    <option value="Oswald" style={{ fontFamily: "Oswald" }}>
+                      Oswald
+                    </option>
+                    <option value="Pacifico" style={{ fontFamily: "Pacifico" }}>
+                      Pacifico
+                    </option>
+                    <option value="Palatino" style={{ fontFamily: "Palatino" }}>
+                      Palatino
+                    </option>
+                    <option
+                      value="Playfair Display"
+                      style={{ fontFamily: "Playfair Display" }}
+                    >
+                      Playfair Display
+                    </option>
+                    <option
+                      value="Playfair Display SC"
+                      style={{ fontFamily: "Playfair Display SC" }}
+                    >
+                      Playfair Display SC
+                    </option>
+                    <option value="Poppins" style={{ fontFamily: "Poppins" }}>
+                      Poppins
+                    </option>
+                    <option
+                      value="Quicksand"
+                      style={{ fontFamily: "Quicksand" }}
+                    >
+                      Quicksand
+                    </option>
+                    <option value="Satisfy" style={{ fontFamily: "Satisfy" }}>
+                      Satisfy
+                    </option>
+                    <option
+                      value="Tangerine"
+                      style={{ fontFamily: "Tangerine" }}
+                    >
+                      Tangerine
+                    </option>
+                    <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>
+                      Vidaloka
+                    </option>
                   </select>
                 </div>
               </div>
