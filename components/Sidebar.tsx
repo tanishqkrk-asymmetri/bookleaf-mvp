@@ -259,7 +259,7 @@ export default function Sidebar({
       }
 
       if (file.size > 2097152) {
-        alert("Size too big");
+        alert("Please upload files below 2MB");
         return;
       }
 
