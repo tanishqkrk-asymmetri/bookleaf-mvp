@@ -584,7 +584,8 @@ export default function Admin() {
       currentTemplate?.coverData.front.backgroundType === "Image" &&
       currentTemplate?.coverData.front.image.imageUrl
     ) {
-      setIsImageLoading(true);
+      console.log(currentTemplate?.coverData.front.image.imageUrl);
+      setIsImageLoading(false);
     }
   }, [currentTemplate?.coverData.front.image.imageUrl]);
 
@@ -987,7 +988,10 @@ export default function Admin() {
                   ? "bg-blue-600 text-white shadow-sm"
                   : "text-zinc-300 hover:bg-zinc-700"
               }`}
-              onClick={() => setSelectedTemplateId(template.id)}
+              onClick={() => {
+                setIsImageLoading(true);
+                setSelectedTemplateId(template.id);
+              }}
             >
               <span className="flex-1 truncate">{template.name}</span>
               <button
