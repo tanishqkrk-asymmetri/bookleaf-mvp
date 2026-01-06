@@ -1746,6 +1746,60 @@ export default function Sidebar({
                       >
                         Vidaloka
                       </option>
+                      <option
+                        value="Breathing"
+                        style={{ fontFamily: "Breathing" }}
+                      >
+                        Breathing
+                      </option>
+                      <option
+                        value="Bright Sunshine"
+                        style={{ fontFamily: "Bright Sunshine" }}
+                      >
+                        Bright Sunshine
+                      </option>
+                      <option
+                        value="Brittany Signature"
+                        style={{ fontFamily: "Brittany Signature" }}
+                      >
+                        Brittany Signature
+                      </option>
+                      <option
+                        value="Eyesome Script"
+                        style={{ fontFamily: "Eyesome Script" }}
+                      >
+                        Eyesome Script
+                      </option>
+                      <option
+                        value="Gellatio"
+                        style={{ fontFamily: "Gellatio" }}
+                      >
+                        Gellatio
+                      </option>
+                      <option
+                        value="Le Jour Serif"
+                        style={{ fontFamily: "Le Jour Serif" }}
+                      >
+                        Le Jour Serif
+                      </option>
+                      <option
+                        value="Majesty"
+                        style={{ fontFamily: "Majesty" }}
+                      >
+                        Majesty
+                      </option>
+                      <option
+                        value="Marck Script"
+                        style={{ fontFamily: "Marck Script" }}
+                      >
+                        Marck Script
+                      </option>
+                      <option
+                        value="TC Chaddlewood"
+                        style={{ fontFamily: "TC Chaddlewood" }}
+                      >
+                        TC Chaddlewood
+                      </option>
                     </select>
                   </div>
                   <div className="space-y-3 py-3">
@@ -2105,6 +2159,60 @@ export default function Sidebar({
                         style={{ fontFamily: "Vidaloka" }}
                       >
                         Vidaloka
+                      </option>
+                      <option
+                        value="Breathing"
+                        style={{ fontFamily: "Breathing" }}
+                      >
+                        Breathing
+                      </option>
+                      <option
+                        value="Bright Sunshine"
+                        style={{ fontFamily: "Bright Sunshine" }}
+                      >
+                        Bright Sunshine
+                      </option>
+                      <option
+                        value="Brittany Signature"
+                        style={{ fontFamily: "Brittany Signature" }}
+                      >
+                        Brittany Signature
+                      </option>
+                      <option
+                        value="Eyesome Script"
+                        style={{ fontFamily: "Eyesome Script" }}
+                      >
+                        Eyesome Script
+                      </option>
+                      <option
+                        value="Gellatio"
+                        style={{ fontFamily: "Gellatio" }}
+                      >
+                        Gellatio
+                      </option>
+                      <option
+                        value="Le Jour Serif"
+                        style={{ fontFamily: "Le Jour Serif" }}
+                      >
+                        Le Jour Serif
+                      </option>
+                      <option
+                        value="Majesty"
+                        style={{ fontFamily: "Majesty" }}
+                      >
+                        Majesty
+                      </option>
+                      <option
+                        value="Marck Script"
+                        style={{ fontFamily: "Marck Script" }}
+                      >
+                        Marck Script
+                      </option>
+                      <option
+                        value="TC Chaddlewood"
+                        style={{ fontFamily: "TC Chaddlewood" }}
+                      >
+                        TC Chaddlewood
                       </option>
                     </select>
                   </div>
@@ -2473,6 +2581,60 @@ export default function Sidebar({
                         style={{ fontFamily: "Vidaloka" }}
                       >
                         Vidaloka
+                      </option>
+                      <option
+                        value="Breathing"
+                        style={{ fontFamily: "Breathing" }}
+                      >
+                        Breathing
+                      </option>
+                      <option
+                        value="Bright Sunshine"
+                        style={{ fontFamily: "Bright Sunshine" }}
+                      >
+                        Bright Sunshine
+                      </option>
+                      <option
+                        value="Brittany Signature"
+                        style={{ fontFamily: "Brittany Signature" }}
+                      >
+                        Brittany Signature
+                      </option>
+                      <option
+                        value="Eyesome Script"
+                        style={{ fontFamily: "Eyesome Script" }}
+                      >
+                        Eyesome Script
+                      </option>
+                      <option
+                        value="Gellatio"
+                        style={{ fontFamily: "Gellatio" }}
+                      >
+                        Gellatio
+                      </option>
+                      <option
+                        value="Le Jour Serif"
+                        style={{ fontFamily: "Le Jour Serif" }}
+                      >
+                        Le Jour Serif
+                      </option>
+                      <option
+                        value="Majesty"
+                        style={{ fontFamily: "Majesty" }}
+                      >
+                        Majesty
+                      </option>
+                      <option
+                        value="Marck Script"
+                        style={{ fontFamily: "Marck Script" }}
+                      >
+                        Marck Script
+                      </option>
+                      <option
+                        value="TC Chaddlewood"
+                        style={{ fontFamily: "TC Chaddlewood" }}
+                      >
+                        TC Chaddlewood
                       </option>
                     </select>
                   </div>
@@ -3160,6 +3322,33 @@ export default function Sidebar({
                     <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>
                       Vidaloka
                     </option>
+                    <option value="Breathing" style={{ fontFamily: "Breathing" }}>
+                      Breathing
+                    </option>
+                    <option value="Bright Sunshine" style={{ fontFamily: "Bright Sunshine" }}>
+                      Bright Sunshine
+                    </option>
+                    <option value="Brittany Signature" style={{ fontFamily: "Brittany Signature" }}>
+                      Brittany Signature
+                    </option>
+                    <option value="Eyesome Script" style={{ fontFamily: "Eyesome Script" }}>
+                      Eyesome Script
+                    </option>
+                    <option value="Gellatio" style={{ fontFamily: "Gellatio" }}>
+                      Gellatio
+                    </option>
+                    <option value="Le Jour Serif" style={{ fontFamily: "Le Jour Serif" }}>
+                      Le Jour Serif
+                    </option>
+                    <option value="Majesty" style={{ fontFamily: "Majesty" }}>
+                      Majesty
+                    </option>
+                    <option value="Marck Script" style={{ fontFamily: "Marck Script" }}>
+                      Marck Script
+                    </option>
+                    <option value="TC Chaddlewood" style={{ fontFamily: "TC Chaddlewood" }}>
+                      TC Chaddlewood
+                    </option>
                   </select>
                 </div>
               </div>
@@ -3411,6 +3600,33 @@ export default function Sidebar({
                     </option>
                     <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>
                       Vidaloka
+                    </option>
+                    <option value="Breathing" style={{ fontFamily: "Breathing" }}>
+                      Breathing
+                    </option>
+                    <option value="Bright Sunshine" style={{ fontFamily: "Bright Sunshine" }}>
+                      Bright Sunshine
+                    </option>
+                    <option value="Brittany Signature" style={{ fontFamily: "Brittany Signature" }}>
+                      Brittany Signature
+                    </option>
+                    <option value="Eyesome Script" style={{ fontFamily: "Eyesome Script" }}>
+                      Eyesome Script
+                    </option>
+                    <option value="Gellatio" style={{ fontFamily: "Gellatio" }}>
+                      Gellatio
+                    </option>
+                    <option value="Le Jour Serif" style={{ fontFamily: "Le Jour Serif" }}>
+                      Le Jour Serif
+                    </option>
+                    <option value="Majesty" style={{ fontFamily: "Majesty" }}>
+                      Majesty
+                    </option>
+                    <option value="Marck Script" style={{ fontFamily: "Marck Script" }}>
+                      Marck Script
+                    </option>
+                    <option value="TC Chaddlewood" style={{ fontFamily: "TC Chaddlewood" }}>
+                      TC Chaddlewood
                     </option>
                   </select>
                 </div>

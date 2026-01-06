@@ -1,0 +1,63 @@
+@font-face {
+  font-family: 'TC Chaddlewood';
+  src: url('/local_fonts/TcChaddlewoodRegular-4nW5Y.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Breathing';
+  src: url('/local_fonts/Breathing.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Bright Sunshine';
+  src: url('/local_fonts/Bright_Sunshine.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Brittany Signature';
+  src: url('/local_fonts/BrittanySignature.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Eyesome Script';
+  src: url('/local_fonts/Eyesome_Script.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gellatio';
+  src: url('/local_fonts/Gellatio.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Le Jour Serif';
+  src: url('/local_fonts/Le_Jour_Serif.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Majesty';
+  src: url('/local_fonts/Majesty_Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Marck Script';
+  src: url('/local_fonts/MarckScript-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
