@@ -864,7 +864,10 @@ export default function Admin() {
   ) => {
     const file = event.target.files?.[0];
     if (!file || !currentTemplate) return;
-
+    if (file.size > 2097152) {
+      alert("Size too big");
+      return;
+    }
     if (!file.type.startsWith("image/")) {
       alert("Please upload an image file");
       return;
@@ -912,7 +915,7 @@ export default function Admin() {
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("❌ Failed to upload image. Please try again.");
-      
+
       // Reset background type on error
       updateTemplate((t) => {
         t.coverData.front.backgroundType = "Color";
@@ -1535,8 +1538,7 @@ export default function Admin() {
                   value={currentTemplate.coverData.front.text.subTitle.content}
                   onChange={(e) => {
                     updateTemplate((t) => {
-                      t.coverData.front.text.subTitle.content =
-                        e.target.value;
+                      t.coverData.front.text.subTitle.content = e.target.value;
                     });
                   }}
                   className="w-full px-2 py-1.5 bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-md mb-1.5 text-xs resize-y"
