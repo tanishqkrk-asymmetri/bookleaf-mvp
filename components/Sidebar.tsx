@@ -1396,7 +1396,7 @@ export default function Sidebar({
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    {imageList.map((image: UnsplashPhoto) => (
+                    {imageList?.map((image: UnsplashPhoto) => (
                       <div
                         onClick={() => handleImageClick(image.urls.full)}
                         key={image.id}
@@ -1782,10 +1782,7 @@ export default function Sidebar({
                       >
                         Le Jour Serif
                       </option>
-                      <option
-                        value="Majesty"
-                        style={{ fontFamily: "Majesty" }}
-                      >
+                      <option value="Majesty" style={{ fontFamily: "Majesty" }}>
                         Majesty
                       </option>
                       <option
@@ -2196,10 +2193,7 @@ export default function Sidebar({
                       >
                         Le Jour Serif
                       </option>
-                      <option
-                        value="Majesty"
-                        style={{ fontFamily: "Majesty" }}
-                      >
+                      <option value="Majesty" style={{ fontFamily: "Majesty" }}>
                         Majesty
                       </option>
                       <option
@@ -2618,10 +2612,7 @@ export default function Sidebar({
                       >
                         Le Jour Serif
                       </option>
-                      <option
-                        value="Majesty"
-                        style={{ fontFamily: "Majesty" }}
-                      >
+                      <option value="Majesty" style={{ fontFamily: "Majesty" }}>
                         Majesty
                       </option>
                       <option
@@ -3322,31 +3313,52 @@ export default function Sidebar({
                     <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>
                       Vidaloka
                     </option>
-                    <option value="Breathing" style={{ fontFamily: "Breathing" }}>
+                    <option
+                      value="Breathing"
+                      style={{ fontFamily: "Breathing" }}
+                    >
                       Breathing
                     </option>
-                    <option value="Bright Sunshine" style={{ fontFamily: "Bright Sunshine" }}>
+                    <option
+                      value="Bright Sunshine"
+                      style={{ fontFamily: "Bright Sunshine" }}
+                    >
                       Bright Sunshine
                     </option>
-                    <option value="Brittany Signature" style={{ fontFamily: "Brittany Signature" }}>
+                    <option
+                      value="Brittany Signature"
+                      style={{ fontFamily: "Brittany Signature" }}
+                    >
                       Brittany Signature
                     </option>
-                    <option value="Eyesome Script" style={{ fontFamily: "Eyesome Script" }}>
+                    <option
+                      value="Eyesome Script"
+                      style={{ fontFamily: "Eyesome Script" }}
+                    >
                       Eyesome Script
                     </option>
                     <option value="Gellatio" style={{ fontFamily: "Gellatio" }}>
                       Gellatio
                     </option>
-                    <option value="Le Jour Serif" style={{ fontFamily: "Le Jour Serif" }}>
+                    <option
+                      value="Le Jour Serif"
+                      style={{ fontFamily: "Le Jour Serif" }}
+                    >
                       Le Jour Serif
                     </option>
                     <option value="Majesty" style={{ fontFamily: "Majesty" }}>
                       Majesty
                     </option>
-                    <option value="Marck Script" style={{ fontFamily: "Marck Script" }}>
+                    <option
+                      value="Marck Script"
+                      style={{ fontFamily: "Marck Script" }}
+                    >
                       Marck Script
                     </option>
-                    <option value="TC Chaddlewood" style={{ fontFamily: "TC Chaddlewood" }}>
+                    <option
+                      value="TC Chaddlewood"
+                      style={{ fontFamily: "TC Chaddlewood" }}
+                    >
                       TC Chaddlewood
                     </option>
                   </select>
@@ -3601,31 +3613,52 @@ export default function Sidebar({
                     <option value="Vidaloka" style={{ fontFamily: "Vidaloka" }}>
                       Vidaloka
                     </option>
-                    <option value="Breathing" style={{ fontFamily: "Breathing" }}>
+                    <option
+                      value="Breathing"
+                      style={{ fontFamily: "Breathing" }}
+                    >
                       Breathing
                     </option>
-                    <option value="Bright Sunshine" style={{ fontFamily: "Bright Sunshine" }}>
+                    <option
+                      value="Bright Sunshine"
+                      style={{ fontFamily: "Bright Sunshine" }}
+                    >
                       Bright Sunshine
                     </option>
-                    <option value="Brittany Signature" style={{ fontFamily: "Brittany Signature" }}>
+                    <option
+                      value="Brittany Signature"
+                      style={{ fontFamily: "Brittany Signature" }}
+                    >
                       Brittany Signature
                     </option>
-                    <option value="Eyesome Script" style={{ fontFamily: "Eyesome Script" }}>
+                    <option
+                      value="Eyesome Script"
+                      style={{ fontFamily: "Eyesome Script" }}
+                    >
                       Eyesome Script
                     </option>
                     <option value="Gellatio" style={{ fontFamily: "Gellatio" }}>
                       Gellatio
                     </option>
-                    <option value="Le Jour Serif" style={{ fontFamily: "Le Jour Serif" }}>
+                    <option
+                      value="Le Jour Serif"
+                      style={{ fontFamily: "Le Jour Serif" }}
+                    >
                       Le Jour Serif
                     </option>
                     <option value="Majesty" style={{ fontFamily: "Majesty" }}>
                       Majesty
                     </option>
-                    <option value="Marck Script" style={{ fontFamily: "Marck Script" }}>
+                    <option
+                      value="Marck Script"
+                      style={{ fontFamily: "Marck Script" }}
+                    >
                       Marck Script
                     </option>
-                    <option value="TC Chaddlewood" style={{ fontFamily: "TC Chaddlewood" }}>
+                    <option
+                      value="TC Chaddlewood"
+                      style={{ fontFamily: "TC Chaddlewood" }}
+                    >
                       TC Chaddlewood
                     </option>
                   </select>
