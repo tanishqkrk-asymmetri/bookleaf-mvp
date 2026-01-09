@@ -2438,7 +2438,7 @@ export default function Admin() {
                 </div>
               ) : searchResults.length > 0 ? (
                 <div className="grid grid-cols-3 gap-4">
-                  {searchResults.map((image) => (
+                  {searchResults?.map((image) => (
                     <button
                       key={image.id}
                       onClick={() => selectUnsplashImage(image.urls.regular)}

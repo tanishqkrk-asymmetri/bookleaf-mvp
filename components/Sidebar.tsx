@@ -2751,7 +2751,7 @@ export default function Sidebar({
                   <div className="grid grid-cols-2 gap-6">
                     {templates.map((temp, i) => {
                       // Canvas dimensions (matching Canvas.tsx)
-                      const CANVAS_WIDTH = 487;
+                      const CANVAS_WIDTH = 500;
                       const CANVAS_HEIGHT = 782;
                       const CANVAS_PADDING_X = 35;
                       const CANVAS_PADDING_Y_TOP = 35;
@@ -2838,7 +2838,7 @@ export default function Sidebar({
                                   zIndex: 10,
                                   left: `${
                                     temp.front.text.title.position.x *
-                                    thumbnailScale
+                                    (thumbnailScale - 0.2)
                                   }px`,
                                   top: `${
                                     temp.front.text.title.position.y *
