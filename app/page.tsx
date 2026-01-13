@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import useDesign from "@/context/DesignContext";
 import { Book } from "@/types/Book";
+import { AnimatePresence, motion } from "motion/react";
 
 export default function Home() {
   const [selectedView, setSelectedView] = useState<"Front" | "Back" | "Spine">(
@@ -46,8 +47,9 @@ export default function Home() {
         const data = await response.json();
 
         setBookData(data);
+        console.log(data);
         // console.log(Object.keys(data).length > 1);
-        if (Object.keys(data).length > 1) {
+        if (Object.keys(data).length > 2) {
           // console.log(JSON.parse(data));
           setDesignData((org) => ({
             ...org,
@@ -71,6 +73,7 @@ export default function Home() {
 
     fetchBookData();
   }, [id]);
+  const [popup, setPopup] = useState(true);
 
   if (error) {
     return (
@@ -91,121 +94,46 @@ export default function Home() {
   console.log(designData);
   return (
     <div className="">
-      {/* <button
-        className="z-99999 fixed top-1/2 left-1/2 text-5xl text-white bg-red-500 hidden"
-        onClick={async () => {
-          const response = await fetch("/api/saveBook", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              ...designData,
-              coverData: JSON.stringify({
-                ...designData.coverData,
-                editTrace: [],
-                lastEdited: 0,
-                front: {
-                  backgroundType: "Color",
-                  text: {
-                    font: "Default",
-                    title: {
-                      color: "#000000",
-                      content: "Sample Title",
-                      font: "Default",
-                      size: 32,
-                      bold: true,
-                      italic: false,
-                      underline: false,
-                      align: "center",
-                      lineHeight: 1.2,
-                      position: {
-                        x: 50,
-                        y: 40,
-                      },
-                    },
-                    subTitle: {
-                      color: "#000000",
-                      content: "Sample SubTitle",
-                      font: "Default",
-                      size: 18,
-                      bold: false,
-                      italic: false,
-                      underline: false,
-                      align: "center",
-                      lineHeight: 1.5,
-                      position: {
-                        x: 50,
-                        y: 55,
-                      },
-                    },
-                    authorName: {
-                      color: "#000000",
-                      content: "Author Name",
-                      font: "Default",
-                      size: 16,
-                      bold: false,
-                      italic: false,
-                      underline: false,
-                      align: "center",
-                      lineHeight: 1.5,
-                      position: {
-                        x: 50,
-                        y: 85,
-                      },
-                    },
-                  },
-                  color: {
-                    colorCode: "",
-                  },
-                  gradient: {
-                    direction: 0,
-                    from: "",
-                    to: "",
-                  },
-                  image: {
-                    imageUrl: "",
-                    overlayColor: "#000000",
-                    overlayOpacity: 0,
-                  },
-                  template: {
-                    templateId: "",
-                  },
-                },
-                back: {
-                  color: {
-                    colorCode: "#FFFFFF",
-                  },
-                  description: {
-                    content:
-                      "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.",
-                    size: 14,
-                    color: "#000000",
-                    font: "Default",
-                  },
-                  author: {
-                    title: "ABOUT THE AUTHOR",
-                    content:
-                      "It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.",
-                    imageUrl: "",
-                    size: 12,
-                    color: "#000000",
-                    font: "Default",
-                  },
-                },
-                spine: {
-                  color: {
-                    colorCode: "#3498DB",
-                  },
-                },
-              }),
-            }),
-          });
-        }}
-      >
-        UNGABUGNA
-      </button> */}
+      <AnimatePresence>
+        {popup && (
+          <motion.div
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+            }}
+            className="w-screen h-screen bg-black/50 fixed top-0 left-0 z-9999999"
+          ></motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {popup && (
+          <motion.div
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+            }}
+            className="w-4xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-99999999999 bg-white p-2 rounded-xl space-y-3"
+          >
+            <img className="w-full" src="/popup.png" alt="" />
+            <div className="flex justify-center items-center">
+              <button
+                onClick={() => {
+                  setPopup(false);
+                }}
+                className="bg-theme rounded-md p-2 text-white cursor-pointer"
+              >
+                Confirm
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <Header url={designData.redirect_url}></Header>
+
       <div className="flex  pt-16 overflow-hidden min-h-screen max-h-screen">
         <Sidebar
           selectedView={selectedView}
