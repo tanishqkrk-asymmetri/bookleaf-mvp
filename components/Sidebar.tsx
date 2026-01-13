@@ -2813,7 +2813,7 @@ export default function Sidebar({
                             onClick={() => {
                               // setSelectedView("Front");
                             }}
-                            className="front bg-foreground/20 overflow-hidden flex justify-center items-center relative"
+                            className="front  overflow-hidden flex justify-center items-center relative"
                             style={{
                               height: `${CANVAS_HEIGHT * thumbnailScale}px`,
                               width: `${CANVAS_WIDTH * thumbnailScale}px`,

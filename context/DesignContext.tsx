@@ -11,6 +11,10 @@ const DesignContext = createContext<{
 function DesignProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   const [designData, setDesignData] = useState<Book>({
     id: "",
+    redirect_url: "",
+    backImageUrl: "",
+    frontImageUrl: "",
+    splineImageUrl: "",
     bookName: "",
     ISBN: "",
     pageCount: 200,
@@ -21,11 +25,11 @@ function DesignProvider({ children }: Readonly<{ children: React.ReactNode }>) {
       front: {
         backgroundType: "Color",
         text: {
-          font: "Default",
+          font: "Lato",
           title: {
             color: "#000000",
             content: "Sample Title",
-            font: "Default",
+            font: "Lato",
             size: 32,
             bold: true,
             italic: false,
@@ -40,7 +44,7 @@ function DesignProvider({ children }: Readonly<{ children: React.ReactNode }>) {
           subTitle: {
             color: "#000000",
             content: "Sample SubTitle",
-            font: "Default",
+            font: "Lato",
             size: 18,
             bold: false,
             italic: false,
@@ -55,7 +59,7 @@ function DesignProvider({ children }: Readonly<{ children: React.ReactNode }>) {
           authorName: {
             color: "#000000",
             content: "Author Name",
-            font: "Default",
+            font: "Lato",
             size: 16,
             bold: false,
             italic: false,
@@ -94,7 +98,7 @@ function DesignProvider({ children }: Readonly<{ children: React.ReactNode }>) {
             "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.",
           size: 14,
           color: "#000000",
-          font: "Default",
+          font: "Lato",
         },
         author: {
           title: "ABOUT THE AUTHOR",
@@ -103,7 +107,7 @@ function DesignProvider({ children }: Readonly<{ children: React.ReactNode }>) {
           imageUrl: "",
           size: 12,
           color: "#000000",
-          font: "Default",
+          font: "Lato",
         },
       },
       spine: {

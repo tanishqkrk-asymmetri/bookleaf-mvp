@@ -91,7 +91,7 @@ export default function Home() {
   console.log(designData);
   return (
     <div className="">
-      <button
+      {/* <button
         className="z-99999 fixed top-1/2 left-1/2 text-5xl text-white bg-red-500 hidden"
         onClick={async () => {
           const response = await fetch("/api/saveBook", {
@@ -204,7 +204,7 @@ export default function Home() {
         }}
       >
         UNGABUGNA
-      </button>
+      </button> */}
       <Header url={designData.redirect_url}></Header>
       <div className="flex  pt-16 overflow-hidden min-h-screen max-h-screen">
         <Sidebar

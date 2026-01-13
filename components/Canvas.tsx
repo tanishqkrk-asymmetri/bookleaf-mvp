@@ -364,7 +364,14 @@ export default function Canvas({
                     />
                     <label
                       htmlFor="canvas-author-image-upload"
-                      className="w-full h-full bg-foreground/10 rounded flex items-center justify-center text-foreground/30 text-xs text-center p-2 cursor-pointer hover:bg-foreground/20 transition-colors"
+                      className={`w-full h-full ${
+                        isColorDark(
+                          designData.coverData.back.color?.colorCode ||
+                            "#FFFFFF"
+                        )
+                          ? "bg-white/50 text-black"
+                          : "bg-black/50 text-white"
+                      }  rounded flex items-center justify-center  text-xs text-center p-2 cursor-pointer  transition-colors`}
                     >
                       Add author image
                     </label>
@@ -386,7 +393,7 @@ export default function Canvas({
                     : "/white2.png"
                 }
                 alt="Bookleaf Publishing"
-                className="h-16 w-auto"
+                className="h-19 w-auto"
               />
             </div>
             <div className="flex flex-col items-center">
@@ -422,10 +429,10 @@ export default function Canvas({
           style={{
             height: "782px",
             width: "487px",
-            paddingTop: "35px",
+            paddingTop: "60px",
             paddingLeft: "35px",
             paddingRight: "35px",
-            paddingBottom: "40px",
+            paddingBottom: "60px",
             background:
               designData.coverData.front.backgroundType === "Gradient"
                 ? `linear-gradient(${designData.coverData.front.gradient?.direction}deg, ${designData.coverData.front.gradient?.from}, ${designData.coverData.front.gradient?.to})`
