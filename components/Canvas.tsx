@@ -107,7 +107,7 @@ export default function Canvas({
   // Calculate spine width based on page count
   const calculateSpineWidth = () => {
     const pageCount = designData.pageCount || 200;
-    const spineWidthMm = ((pageCount / 2) * 80 * 1.43) / 1000 + 0.6;
+    const spineWidthMm = (((pageCount as number) / 2) * 80 * 1.43) / 1000 + 0.6;
     const spineWidthPx = spineWidthMm * 3.78;
     return spineWidthPx;
   };
@@ -425,7 +425,7 @@ export default function Canvas({
           onClick={() => {
             // setSelectedView("Front");
           }}
-          className="front bg-foreground/20 flex justify-center items-center relative scale-80"
+          className="frontMain bg-foreground/20 flex justify-center items-center relative scale-80"
           style={{
             height: "782px",
             width: "487px",

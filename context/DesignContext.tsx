@@ -17,8 +17,8 @@ function DesignProvider({ children }: Readonly<{ children: React.ReactNode }>) {
     splineImageUrl: "",
     bookName: "",
     ISBN: "",
-    pageCount: 200,
-    splineWidth: 0,
+    pageCount: "200",
+    splineWidth: "0",
     coverData: {
       editTrace: [],
       lastEdited: 0,

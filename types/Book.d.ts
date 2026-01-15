@@ -2,8 +2,8 @@ export interface Book {
   id: string;
   bookName: string;
   ISBN: string;
-  pageCount: number;
-  splineWidth: number;
+  pageCount: string;
+  splineWidth: string;
   coverData: CoverData;
   frontImageUrl?: string;
   backImageUrl?: string;

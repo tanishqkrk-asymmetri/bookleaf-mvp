@@ -29,7 +29,7 @@ export default function Header({ url }: { url?: string }) {
     setTempBookName(designData.bookName);
     setIsEditingBookName(true);
   };
-
+  const [test, setTest] = useState("");
   const convertElementToBase64 = async (
     className: string
   ): Promise<string | null> => {
@@ -60,10 +60,12 @@ export default function Header({ url }: { url?: string }) {
     setIsUploading(true);
     try {
       const [frontBase64, spineBase64, backBase64] = await Promise.all([
-        convertElementToBase64("front"),
+        convertElementToBase64("frontMain"),
         convertElementToBase64("spine"),
         convertElementToBase64("back"),
       ]);
+
+      setTest(frontBase64 || "");
 
       console.log([frontBase64, spineBase64, backBase64]);
 
@@ -76,7 +78,7 @@ export default function Header({ url }: { url?: string }) {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              filename: designData.bookName + Date.now() + ".jpg",
+              filename: designData.bookName + Date.now() + ".png",
               upload_file: {
                 filename:
                   designData.ISBN +
@@ -87,7 +89,7 @@ export default function Header({ url }: { url?: string }) {
                     : i === 2
                     ? "back"
                     : "") +
-                  ".jpg",
+                  ".png",
                 contents: x?.split(",")[1] || x,
               },
             }),
@@ -97,7 +99,6 @@ export default function Header({ url }: { url?: string }) {
         })
       );
 
-      // Update links state with all uploaded URLs
       const newLinks = {
         frontImageUrl: uploadResults[0]?.hostedLink || "",
         splineImageUrl: uploadResults[1]?.hostedLink || "",
@@ -108,8 +109,6 @@ export default function Header({ url }: { url?: string }) {
 
       setLinks(newLinks);
 
-      // console.log("Uploaded links:", newLinks);
-
       const post = await fetch("/api/saveBook", {
         method: "POST",
         headers: {
@@ -117,7 +116,8 @@ export default function Header({ url }: { url?: string }) {
         },
         body: JSON.stringify({
           ...designData,
-          coverData: JSON.stringify({ ...designData.coverData, ...newLinks }),
+          coverData: JSON.stringify({ ...designData.coverData }),
+          ...newLinks,
         }),
       });
 
@@ -159,6 +159,16 @@ export default function Header({ url }: { url?: string }) {
 
   return (
     <div className="w-full bg-background px-4 text-foreground fixed top-0 h-16 z-50">
+      {/* <img
+        className="fixed top-0 left-0 w-36 z-99999999999"
+        src={test}
+        alt=""
+      /> */}
+      {/* <img
+        className="fixed top-0 left-36 w-36 z-99999999999"
+        src={links.backImageUrl}
+        alt=""
+      /> */}
       <div className="flex justify-between items-center h-full">
         <img
           src={"/white.png"}

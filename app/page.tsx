@@ -47,25 +47,29 @@ export default function Home() {
         const data = await response.json();
 
         setBookData(data);
-        console.log(data);
-        // console.log(Object.keys(data).length > 1);
-        if (Object.keys(data).length > 2) {
-          // console.log(JSON.parse(data));
+
+        const coverData = JSON.parse(data?.coverData);
+
+        // console.log(JSON.parse(data.coverData));
+        if (data) {
           setDesignData((org) => ({
-            ...org,
-            id,
-            bookName: data.bookName || "",
-            ISBN: data.ISBN?.toString() || "",
-            splineWidth: data?.splineWidth.toString() || "",
-            coverData: JSON.parse(data.coverData || "") || {},
-            redirect_url: data?.redirect_url,
+            // ...org,
+            ...data,
+            coverData,
           }));
+
+          console.log({
+            ...data,
+            coverData,
+          });
+
           setError(null);
         } else {
           setError("No data found for this book.");
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
+        console.log(err);
       } finally {
         setLoading(false);
       }
