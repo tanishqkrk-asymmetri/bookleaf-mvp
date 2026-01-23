@@ -31,7 +31,7 @@ export default function Header({ url }: { url?: string }) {
   };
   const [test, setTest] = useState("");
   const convertElementToBase64 = async (
-    className: string
+    className: string,
   ): Promise<string | null> => {
     const element = document.querySelector(`.${className}`) as HTMLElement;
 
@@ -85,10 +85,10 @@ export default function Header({ url }: { url?: string }) {
                   (i === 0
                     ? "front"
                     : i === 1
-                    ? "spine"
-                    : i === 2
-                    ? "back"
-                    : "") +
+                      ? "spine"
+                      : i === 2
+                        ? "back"
+                        : "") +
                   ".png",
                 contents: x?.split(",")[1] || x,
               },
@@ -96,7 +96,7 @@ export default function Header({ url }: { url?: string }) {
           });
           const result = await response.json();
           return { index: i, hostedLink: result.hosted_link };
-        })
+        }),
       );
 
       const newLinks = {
