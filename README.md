@@ -1,67 +1,18 @@
 admin@bookleaf.com
 admin123
 
----
+In the meantime, here are the things that were required from my end:
 
-Mr Dafoe
+Front cover and back cover each:
 
-ADIREK SERIF - Spectral
+782 px height (206.9 mm)
+487 px width (128.8 mm)
 
-Arimo
+Margins:
 
-JOSEFIN SANS
+- 27 px (7.14 mm) from all edges (except spine)
+- 40 px (10.58 mm) from the bottom edge on front cover
 
-Georgia Pro - Cormorant Garamond
+Formula for spine width (in mm):
 
-Oswald
-
-Gellatio - Allura
-
-Forum
-
-Playfair Display
-
-Breathing - Dancing Script
-
-Great Vibes
-
-Vidaloka
-
-Open sauce - Inter
-
-Lucy Rose - Crimson Text
-
-Apricots - Courgette
-
-The Seasons - Cormorant
-
-CANVA SANS - Plus Jakarta Sans
-
-Cinzel
-
-Bright Sunshine - Satisfy
-
-Monterchi- Nunito
-Futura
-
-TC Chaddlewood - shadows into light
-
-Majesty - null
-
-Le Jour Serif - Merriweather
-
-Handsome - Dancing Script
-
-della respira - Cormorant
-
-Britany - null
-
-Better Saturday - Great Vibes
-
-Eyesome Script - Alex brush
-
-Boston Angel - Georgia
-
-Montserrat
-
-Norwester - Anton
+{(no. of pages/2)*80*1.43/1000}+0.6

@@ -41,11 +41,29 @@ export default function Header({ url }: { url?: string }) {
     }
 
     try {
-      const dataUrl = await htmlToImage.toPng(element, { quality: 1 });
-      // console.log(dataUrl);
-      return dataUrl;
+      element.style.scale = "1";
+
+      const dataUrl = await htmlToImage.toSvg(element, {
+        quality: 1,
+      });
+
+      // Extract SVG content from data URL and convert to base64
+      // dataUrl format: "data:image/svg+xml;charset=utf-8,<svg>...</svg>"
+      const svgContent = decodeURIComponent(
+        dataUrl.replace("data:image/svg+xml;charset=utf-8,", ""),
+      );
+
+      // Convert SVG string to base64
+      const base64Svg = btoa(unescape(encodeURIComponent(svgContent)));
+
+      console.log("Base64 SVG:", base64Svg);
+
+      return base64Svg;
     } catch (error) {
       console.error(`Error converting ${className} to base64:`, error);
+      console.log("=========================");
+      console.log(error);
+      console.log("=========================");
       return null;
     }
   };
@@ -53,44 +71,36 @@ export default function Header({ url }: { url?: string }) {
   const [links, setLinks] = useState({
     frontImageUrl: "",
     backImageUrl: "",
-    splineImageUrl: "",
   });
 
   const handleContinue = async () => {
     setIsUploading(true);
     try {
-      const [frontBase64, spineBase64, backBase64] = await Promise.all([
+      const [frontBase64, backBase64] = await Promise.all([
         convertElementToBase64("frontMain"),
-        convertElementToBase64("spine"),
         convertElementToBase64("back"),
       ]);
 
-      setTest(frontBase64 || "");
-
-      console.log([frontBase64, spineBase64, backBase64]);
+      console.log([frontBase64, backBase64]);
 
       const uploadResults = await Promise.all(
-        [frontBase64, spineBase64, backBase64].map(async (x, i) => {
-          console.log(x);
+        [frontBase64, backBase64].map(async (x, i) => {
           const response = await fetch("/api/uploadImage", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
+
             body: JSON.stringify({
-              filename: designData.bookName + Date.now() + ".png",
+              filename: designData.bookName + Date.now() + ".svg",
               upload_file: {
                 filename:
                   designData.ISBN +
-                  (i === 0
-                    ? "front"
-                    : i === 1
-                      ? "spine"
-                      : i === 2
-                        ? "back"
-                        : "") +
-                  ".png",
-                contents: x?.split(",")[1] || x,
+                  (i === 0 ? "front" : i === 1 ? "back" : "") +
+                  ".svg",
+                // contents: x!.split("data:image/svg+xml;charset=utf-8,")[1],
+                // contents: x?.split(",")[1] || x,
+                contents: x,
               },
             }),
           });
@@ -101,8 +111,7 @@ export default function Header({ url }: { url?: string }) {
 
       const newLinks = {
         frontImageUrl: uploadResults[0]?.hostedLink || "",
-        splineImageUrl: uploadResults[1]?.hostedLink || "",
-        backImageUrl: uploadResults[2]?.hostedLink || "",
+        backImageUrl: uploadResults[1]?.hostedLink || "",
       };
 
       console.log(newLinks);
@@ -121,8 +130,10 @@ export default function Header({ url }: { url?: string }) {
         }),
       });
 
+      console.log(post.body);
+
       console.log(url);
-      // window.location.href = url || "/";
+      window.location.href = url || "/";
     } catch (error) {
       console.error("Error uploading:", error);
     } finally {
@@ -130,40 +141,15 @@ export default function Header({ url }: { url?: string }) {
     }
   };
 
-  const downloadDesign = (className: string, designName: string) => {
-    const element = document.querySelector(`.${className}`) as HTMLElement;
-
-    if (!element) {
-      console.error(`Element with class ${className} not found`);
-      return;
-    }
-
-    htmlToImage
-      .toPng(element, { quality: 1 })
-      .then(function (dataUrl) {
-        let link = document.createElement("a");
-        link.download =
-          (designData.bookName || "design") +
-          "_" +
-          designName +
-          "_" +
-          Date.now().toString() +
-          ".png";
-        link.href = dataUrl;
-        link.click();
-      })
-      .catch(function (error) {
-        console.error("Error generating image:", error);
-      });
-  };
-
   return (
     <div className="w-full bg-background px-4 text-foreground fixed top-0 h-16 z-50">
-      {/* <img
+      <img
         className="fixed top-0 left-0 w-36 z-99999999999"
-        src={test}
+        src={
+          "6274f7c38db2a9c87269441dcb6b21d1.cdn.bubble.io/f1769157617924x859769648027283500/1234546back.svg"
+        }
         alt=""
-      /> */}
+      />
       {/* <img
         className="fixed top-0 left-36 w-36 z-99999999999"
         src={links.backImageUrl}
@@ -254,32 +240,6 @@ export default function Header({ url }: { url?: string }) {
                 Continue <ChevronRight />
               </>
             )}
-          </button>
-        </div>
-        <div className="flex gap-2 hidden">
-          <button
-            onClick={() => downloadDesign("front", "front")}
-            className="flex items-center gap-2 bg-background text-foreground px-4 py-2 rounded hover:opacity-80 transition-opacity"
-            title="Download Front Cover"
-          >
-            <Download size={16} />
-            Front
-          </button>
-          <button
-            onClick={() => downloadDesign("spine", "spine")}
-            className="flex items-center gap-2 bg-background text-foreground px-4 py-2 rounded hover:opacity-80 transition-opacity"
-            title="Download Spine"
-          >
-            <Download size={16} />
-            Spine
-          </button>
-          <button
-            onClick={() => downloadDesign("back", "back")}
-            className="flex items-center gap-2 bg-background text-foreground px-4 py-2 rounded hover:opacity-80 transition-opacity"
-            title="Download Back Cover"
-          >
-            <Download size={16} />
-            Back
           </button>
         </div>
       </div>

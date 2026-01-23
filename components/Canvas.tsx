@@ -56,7 +56,7 @@ export default function Canvas({
   const applySnapping = (
     x: number,
     y: number,
-    elementRef?: React.RefObject<HTMLDivElement | null>
+    elementRef?: React.RefObject<HTMLDivElement | null>,
   ) => {
     let snappedX = x;
     let snappedY = y;
@@ -113,7 +113,7 @@ export default function Canvas({
   };
 
   const handleAuthorImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -275,9 +275,10 @@ export default function Canvas({
         JsBarcode("#barcode", designData.ISBN, {
           format: "CODE128",
           lineColor: "#000",
-          width: 2,
-          height: 40,
-          displayValue: false,
+          width: 0.8,
+          height: 50,
+          displayValue: true,
+          fontSize: 10,
         });
       } catch (error) {
         console.error("Error generating barcode:", error);
@@ -367,7 +368,7 @@ export default function Canvas({
                       className={`w-full h-full ${
                         isColorDark(
                           designData.coverData.back.color?.colorCode ||
-                            "#FFFFFF"
+                            "#FFFFFF",
                         )
                           ? "bg-white/50 text-black"
                           : "bg-black/50 text-white"
@@ -387,23 +388,23 @@ export default function Canvas({
               <img
                 src={
                   isColorDark(
-                    designData.coverData.back.color?.colorCode || "#FFFFFF"
+                    designData.coverData.back.color?.colorCode || "#FFFFFF",
                   )
                     ? "/black2.png"
                     : "/white2.png"
                 }
                 alt="Bookleaf Publishing"
-                className="h-19 w-auto"
+                className="h-22 w-auto"
               />
             </div>
             <div className="flex flex-col items-center">
               <svg id="barcode"></svg>
-              <div
+              {/* <div
                 className="text-xs mt-1"
                 style={{ color: getLogoColors().textColor }}
               >
                 {designData.ISBN}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
