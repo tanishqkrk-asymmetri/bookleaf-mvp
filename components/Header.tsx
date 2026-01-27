@@ -71,17 +71,28 @@ export default function Header({ url }: { url?: string }) {
     });
   };
 
+  // Helper function to check if URL is external (needs proxy)
+  const isExternalUrl = (url: string): boolean => {
+    if (!url || url.startsWith("data:")) return false;
+    
+    try {
+      const urlObj = new URL(url, window.location.origin);
+      // It's external if the host is different from our origin
+      return urlObj.origin !== window.location.origin;
+    } catch {
+      return false;
+    }
+  };
+
   // Helper function to fetch an image through proxy and convert to compressed data URL
   const fetchImageAsDataUrl = async (url: string): Promise<string | null> => {
     try {
-      // Skip if already a data URL or local image
-      if (
-        url.startsWith("data:") ||
-        url.startsWith("/") ||
-        url.startsWith(window.location.origin)
-      ) {
+      // Skip if not an external URL
+      if (!isExternalUrl(url)) {
         return null; // No need to proxy local images
       }
+
+      console.log("Proxying external image:", url);
 
       // Fetch through our proxy to bypass CORS
       const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}`;
@@ -112,12 +123,7 @@ export default function Header({ url }: { url?: string }) {
 
     const imagePromises = Array.from(images).map(async (img) => {
       const src = img.src;
-      if (
-        src &&
-        !src.startsWith("data:") &&
-        !src.startsWith("/") &&
-        !src.startsWith(window.location.origin)
-      ) {
+      if (src && isExternalUrl(src)) {
         originalSrcs.set(img, src);
         const dataUrl = await fetchImageAsDataUrl(src);
         if (dataUrl) {
