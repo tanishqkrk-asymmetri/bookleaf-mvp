@@ -92,12 +92,16 @@ export default function Header({ url }: { url?: string }) {
             },
 
             body: JSON.stringify({
-              filename: designData.bookName + Date.now() + ".svg",
+              filename: (designData.bookName + Date.now() + ".svg").replaceAll(
+                " ",
+                "_",
+              ),
               upload_file: {
-                filename:
+                filename: (
                   designData.ISBN +
                   (i === 0 ? "front" : i === 1 ? "back" : "") +
-                  ".svg",
+                  ".svg"
+                ).replaceAll(" ", "_"),
                 // contents: x!.split("data:image/svg+xml;charset=utf-8,")[1],
                 // contents: x?.split(",")[1] || x,
                 contents: x,
