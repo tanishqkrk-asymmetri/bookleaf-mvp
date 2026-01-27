@@ -10,7 +10,7 @@ export async function POST(request: Request) {
         authorization: "Bearer 8fa412098df1854f20b7607ec869e4d8",
       },
       body: JSON.stringify(req),
-    }
+    },
   );
 
   const data = await response.json();
