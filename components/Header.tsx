@@ -35,7 +35,7 @@ export default function Header({ url }: { url?: string }) {
   const compressImageToDataUrl = async (
     blob: Blob,
     maxWidth: number = 1200,
-    quality: number = 0.8
+    quality: number = 0.8,
   ): Promise<string> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -43,7 +43,7 @@ export default function Header({ url }: { url?: string }) {
         // Calculate new dimensions
         let width = img.width;
         let height = img.height;
-        
+
         if (width > maxWidth) {
           height = (height * maxWidth) / width;
           width = maxWidth;
@@ -54,14 +54,14 @@ export default function Header({ url }: { url?: string }) {
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext("2d");
-        
+
         if (!ctx) {
           reject(new Error("Could not get canvas context"));
           return;
         }
 
         ctx.drawImage(img, 0, 0, width, height);
-        
+
         // Convert to JPEG for better compression (or PNG if transparency needed)
         const dataUrl = canvas.toDataURL("image/jpeg", quality);
         resolve(dataUrl);
@@ -75,21 +75,25 @@ export default function Header({ url }: { url?: string }) {
   const fetchImageAsDataUrl = async (url: string): Promise<string | null> => {
     try {
       // Skip if already a data URL or local image
-      if (url.startsWith("data:") || url.startsWith("/") || url.startsWith(window.location.origin)) {
+      if (
+        url.startsWith("data:") ||
+        url.startsWith("/") ||
+        url.startsWith(window.location.origin)
+      ) {
         return null; // No need to proxy local images
       }
 
       // Fetch through our proxy to bypass CORS
       const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}`;
       const response = await fetch(proxyUrl);
-      
+
       if (!response.ok) {
         console.warn(`Failed to proxy image: ${url}`);
         return null;
       }
 
       const blob = await response.blob();
-      
+
       // Compress the image to reduce size (1200px max, 80% quality for book covers)
       const compressedDataUrl = await compressImageToDataUrl(blob, 1200, 0.8);
       return compressedDataUrl;
@@ -100,13 +104,20 @@ export default function Header({ url }: { url?: string }) {
   };
 
   // Pre-process element to convert external images to compressed data URLs
-  const preprocessExternalImages = async (element: HTMLElement): Promise<Map<HTMLImageElement, string>> => {
+  const preprocessExternalImages = async (
+    element: HTMLElement,
+  ): Promise<Map<HTMLImageElement, string>> => {
     const originalSrcs = new Map<HTMLImageElement, string>();
     const images = element.querySelectorAll("img");
-    
+
     const imagePromises = Array.from(images).map(async (img) => {
       const src = img.src;
-      if (src && !src.startsWith("data:") && !src.startsWith("/") && !src.startsWith(window.location.origin)) {
+      if (
+        src &&
+        !src.startsWith("data:") &&
+        !src.startsWith("/") &&
+        !src.startsWith(window.location.origin)
+      ) {
         originalSrcs.set(img, src);
         const dataUrl = await fetchImageAsDataUrl(src);
         if (dataUrl) {
@@ -247,7 +258,7 @@ export default function Header({ url }: { url?: string }) {
       console.log(post.body);
 
       console.log(url);
-      // window.location.href = url || "/";
+      window.location.href = url || "/";
     } catch (error) {
       console.error("Error uploading:", error);
     } finally {
