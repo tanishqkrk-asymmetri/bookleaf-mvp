@@ -1,7 +1,7 @@
-import { CoverData } from "@/types/Book";
+import { Book, CoverData } from "@/types/Book";
 
 export async function POST(request: Request) {
-  const req: CoverData = await request.json();
+  const req: Book = await request.json();
 
   console.log(req);
 
@@ -13,7 +13,10 @@ export async function POST(request: Request) {
         "content-type": "application/json",
         authorization: "Bearer 8fa412098df1854f20b7607ec869e4d8",
       },
-      body: JSON.stringify({ ...req, backColor: req.back.color.colorCode }),
+      body: JSON.stringify({
+        ...req,
+        backColor: req.coverData.back.color.colorCode,
+      }),
     },
   );
 
