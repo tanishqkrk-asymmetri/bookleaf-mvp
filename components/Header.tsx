@@ -85,31 +85,34 @@ export default function Header({ url }: { url?: string }) {
 
       const uploadResults = await Promise.all(
         [frontBase64, backBase64].map(async (x, i) => {
-          const response = await fetch("/api/uploadImage", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+          if (x) {
+            const response = await fetch("/api/uploadImage", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
 
-            body: JSON.stringify({
-              filename: (designData.bookName + Date.now() + ".svg").replaceAll(
-                " ",
-                "_",
-              ),
-              upload_file: {
+              body: JSON.stringify({
                 filename: (
-                  designData.ISBN +
-                  (i === 0 ? "front" : i === 1 ? "back" : "") +
+                  designData.bookName +
+                  Date.now() +
                   ".svg"
                 ).replaceAll(" ", "_"),
-                // contents: x!.split("data:image/svg+xml;charset=utf-8,")[1],
-                // contents: x?.split(",")[1] || x,
-                contents: x,
-              },
-            }),
-          });
-          const result = await response.json();
-          return { index: i, hostedLink: result.hosted_link };
+                upload_file: {
+                  filename: (
+                    designData.ISBN +
+                    (i === 0 ? "front" : i === 1 ? "back" : "") +
+                    ".svg"
+                  ).replaceAll(" ", "_"),
+                  // contents: x!.split("data:image/svg+xml;charset=utf-8,")[1],
+                  // contents: x?.split(",")[1] || x,
+                  contents: x,
+                },
+              }),
+            });
+            const result = await response.json();
+            return { index: i, hostedLink: result.hosted_link };
+          }
         }),
       );
 
