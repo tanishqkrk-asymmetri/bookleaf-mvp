@@ -248,7 +248,7 @@ export default function Sidebar({
   };
 
   const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
 
@@ -450,7 +450,7 @@ export default function Sidebar({
   };
 
   const handleTitleAlignChange = (
-    align: "left" | "center" | "right" | "justify"
+    align: "left" | "center" | "right" | "justify",
   ) => {
     setDesignData((org) => ({
       ...org,
@@ -623,7 +623,7 @@ export default function Sidebar({
   };
 
   const handleSubtitleAlignChange = (
-    align: "left" | "center" | "right" | "justify"
+    align: "left" | "center" | "right" | "justify",
   ) => {
     setDesignData((org) => ({
       ...org,
@@ -796,7 +796,7 @@ export default function Sidebar({
   };
 
   const handleAuthorNameAlignChange = (
-    align: "left" | "center" | "right" | "justify"
+    align: "left" | "center" | "right" | "justify",
   ) => {
     setDesignData((org) => ({
       ...org,
@@ -992,7 +992,7 @@ export default function Sidebar({
   };
 
   const handleAuthorImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -1253,7 +1253,7 @@ export default function Sidebar({
             </div>
             {selectedFrontView === "Background" ? (
               <div className="divide-y-2 divide-zinc-500">
-                <div className="space-y-3 py-3 hidden">
+                <div className="space-y-3 py-3 ">
                   <div>Choose color</div>
 
                   <div className="grid grid-cols-5 gap-1">
@@ -1482,7 +1482,7 @@ export default function Sidebar({
                       />
                       <div className="text-sm text-center text-foreground/70">
                         {Math.round(
-                          designData.coverData.front.image.overlayOpacity * 100
+                          designData.coverData.front.image.overlayOpacity * 100,
                         )}
                         %
                       </div>
