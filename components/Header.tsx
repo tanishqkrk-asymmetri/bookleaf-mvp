@@ -56,7 +56,7 @@ export default function Header({ url }: { url?: string }) {
       // Convert SVG string to base64
       const base64Svg = btoa(unescape(encodeURIComponent(svgContent)));
 
-      console.log("Base64 SVG:", base64Svg);
+      // console.log("Base64 SVG:", base64Svg);
 
       return base64Svg;
     } catch (error) {
@@ -81,7 +81,7 @@ export default function Header({ url }: { url?: string }) {
         convertElementToBase64("back"),
       ]);
 
-      console.log([frontBase64, backBase64]);
+      // console.log([frontBase64, backBase64]);
 
       const uploadResults = await Promise.all(
         [frontBase64, backBase64].map(async (x, i) => {
@@ -111,14 +111,15 @@ export default function Header({ url }: { url?: string }) {
               }),
             });
             const result = await response.json();
+            console.log(result);
             return { index: i, hostedLink: result.hosted_link };
           }
         }),
       );
 
       const newLinks = {
-        frontImageUrl: uploadResults[0]?.hostedLink || "",
-        backImageUrl: uploadResults[1]?.hostedLink || "",
+        frontImageUrl: (await uploadResults[0]?.hostedLink) || "",
+        backImageUrl: (await uploadResults[1]?.hostedLink) || "",
       };
 
       console.log(newLinks);
@@ -140,7 +141,7 @@ export default function Header({ url }: { url?: string }) {
       console.log(post.body);
 
       console.log(url);
-      window.location.href = url || "/";
+      // window.location.href = url || "/";
     } catch (error) {
       console.error("Error uploading:", error);
     } finally {
