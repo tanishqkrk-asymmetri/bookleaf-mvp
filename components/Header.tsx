@@ -31,7 +31,47 @@ export default function Header({ url }: { url?: string }) {
   };
   const [test, setTest] = useState("");
 
-  // Helper function to fetch an image through proxy and convert to data URL
+  // Helper function to compress an image and convert to data URL
+  const compressImageToDataUrl = async (
+    blob: Blob,
+    maxWidth: number = 1200,
+    quality: number = 0.8
+  ): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        // Calculate new dimensions
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+
+        // Create canvas and draw compressed image
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        
+        if (!ctx) {
+          reject(new Error("Could not get canvas context"));
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convert to JPEG for better compression (or PNG if transparency needed)
+        const dataUrl = canvas.toDataURL("image/jpeg", quality);
+        resolve(dataUrl);
+      };
+      img.onerror = () => reject(new Error("Failed to load image"));
+      img.src = URL.createObjectURL(blob);
+    });
+  };
+
+  // Helper function to fetch an image through proxy and convert to compressed data URL
   const fetchImageAsDataUrl = async (url: string): Promise<string | null> => {
     try {
       // Skip if already a data URL or local image
@@ -49,19 +89,17 @@ export default function Header({ url }: { url?: string }) {
       }
 
       const blob = await response.blob();
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = () => resolve(null);
-        reader.readAsDataURL(blob);
-      });
+      
+      // Compress the image to reduce size (1200px max, 80% quality for book covers)
+      const compressedDataUrl = await compressImageToDataUrl(blob, 1200, 0.8);
+      return compressedDataUrl;
     } catch (error) {
       console.warn(`Error fetching image through proxy: ${url}`, error);
       return null;
     }
   };
 
-  // Pre-process element to convert external images to data URLs
+  // Pre-process element to convert external images to compressed data URLs
   const preprocessExternalImages = async (element: HTMLElement): Promise<Map<HTMLImageElement, string>> => {
     const originalSrcs = new Map<HTMLImageElement, string>();
     const images = element.querySelectorAll("img");
