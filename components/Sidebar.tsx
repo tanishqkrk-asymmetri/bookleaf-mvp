@@ -1253,7 +1253,7 @@ export default function Sidebar({
             </div>
             {selectedFrontView === "Background" ? (
               <div className="divide-y-2 divide-zinc-500">
-                <div className="space-y-3 py-3 ">
+                <div className="space-y-3 py-3 hidden">
                   <div>Choose color</div>
 
                   <div className="grid grid-cols-5 gap-1">

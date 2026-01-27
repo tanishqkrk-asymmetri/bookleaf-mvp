@@ -30,6 +30,64 @@ export default function Header({ url }: { url?: string }) {
     setIsEditingBookName(true);
   };
   const [test, setTest] = useState("");
+
+  // Helper function to fetch an image through proxy and convert to data URL
+  const fetchImageAsDataUrl = async (url: string): Promise<string | null> => {
+    try {
+      // Skip if already a data URL or local image
+      if (url.startsWith("data:") || url.startsWith("/") || url.startsWith(window.location.origin)) {
+        return null; // No need to proxy local images
+      }
+
+      // Fetch through our proxy to bypass CORS
+      const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}`;
+      const response = await fetch(proxyUrl);
+      
+      if (!response.ok) {
+        console.warn(`Failed to proxy image: ${url}`);
+        return null;
+      }
+
+      const blob = await response.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.warn(`Error fetching image through proxy: ${url}`, error);
+      return null;
+    }
+  };
+
+  // Pre-process element to convert external images to data URLs
+  const preprocessExternalImages = async (element: HTMLElement): Promise<Map<HTMLImageElement, string>> => {
+    const originalSrcs = new Map<HTMLImageElement, string>();
+    const images = element.querySelectorAll("img");
+    
+    const imagePromises = Array.from(images).map(async (img) => {
+      const src = img.src;
+      if (src && !src.startsWith("data:") && !src.startsWith("/") && !src.startsWith(window.location.origin)) {
+        originalSrcs.set(img, src);
+        const dataUrl = await fetchImageAsDataUrl(src);
+        if (dataUrl) {
+          img.src = dataUrl;
+        }
+      }
+    });
+
+    await Promise.all(imagePromises);
+    return originalSrcs;
+  };
+
+  // Restore original image sources
+  const restoreImageSources = (originalSrcs: Map<HTMLImageElement, string>) => {
+    originalSrcs.forEach((src, img) => {
+      img.src = src;
+    });
+  };
+
   const convertElementToBase64 = async (
     className: string,
   ): Promise<string | null> => {
@@ -40,8 +98,13 @@ export default function Header({ url }: { url?: string }) {
       return null;
     }
 
+    let originalSrcs: Map<HTMLImageElement, string> | null = null;
+
     try {
       element.style.scale = "1";
+
+      // Pre-process external images to bypass CORS
+      originalSrcs = await preprocessExternalImages(element);
 
       const dataUrl = await htmlToImage.toSvg(element, {
         quality: 1,
@@ -65,6 +128,11 @@ export default function Header({ url }: { url?: string }) {
       console.log(error);
       console.log("=========================");
       return null;
+    } finally {
+      // Restore original image sources
+      if (originalSrcs) {
+        restoreImageSources(originalSrcs);
+      }
     }
   };
 

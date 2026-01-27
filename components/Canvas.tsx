@@ -286,6 +286,9 @@ export default function Canvas({
     }
   }, [designData.ISBN]);
 
+  const proxyUrl = `/api/proxy?url=${encodeURIComponent("https://" + designData.coverData.front.image.imageUrl.replaceAll("//", ""))}`;
+
+  console.log(proxyUrl);
   return (
     <div className="w-full bg-[#f3edeb] ">
       <div className="flex justify-center items-center h-full gap-0">
@@ -695,6 +698,7 @@ export default function Canvas({
           {designData.coverData.front.backgroundType === "Image" && (
             <>
               <img
+                // src={proxyUrl}
                 src={designData.coverData.front.image.imageUrl}
                 className="w-full h-full absolute top-0 left-0 object-cover"
                 alt=""

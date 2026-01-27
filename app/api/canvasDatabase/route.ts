@@ -10,10 +10,10 @@ export async function POST(request: Request) {
         "content-type": "application/json",
         authorization: "Bearer 8fa412098df1854f20b7607ec869e4d8",
       },
-    }
+    },
   );
 
-  console.log(response);
+  // console.log(response);
   const data = await response.json();
 
   // return Response.json({ hi: "hi" });
