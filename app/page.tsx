@@ -54,9 +54,9 @@ export default function Home() {
         if (data) {
           setDesignData((org) => ({
             // ...org,
-            ...data,
-            coverData,
             backColor: "",
+            coverData,
+            ...data,
           }));
 
           // console.log({

@@ -358,7 +358,7 @@ export default function Header({ url }: { url?: string }) {
               await handleContinue();
               // console.log(links);
             }}
-            disabled={isUploading}
+            disabled={isUploading || isSaving}
             className="bg-[#e45a6a]  rounded-md p-2 text-white flex hover:scale-105 duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isUploading ? (
