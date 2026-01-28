@@ -261,10 +261,22 @@ export default function Header({ url }: { url?: string }) {
         }),
       });
 
-      console.log(post.body);
+      console.log("===========================");
+      console.log({
+        ...designData,
+        coverData: JSON.stringify({
+          ...designData.coverData,
+          backColor: designData.coverData.back.color.colorCode,
+        }),
+        backColor: designData.coverData.back.color.colorCode,
+        ...newLinks,
+      });
+      console.log("===========================");
+
+      // console.log(post.body);
 
       console.log(url);
-      window.location.href = url || "/";
+      // window.location.href = url || "/";
     } catch (error) {
       console.error("Error uploading:", error);
     } finally {

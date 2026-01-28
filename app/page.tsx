@@ -52,6 +52,7 @@ export default function Home() {
 
         // console.log(JSON.parse(data.coverData));
         if (data) {
+          console.log(data);
           setDesignData((org) => ({
             // ...org,
             ...data,
