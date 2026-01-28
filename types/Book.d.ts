@@ -9,6 +9,7 @@ export interface Book {
   backImageUrl?: string;
   splineImageUrl?: string;
   redirect_url: string;
+  backColor: string;
 }
 
 // {

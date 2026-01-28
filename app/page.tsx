@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from "motion/react";
 
 export default function Home() {
   const [selectedView, setSelectedView] = useState<"Front" | "Back" | "Spine">(
-    "Front"
+    "Front",
   );
 
   const { designData, setDesignData } = useDesign()!;
@@ -56,12 +56,13 @@ export default function Home() {
             // ...org,
             ...data,
             coverData,
+            backColor: "",
           }));
 
-          console.log({
-            ...data,
-            coverData,
-          });
+          // console.log({
+          //   ...data,
+          //   coverData,
+          // });
 
           setError(null);
         } else {
@@ -95,7 +96,7 @@ export default function Home() {
     );
   }
 
-  console.log(designData);
+  // console.log(designData);
   return (
     <div className="">
       <AnimatePresence>

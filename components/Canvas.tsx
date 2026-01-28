@@ -288,7 +288,7 @@ export default function Canvas({
 
   const proxyUrl = `/api/proxy?url=${encodeURIComponent("https://" + designData.coverData.front.image.imageUrl.replaceAll("//", ""))}`;
 
-  console.log(proxyUrl);
+  // console.log(proxyUrl);
   return (
     <div className="w-full bg-[#f3edeb] ">
       <div className="flex justify-center items-center h-full gap-0">

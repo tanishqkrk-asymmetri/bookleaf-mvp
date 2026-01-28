@@ -116,6 +116,7 @@ function DesignProvider({ children }: Readonly<{ children: React.ReactNode }>) {
         },
       },
     },
+    backColor: "",
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -138,7 +139,9 @@ function DesignProvider({ children }: Readonly<{ children: React.ReactNode }>) {
     }
 
     const data = await response.json();
-    // console.log(data);
+    console.log("=====================");
+    console.log(data);
+    console.log("=====================");
   }
 
   // Autosave with 1000ms debounce
@@ -162,7 +165,7 @@ function DesignProvider({ children }: Readonly<{ children: React.ReactNode }>) {
       saveTimeoutRef.current = setTimeout(async () => {
         try {
           await saveData();
-          // console.log("Design data autosaved");
+          console.log("Design data autosaved");
         } catch (error) {
           console.error(error);
         } finally {
