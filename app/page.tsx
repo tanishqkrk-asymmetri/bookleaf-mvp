@@ -53,23 +53,17 @@ export default function Home() {
         // console.log(JSON.parse(data.coverData));
         if (data) {
           console.log({
-            // ...org,
             ...data,
-            // backColor: "",
+            backColor:
+              data.backColor || data.coverData.spine.color.colorCode || "",
             coverData,
           });
           setDesignData((org) => ({
-            // ...org,
             ...data,
             backColor:
               org.backColor || org.coverData.spine.color.colorCode || "",
             coverData,
           }));
-
-          // console.log({
-          //   ...data,
-          //   coverData,
-          // });
 
           setError(null);
         } else {
