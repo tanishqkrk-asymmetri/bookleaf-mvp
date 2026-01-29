@@ -54,14 +54,12 @@ export default function Home() {
         if (data) {
           console.log({
             ...data,
-            backColor:
-              data.backColor || data.coverData.spine.color.colorCode || "",
+            backColor: data.backColor || "",
             coverData,
           });
           setDesignData((org) => ({
             ...data,
-            backColor:
-              org.backColor || org.coverData.spine.color.colorCode || "",
+            backColor: org.backColor || "",
             coverData,
           }));
 
