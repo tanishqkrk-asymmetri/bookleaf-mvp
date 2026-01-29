@@ -52,11 +52,17 @@ export default function Home() {
 
         // console.log(JSON.parse(data.coverData));
         if (data) {
-          console.log(data);
+          console.log({
+            // ...org,
+            ...data,
+            // backColor: "",
+            coverData,
+          });
           setDesignData((org) => ({
             // ...org,
             ...data,
-            backColor: "",
+            backColor:
+              org.backColor || org.coverData.spine.color.colorCode || "",
             coverData,
           }));
 

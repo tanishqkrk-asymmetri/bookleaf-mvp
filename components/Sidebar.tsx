@@ -862,6 +862,7 @@ export default function Sidebar({
           },
         },
       },
+      backColor: colorCode,
     }));
   };
 
@@ -876,9 +877,9 @@ export default function Sidebar({
             colorCode: colorCode,
           },
         },
-        backColor: colorCode,
+        // backColor: colorCode,
       },
-      backColor: colorCode,
+      // backColor: colorCode,
     }));
   };
 

@@ -266,9 +266,9 @@ export default function Header({ url }: { url?: string }) {
         ...designData,
         coverData: JSON.stringify({
           ...designData.coverData,
-          backColor: designData.coverData.back.color.colorCode,
+          backColor: designData.coverData.spine.color.colorCode,
         }),
-        backColor: designData.coverData.back.color.colorCode,
+        backColor: designData.coverData.spine.color.colorCode,
         ...newLinks,
       });
       console.log("===========================");
