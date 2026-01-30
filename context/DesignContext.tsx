@@ -131,6 +131,10 @@ function DesignProvider({ children }: Readonly<{ children: React.ReactNode }>) {
       body: JSON.stringify({
         ...designData,
         coverData: JSON.stringify(designData.coverData),
+        backColor:
+          designData.backColor ||
+          designData.coverData.spine.color.colorCode ||
+          "",
       }),
     });
 
