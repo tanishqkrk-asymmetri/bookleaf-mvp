@@ -249,31 +249,41 @@ export default function Header({ url }: { url?: string }) {
 
       setLinks(newLinks);
 
+      let spineColor = designData.backColor;
+
+      if (designData.backColor.length === 0) {
+        spineColor = designData.coverData.spine.color.colorCode;
+        console.log(
+          "Spine set to default:",
+          designData.coverData.spine.color.colorCode,
+        );
+      }
+
       const post = await fetch("/api/saveBook", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
           ...designData,
           coverData: JSON.stringify({ ...designData.coverData }),
+          // backColor: spineColor,
           ...newLinks,
         }),
       });
 
       console.log("===========================");
+      console.log(designData.backColor.length > 0);
+      console.log(designData.coverData.spine.color.colorCode.length > 0);
+      console.log("===========================");
       console.log({
         ...designData,
-        coverData: JSON.stringify({
-          ...designData.coverData,
-          backColor: designData.coverData.spine.color.colorCode,
-        }),
-        backColor: designData.coverData.spine.color.colorCode,
+        coverData: JSON.stringify({ ...designData.coverData }),
         ...newLinks,
       });
-      console.log("===========================");
 
-      // console.log(post.body);
+      console.log("===========================");
 
       console.log(url);
       window.location.href = url || "/";

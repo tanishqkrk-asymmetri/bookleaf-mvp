@@ -51,17 +51,28 @@ export default function Home() {
         const coverData = JSON.parse(data?.coverData);
 
         // console.log(JSON.parse(data.coverData));
+
+        console.log(coverData);
+
+        console.log(coverData.spine.color.colorCode);
+
         if (data) {
-          console.log({
-            ...data,
-            backColor: data.backColor || "",
-            coverData,
-          });
-          setDesignData((org) => ({
-            ...data,
-            backColor: org.backColor || "",
-            coverData,
-          }));
+          if (coverData) {
+            console.log({
+              ...data,
+              backColor: coverData.spine.color.colorCode
+                ? coverData.spine.color.colorCode
+                : "",
+              coverData,
+            });
+            setDesignData((org) => ({
+              ...data,
+              backColor: coverData.spine.color.colorCode
+                ? coverData.spine.color.colorCode
+                : "",
+              coverData,
+            }));
+          }
 
           setError(null);
         } else {
